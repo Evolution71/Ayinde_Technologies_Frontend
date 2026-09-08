@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Production build
+/build
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Testing
+/coverage
+venv/
+__pycache__/
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+*.db 
+# Logs
+npm-debug.log*
+yarn-error.log*
