@@ -175,6 +175,12 @@ const Team = () => {
                     <span key={idx} className="expertise-badge">{exp}</span>
                   ))}
                 </div>
+                {(member.email || member.phone) && (
+                  <div className="member-contact">
+                    {member.email && <a href={`mailto:${member.email}`}>{member.email}</a>}
+                    {member.phone && <span className="member-phone">{member.phone}</span>}
+                  </div>
+                )}
               </div>
             ))}
           </div>

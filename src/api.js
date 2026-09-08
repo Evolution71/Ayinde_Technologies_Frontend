@@ -1,6 +1,6 @@
 // Backend API URL — set REACT_APP_API_URL in a .env file for production;
 // falls back to localhost for local development.
-export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+export const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
 
 const TOKEN_KEY = 'ayinde_token';
 
@@ -34,20 +34,28 @@ async function parseOrThrow(res) {
 }
 
 export const api = {
-  async register(name, email, password) {
+  async register(name, email, password, captchaToken, captchaAnswer) {
     const res = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({
+        name, email, password,
+        captcha_token: captchaToken,
+        captcha_answer: captchaAnswer,
+      }),
     });
     return parseOrThrow(res);
   },
 
-  async login(email, password) {
+  async login(email, password, captchaToken, captchaAnswer) {
     const res = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email, password,
+        captcha_token: captchaToken,
+        captcha_answer: captchaAnswer,
+      }),
     });
     return parseOrThrow(res);
   },
@@ -81,6 +89,15 @@ export const api = {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll`, {
       method: 'POST',
       headers: authHeaders(),
+    });
+    return parseOrThrow(res);
+  },
+
+  async initiatePayment(courseId) {
+    const res = await fetch(`${API_URL}/api/payments/initiate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ course_id: courseId }),
     });
     return parseOrThrow(res);
   },

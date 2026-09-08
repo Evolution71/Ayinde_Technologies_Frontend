@@ -13,13 +13,12 @@ node_modules/
 
 # Testing
 /coverage
-venv/
-__pycache__/
+
 # IDE / OS
 .vscode/
 .idea/
 .DS_Store
-*.db 
+
 # Logs
 npm-debug.log*
 yarn-error.log*
