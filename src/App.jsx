@@ -248,19 +248,19 @@ const Contact = () => {
           <div className="contact-info">
             <div className="info-item">
               <h4>📍 Address</h4>
-              <p>Nigeria</p>
+              <p>United States</p>
             </div>
             <div className="info-item">
               <h4>📞 Phone</h4>
-              <p>+234 (XXX) XXX-XXXX</p>
+              <p>+1949-520-8178</p>
             </div>
             <div className="info-item">
               <h4>📧 Email</h4>
-              <p>info@ayindetech.com</p>
+              <p>info@ayindetechnologies.com</p>
             </div>
             <div className="info-item">
               <h4>🕐 Response Time</h4>
-              <p>Within 24 hours</p>
+              <p>Less than 24 hours</p>
             </div>
           </div>
 
