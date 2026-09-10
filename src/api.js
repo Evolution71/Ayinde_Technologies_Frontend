@@ -102,15 +102,6 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  async verifyPayment(transactionId) {
-    const res = await fetch(`${API_URL}/api/payments/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ transaction_id: transactionId }),
-    });
-    return parseOrThrow(res);
-  },
-
   async getCaptcha() {
     const res = await fetch(`${API_URL}/api/captcha`);
     return parseOrThrow(res);
