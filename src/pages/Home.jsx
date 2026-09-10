@@ -6,7 +6,7 @@ import Captcha from '../components/Captcha';
 import { api } from '../api';
 import heroIllustration from '../assets/hero-illustration.svg';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
 
 // Scrolls to a section when arriving at "/" with a #hash — used when the
 // nav links are clicked from a different page (e.g. /about -> /#services).
@@ -220,7 +220,7 @@ const Contact = () => {
             </div>
             <div className="info-item">
               <h4>📞 Phone</h4>
-              <p><a href="tel:+19495208178">+1 949-520-8178</a></p>
+              <p><a href="tel:+1949-66-7869">+1 949-662-7869</a></p>
             </div>
             <div className="info-item">
               <h4>📧 Email</h4>

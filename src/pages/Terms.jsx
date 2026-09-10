@@ -76,7 +76,7 @@ export default function Terms() {
             <p>
               Questions about these terms can go to{' '}
               <a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a>{' '}
-              or +1 949-520-8178.
+              or +1 949-662-7869.
             </p>
           </div>
         </div>

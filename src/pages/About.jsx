@@ -23,12 +23,12 @@ export default function About() {
             <h2>Built around one idea: technology should follow a plan, not replace one.</h2>
             <p>
               Ayinde Technologies started from a simple observation: most businesses don't fail
-              at technology because the code is bad — they fail because the app, website, or AI
+              at technology because the code is bad they fail because the app, website, or AI
               feature they paid for was never the right thing to build in the first place.
             </p>
             <p>
-              So we work in three stages instead of one. We guide — sitting down with a business,
-              marketing, or proposal plan before touching a keyboard. We build — AI applications
+              So we work in three stages instead of one. We guide sitting down with a business,
+              marketing, or proposal plan before touching a keyboard. We build AI applications
               and websites, from a first working version through to something production-ready.
               And we implement — staying involved through rollout, so the team that has to run
               the thing we built actually can.
@@ -59,7 +59,7 @@ export default function About() {
             </div>
             <div className="value-card">
               <h3>Stay hands-on</h3>
-              <p>Delivery isn't the finish line — we stick around through rollout and adoption.</p>
+              <p>Delivery isn't the finish line - we stick around through rollout and adoption.</p>
             </div>
             <div className="value-card">
               <h3>Teach as we go</h3>

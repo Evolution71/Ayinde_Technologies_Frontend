@@ -1,6 +1,6 @@
 // Backend API URL — set REACT_APP_API_URL in a .env file for production;
 // falls back to localhost for local development.
-export const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.appZ';
+export const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
 
 const TOKEN_KEY = 'ayinde_token';
 
