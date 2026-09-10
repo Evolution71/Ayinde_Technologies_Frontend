@@ -1,0 +1,32 @@
+<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Abstract growth illustration">
+  <defs>
+    <linearGradient id="aboutBar" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#185FA5"/>
+      <stop offset="100%" stop-color="#378ADD"/>
+    </linearGradient>
+    <linearGradient id="aboutGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D85A30" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#F08A5D" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="30" y="30" width="420" height="280" rx="16" fill="#0a0e27"/>
+
+  <!-- rising bars -->
+  <rect x="70" y="220" width="34" height="60" rx="4" fill="url(#aboutBar)" opacity="0.6"/>
+  <rect x="120" y="180" width="34" height="100" rx="4" fill="url(#aboutBar)" opacity="0.75"/>
+  <rect x="170" y="130" width="34" height="150" rx="4" fill="url(#aboutBar)" opacity="0.9"/>
+  <rect x="220" y="90" width="34" height="190" rx="4" fill="url(#aboutBar)"/>
+
+  <!-- orbit / node cluster representing people + tech -->
+  <circle cx="350" cy="150" r="60" fill="none" stroke="#378ADD" stroke-opacity="0.3" stroke-width="1.5"/>
+  <circle cx="350" cy="150" r="14" fill="url(#aboutGlow)"/>
+  <circle cx="395" cy="120" r="8" fill="#378ADD"/>
+  <circle cx="400" cy="180" r="8" fill="#0F6E56"/>
+  <circle cx="310" cy="190" r="7" fill="#378ADD"/>
+  <line x1="350" y1="150" x2="395" y2="120" stroke="#378ADD" stroke-width="1.5" opacity="0.6"/>
+  <line x1="350" y1="150" x2="400" y2="180" stroke="#0F6E56" stroke-width="1.5" opacity="0.6"/>
+  <line x1="350" y1="150" x2="310" y2="190" stroke="#378ADD" stroke-width="1.5" opacity="0.6"/>
+
+  <rect x="70" y="296" width="180" height="8" rx="4" fill="#ffffff" opacity="0.08"/>
+</svg>

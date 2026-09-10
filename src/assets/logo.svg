@@ -1,0 +1,22 @@
+<svg width="280" height="64" viewBox="0 0 280 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ayinde Technologies">
+  <defs>
+    <linearGradient id="markGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#378ADD"/>
+      <stop offset="100%" stop-color="#185FA5"/>
+    </linearGradient>
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F08A5D"/>
+      <stop offset="100%" stop-color="#D85A30"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark: rounded badge with an abstract "A" formed by two strokes meeting at a spark -->
+  <rect x="0" y="4" width="56" height="56" rx="14" fill="#0a0e27"/>
+  <path d="M14 44 L28 16 L34 16 L48 44" fill="none" stroke="url(#markGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="20" y1="34" x2="42" y2="34" stroke="url(#markGrad)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="31" cy="16" r="4.5" fill="url(#sparkGrad)"/>
+
+  <!-- Wordmark -->
+  <text x="70" y="34" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="700" fill="#0a0e27">Ayinde</text>
+  <text x="70" y="54" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="500" fill="#185FA5" letter-spacing="2">TECHNOLOGIES</text>
+</svg>

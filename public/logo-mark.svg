@@ -1,0 +1,16 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ayinde Technologies mark">
+  <defs>
+    <linearGradient id="markGradIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#378ADD"/>
+      <stop offset="100%" stop-color="#185FA5"/>
+    </linearGradient>
+    <linearGradient id="sparkGradIcon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F08A5D"/>
+      <stop offset="100%" stop-color="#D85A30"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#0a0e27"/>
+  <path d="M25 78 L48 26 L58 26 L81 78" fill="none" stroke="url(#markGradIcon)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="35" y1="60" x2="73" y2="60" stroke="url(#markGradIcon)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="53" cy="26" r="8" fill="url(#sparkGradIcon)"/>
+</svg>
