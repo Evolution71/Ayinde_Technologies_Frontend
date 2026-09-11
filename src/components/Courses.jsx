@@ -24,9 +24,11 @@ export default function Courses() {
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [payNote, setPayNote] = useState('');
+  const [activeCourse, setActiveCourse] = useState(null); // course object shown in the detail modal
 
   function loadCourses() {
     setLoading(true);
+    setError('');
     api.getCourses()
       .then(setCourses)
       .catch((e) => setError(e.message))
@@ -36,6 +38,15 @@ export default function Courses() {
   useEffect(() => {
     if (user) loadCourses();
   }, [user]);
+
+  // Keep the modal's data in sync after enroll/pay actions change course state.
+  useEffect(() => {
+    if (activeCourse) {
+      const fresh = courses.find((c) => c.id === activeCourse.id);
+      if (fresh) setActiveCourse(fresh);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courses]);
 
   async function handleEnroll(courseId) {
     setBusyId(courseId);
@@ -67,7 +78,7 @@ export default function Courses() {
     }
   }
 
-  function renderAction(course) {
+  function renderAction(course, size = '') {
     if (course.access_status === 'trial') {
       return <span className="trial-badge">Free trial until {formatTrialEnd(course.trial_ends_at)}</span>;
     }
@@ -76,14 +87,22 @@ export default function Courses() {
     }
     if (course.access_status === 'expired') {
       return (
-        <button className="btn btn-primary" onClick={() => handleUpgrade(course.id)} disabled={busyId === course.id}>
+        <button
+          className={`btn btn-primary ${size}`}
+          onClick={(e) => { e.stopPropagation(); handleUpgrade(course.id); }}
+          disabled={busyId === course.id}
+        >
           {busyId === course.id ? 'Please wait...' : `Pay ${formatPrice(course.price, course.currency)}/mo to continue`}
         </button>
       );
     }
     return (
-      <button className="btn btn-primary" onClick={() => handleEnroll(course.id)} disabled={busyId === course.id}>
-        {busyId === course.id ? 'Enrolling...' : 'Start free trial'}
+      <button
+        className={`btn btn-primary ${size}`}
+        onClick={(e) => { e.stopPropagation(); handleEnroll(course.id); }}
+        disabled={busyId === course.id}
+      >
+        {busyId === course.id ? 'Enrolling...' : 'Enroll to start learning'}
       </button>
     );
   }
@@ -104,25 +123,50 @@ export default function Courses() {
         ) : loading ? (
           <p className="loading">Loading courses...</p>
         ) : error ? (
-          <p className="error-text">{error}</p>
+          <div className="error-block">
+            <p className="error-text">{error}</p>
+            <button className="btn btn-secondary" onClick={loadCourses}>Retry</button>
+          </div>
         ) : (
           <>
             {payNote && <div className="alert alert-error payment-note">{payNote}</div>}
             <div className="courses-grid">
               {courses.map((course) => (
-                <div key={course.id} className="course-card">
+                <div
+                  key={course.id}
+                  className="course-card course-card-clickable"
+                  onClick={() => setActiveCourse(course)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setActiveCourse(course); }}
+                >
                   <div className="course-icon">{course.icon}</div>
                   <h3>{course.title}</h3>
                   <p className="course-level">{course.level} &middot; {course.duration}</p>
-                  <p>{course.description}</p>
+                  <p className="course-desc-preview">{course.description}</p>
                   <p className="course-price">{formatPrice(course.price, course.currency)}/month after trial</p>
-                  {renderAction(course)}
+                  <span className="view-details-hint">View details &amp; enroll →</span>
                 </div>
               ))}
             </div>
           </>
         )}
+
+        {activeCourse && (
+          <div className="modal-overlay" onClick={() => setActiveCourse(null)}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setActiveCourse(null)} aria-label="Close">×</button>
+              <div className="course-icon modal-course-icon">{activeCourse.icon}</div>
+              <h3>{activeCourse.title}</h3>
+              <p className="course-level">{activeCourse.level} &middot; {activeCourse.duration}</p>
+              <p className="modal-description">{activeCourse.description}</p>
+              <p className="course-price">{formatPrice(activeCourse.price, activeCourse.currency)}/month after a 1-month free trial</p>
+              <div className="modal-action">{renderAction(activeCourse, 'btn-large')}</div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
 }
+

@@ -43,7 +43,7 @@ export default function Projects() {
               <div key={project.id} className="project-card">
                 <div className="project-image">{project.image}</div>
                 <h3>{project.title}</h3>
-                <p className="project-client">Client: {project.client}</p>
+                <p className="project-client">{project.client}</p>
                 <p className="project-description">{project.description}</p>
                 <div className="technologies">
                   {project.technologies.map((tech, idx) => (
