@@ -4,8 +4,6 @@ React (Create React App) frontend, now with login, gated Projects/Courses
 sections, and a captcha-protected contact form.
 
 ## Structure
-
-```
 frontend/src/
 ├── App.jsx                    <- page layout (Nav, Hero, Services, Team, Contact, Footer)
 ├── api.js                      <- all backend calls in one place
