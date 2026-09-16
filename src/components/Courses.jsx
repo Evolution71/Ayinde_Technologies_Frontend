@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import AuthForms from './AuthForms';
+import SquarePaymentModal from './SquarePaymentModal';
 
 function formatPrice(price, currency) {
   try {
@@ -24,7 +25,8 @@ export default function Courses() {
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
   const [payNote, setPayNote] = useState('');
-  const [activeCourse, setActiveCourse] = useState(null); // course object shown in the detail modal
+  const [activeCourse, setActiveCourse] = useState(null);
+  const [paymentModal, setPaymentModal] = useState(null); // { clientToken, paymentId, amount, courseName }
 
   function loadCourses() {
     setLoading(true);
@@ -45,7 +47,6 @@ export default function Courses() {
       const fresh = courses.find((c) => c.id === activeCourse.id);
       if (fresh) setActiveCourse(fresh);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [courses]);
 
   async function handleEnroll(courseId) {
@@ -64,18 +65,35 @@ export default function Courses() {
     setBusyId(courseId);
     setPayNote('');
     try {
-      const result = await api.initiatePayment(courseId);
-      if (result.status === 'success' && result.payment_link) {
-        window.location.href = result.payment_link;
-      } else {
-        // Covers both "unavailable" (no Flutterwave key set yet) and "error"
+      // Step 1: Create payment intent and get client token
+      const result = await api.createPaymentIntent(courseId);
+      
+      if (result.status === 'success' && result.client_token) {
+        // Show Square payment modal
+        setPaymentModal({
+          clientToken: result.client_token,
+          paymentId: result.payment_id,
+          amount: result.amount, // in cents
+          courseName: result.course_title,
+        });
+      } else if (result.status === 'trial_active') {
         setPayNote(result.message);
+      } else if (result.status === 'already_enrolled') {
+        setPayNote(result.message);
+      } else {
+        setPayNote(result.message || 'Failed to initiate payment');
       }
     } catch (e) {
       setPayNote(e.message);
     } finally {
       setBusyId(null);
     }
+  }
+
+  function handlePaymentSuccess() {
+    // Payment verified by backend, refresh courses
+    setPaymentModal(null);
+    loadCourses();
   }
 
   function renderAction(course, size = '') {
@@ -92,7 +110,7 @@ export default function Courses() {
           onClick={(e) => { e.stopPropagation(); handleUpgrade(course.id); }}
           disabled={busyId === course.id}
         >
-          {busyId === course.id ? 'Please wait...' : `Pay ${formatPrice(course.price, course.currency)}/mo to continue`}
+          {busyId === course.id ? 'Please wait...' : `Renew access - ${formatPrice(course.price, course.currency)}/year`}
         </button>
       );
     }
@@ -102,7 +120,7 @@ export default function Courses() {
         onClick={(e) => { e.stopPropagation(); handleEnroll(course.id); }}
         disabled={busyId === course.id}
       >
-        {busyId === course.id ? 'Enrolling...' : 'Enroll to start learning'}
+        {busyId === course.id ? 'Enrolling...' : 'Start free trial'}
       </button>
     );
   }
@@ -111,7 +129,7 @@ export default function Courses() {
     <section className="courses" id="courses">
       <div className="container">
         <h2 className="section-title">Online Courses</h2>
-        <p className="section-subtitle">1 month free, then a simple monthly rate to continue</p>
+        <p className="section-subtitle">Start free, then upgrade to continue learning</p>
 
         {authLoading ? (
           <p className="loading">Checking login status...</p>
@@ -144,7 +162,7 @@ export default function Courses() {
                   <h3>{course.title}</h3>
                   <p className="course-level">{course.level} &middot; {course.duration}</p>
                   <p className="course-desc-preview">{course.description}</p>
-                  <p className="course-price">{formatPrice(course.price, course.currency)}/month after trial</p>
+                  <p className="course-price">{formatPrice(course.price, course.currency)}/year after trial</p>
                   <span className="view-details-hint">View details &amp; enroll →</span>
                 </div>
               ))}
@@ -160,13 +178,20 @@ export default function Courses() {
               <h3>{activeCourse.title}</h3>
               <p className="course-level">{activeCourse.level} &middot; {activeCourse.duration}</p>
               <p className="modal-description">{activeCourse.description}</p>
-              <p className="course-price">{formatPrice(activeCourse.price, activeCourse.currency)}/month after a 1-month free trial</p>
+              <p className="course-price">{formatPrice(activeCourse.price, activeCourse.currency)}/year after a 30-day free trial</p>
               <div className="modal-action">{renderAction(activeCourse, 'btn-large')}</div>
             </div>
           </div>
+        )}
+
+        {paymentModal && (
+          <SquarePaymentModal
+            payment={paymentModal}
+            onClose={() => setPaymentModal(null)}
+            onSuccess={handlePaymentSuccess}
+          />
         )}
       </div>
     </section>
   );
 }
-

@@ -93,8 +93,10 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  async initiatePayment(courseId) {
-    const res = await fetch(`${API_URL}/api/payments/initiate`, {
+  // SQUARE PAYMENT - NEW FLOW
+  // Step 1: Create payment intent (get client token)
+  async createPaymentIntent(courseId) {
+    const res = await fetch(`${API_URL}/api/payments/create-intent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ course_id: courseId }),
@@ -102,11 +104,24 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  async verifyPayment(transactionId) {
+  // Step 2: Verify payment after Square SDK completes payment
+  async verifyPayment(paymentId, squarePaymentId, squareReceiptUrl) {
     const res = await fetch(`${API_URL}/api/payments/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ transaction_id: transactionId }),
+      body: JSON.stringify({
+        payment_id: paymentId,
+        square_payment_id: squarePaymentId,
+        square_receipt_url: squareReceiptUrl,
+      }),
+    });
+    return parseOrThrow(res);
+  },
+
+  // Get payment status
+  async getPaymentStatus(paymentId) {
+    const res = await fetch(`${API_URL}/api/payments/${paymentId}`, {
+      headers: authHeaders(),
     });
     return parseOrThrow(res);
   },
