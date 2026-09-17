@@ -1,194 +1,199 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { api } from '../api';
+import React, { useState, useEffect } from 'react';
+import api from '../api';
+import './SquarePaymentModal.css';
 
-/**
- * SquarePaymentModal
- * 
- * Handles payment collection using Square Web Payments SDK.
- * 
- * Flow:
- * 1. Modal opens with client_token
- * 2. Square Web Payments SDK initializes
- * 3. User enters payment method in the form
- * 4. User clicks "Pay Now"
- * 5. SDK requests nonce
- * 6. We send nonce to backend for verification
- * 7. Backend charges and grants access
- * 8. Success or error message
- */
-export default function SquarePaymentModal({ payment, onClose, onSuccess }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
-  const paymentFormRef = useRef(null);
+const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
+  const [clientToken, setClientToken] = useState(null);
+  const [paymentId, setPaymentId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(false);
 
-  useEffect(() => {
-    // Load Square Web Payments SDK
-    loadSquareSDK();
-  }, []);
-
-  async function loadSquareSDK() {
-    // Check if already loaded
-    if (window.Square) {
-      initializePaymentForm();
-      return;
-    }
-
-    // Load script
-    const script = document.createElement('script');
-    script.src = 'https://web.squarecdn.com/v1/square.js';
-    script.async = true;
-    script.onload = initializePaymentForm;
-    script.onerror = () => setError('Failed to load Square payment SDK');
-    document.head.appendChild(script);
-  }
-
-  async function initializePaymentForm() {
+  // Load Square SDK and create payment intent
+  const loadSquareSDK = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
+      // Load Square Web Payments SDK
       if (!window.Square) {
-        setError('Square SDK not available');
-        return;
+        const script = document.createElement('script');
+        script.src = 'https://web.squarecdn.com/v1/square.js';
+        script.async = true;
+        document.head.appendChild(script);
+
+        await new Promise(resolve => {
+          script.onload = resolve;
+        });
       }
 
-      const web = await window.Square.Web.Payments(
-        process.env.REACT_APP_SQUARE_APP_ID
-      );
-
-      // Initialize payment form with client token
-      const paymentForm = web.payments({ clientToken: payment.clientToken });
-
-      // Create card payment method (you can add other methods here)
-      const cardPaymentMethod = await paymentForm.card();
-      await cardPaymentMethod.attach('#sq-card-container');
-
-      paymentFormRef.current = { paymentForm, cardPaymentMethod };
-    } catch (err) {
-      console.error('Error initializing payment form:', err);
-      setError(err.message || 'Failed to initialize payment form');
-    }
-  }
-
-  async function handlePayment(e) {
-    e.preventDefault();
-    
-    if (!paymentFormRef.current) {
-      setError('Payment form not initialized');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const { paymentForm } = paymentFormRef.current;
-
-      // Request payment nonce from Square
-      const result = await paymentForm.requestCardNonce();
-
-      if (result.status === 'OK') {
-        const nonce = result.details.id;
-        const receiptUrl = result.details.receipt?.url || null;
-
-        // Send to backend for verification
-        const verifyResult = await api.verifyPayment(
-          payment.paymentId,
-          nonce,
-          receiptUrl
-        );
-
-        if (verifyResult.status === 'success') {
-          setSuccess(true);
-          setTimeout(() => {
-            onSuccess?.();
-            onClose();
-          }, 2000);
-        } else {
-          setError(verifyResult.message || 'Payment verification failed');
-        }
+      // Create payment intent
+      const response = await api.createPaymentIntent(course.id);
+      
+      if (response.status === 'success') {
+        setClientToken(response.client_token);
+        setPaymentId(response.payment_id);
       } else {
-        setError(result.errors?.[0]?.message || 'Failed to process payment');
+        setError(response.message || 'Failed to create payment intent');
       }
     } catch (err) {
-      console.error('Payment error:', err);
-      setError(err.message || 'Payment failed');
+      console.error('Error loading Square SDK:', err);
+      setError('Failed to initialize payment. Please try again.');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  const amountDisplay = (payment.amount / 100).toFixed(2);
+  // Initialize Square payment on mount
+  useEffect(() => {
+    loadSquareSDK();
+  }, [course.id, user]);
+
+  // Initialize Web Payments SDK when client token is ready
+  useEffect(() => {
+    if (!clientToken || !window.Square) return;
+
+    initializeWebPayments();
+  }, [clientToken]);
+
+  const initializeWebPayments = async () => {
+    try {
+      const payments = window.Square.payments(
+        process.env.REACT_APP_SQUARE_APP_ID
+      );
+
+      // Create card payment method
+      const card = await payments.card();
+      await card.attach('#sq-card-container');
+
+      // Store card instance for later use
+      window.squareCard = card;
+    } catch (err) {
+      console.error('Error initializing card:', err);
+      setError('Failed to initialize card payment');
+    }
+  };
+
+  const handlePayment = async (e) => {
+    e.preventDefault();
+    setProcessing(true);
+    setError(null);
+
+    try {
+      const payments = window.Square.payments(
+        process.env.REACT_APP_SQUARE_APP_ID
+      );
+      const card = window.squareCard;
+
+      // Request card nonce
+      const result = await card.requestCardNonce();
+
+      if (result.status === 'OK') {
+        const nonce = result.details.cardNonce;
+
+        // Complete payment
+        const paymentResult = await api.verifyPayment(
+          paymentId,
+          nonce
+        );
+
+        if (paymentResult.status === 'success') {
+          onSuccess();
+          onClose();
+        } else {
+          setError(paymentResult.message || 'Payment failed. Please try again.');
+        }
+      } else {
+        setError('Failed to process card. Please check your information.');
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
+      setError('Payment failed. Please try again or contact support.');
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-card square-payment-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">×</button>
-
-        <div className="payment-header">
-          <h2>Complete Payment</h2>
-          <p className="course-name">{payment.courseName}</p>
+      <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2>Complete Your Purchase</h2>
+          <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
-        {success ? (
-          <div className="payment-success">
-            <div className="success-icon">✓</div>
-            <h3>Payment Successful!</h3>
-            <p>Your course access is now active. Redirecting...</p>
+        <div className="modal-body">
+          {/* Course Summary */}
+          <div className="course-summary">
+            <div className="summary-item">
+              <span>Course:</span>
+              <span className="summary-value">{course.title}</span>
+            </div>
+            <div className="summary-item">
+              <span>Price:</span>
+              <span className="summary-value">${course.price}</span>
+            </div>
+            <div className="summary-item">
+              <span>Instructor:</span>
+              <span className="summary-value">{course.instructor || 'Expert Instructor'}</span>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handlePayment} className="payment-form">
-            {error && (
-              <div className="alert alert-error">
-                <p>{error}</p>
+
+          {/* Payment Form */}
+          {loading ? (
+            <div className="loading">Initializing payment...</div>
+          ) : error ? (
+            <div className="error-message">{error}</div>
+          ) : (
+            <form onSubmit={handlePayment}>
+              <div className="form-group">
+                <label>Card Details</label>
+                <div id="sq-card-container"></div>
               </div>
-            )}
 
-            <div className="payment-amount">
-              <span className="amount">${amountDisplay}</span>
-              <span className="currency">USD</span>
-            </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="form-input"
+                />
+              </div>
 
-            {/* Square Card Payment Form */}
-            <div className="payment-field-group">
-              <label htmlFor="sq-card-container">Card Details</label>
-              <div id="sq-card-container" className="sq-input"></div>
-            </div>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  value={user?.name || ''}
+                  disabled
+                  className="form-input"
+                />
+              </div>
 
-            {/* Billing Info (Optional - you can add these if needed) */}
-            <div className="payment-note">
-              <p>🔒 Secure payment powered by Square</p>
-              <p>Your card details are encrypted and never stored on our servers</p>
-            </div>
+              <button
+                type="submit"
+                disabled={processing || loading}
+                className="btn-pay"
+              >
+                {processing ? 'Processing...' : `Pay $${course.price}`}
+              </button>
 
-            <button
-              type="submit"
-              className="btn btn-primary btn-large"
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <span className="spinner"></span>
-                  Processing Payment...
-                </>
-              ) : (
-                `Pay $${amountDisplay}`
-              )}
-            </button>
+              <p className="payment-note">
+                Your payment is secure and encrypted. You will have immediate access to the course after payment.
+              </p>
+            </form>
+          )}
+        </div>
 
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-              disabled={loading}
-            >
-              Cancel
-            </button>
-          </form>
-        )}
-
-        <div className="payment-footer">
-          <p>Questions? Email us at support@ayindetechnologies.com</p>
+        <div className="modal-footer">
+          <button className="btn-cancel" onClick={onClose}>
+            Cancel
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SquarePaymentModal;
