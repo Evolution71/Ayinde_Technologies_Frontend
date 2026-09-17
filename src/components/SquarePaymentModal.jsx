@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../api';
-import './SquarePaymentModal.css';
+import { api } from '../api';
 
 const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
   const [clientToken, setClientToken] = useState(null);
@@ -9,45 +8,44 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
 
-  // Load Square SDK and create payment intent
-  const loadSquareSDK = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Load Square Web Payments SDK
-      if (!window.Square) {
-        const script = document.createElement('script');
-        script.src = 'https://web.squarecdn.com/v1/square.js';
-        script.async = true;
-        document.head.appendChild(script);
-
-        await new Promise(resolve => {
-          script.onload = resolve;
-        });
-      }
-
-      // Create payment intent
-      const response = await api.createPaymentIntent(course.id);
-      
-      if (response.status === 'success') {
-        setClientToken(response.client_token);
-        setPaymentId(response.payment_id);
-      } else {
-        setError(response.message || 'Failed to create payment intent');
-      }
-    } catch (err) {
-      console.error('Error loading Square SDK:', err);
-      setError('Failed to initialize payment. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initialize Square payment on mount
+  // Initialize payment on mount
   useEffect(() => {
-    loadSquareSDK();
-  }, [course.id, user]);
+    const initializePayment = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Load Square Web Payments SDK
+        if (!window.Square) {
+          const script = document.createElement('script');
+          script.src = 'https://web.squarecdn.com/v1/square.js';
+          script.async = true;
+          document.head.appendChild(script);
+
+          await new Promise(resolve => {
+            script.onload = resolve;
+          });
+        }
+
+        // Create payment intent
+        const response = await api.createPaymentIntent(course.id);
+        
+        if (response.status === 'success') {
+          setClientToken(response.client_token);
+          setPaymentId(response.payment_id);
+        } else {
+          setError(response.message || 'Failed to create payment intent');
+        }
+      } catch (err) {
+        console.error('Error initializing payment:', err);
+        setError('Failed to initialize payment. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializePayment();
+  }, [course.id]);
 
   // Initialize Web Payments SDK when client token is ready
   useEffect(() => {

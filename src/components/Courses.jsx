@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../AuthContext';
-import api from '../api';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../api';
 import SquarePaymentModal from './SquarePaymentModal';
-import './Courses.css';
 
 const Courses = () => {
   const { user } = useAuth();
@@ -32,31 +31,6 @@ const Courses = () => {
     fetchCourses();
   }, []);
 
-  // Fetch course details and enrollment status when active course changes
-  useEffect(() => {
-    if (!activeCourse) return;
-
-    const fetchCourseDetails = async () => {
-      try {
-        const courseData = await api.getCourseDetail(activeCourse.id);
-        setActiveCourse(courseData);
-
-        // Check enrollment status
-        if (user) {
-          const enrollmentStatus = await api.getEnrollmentStatus(activeCourse.id);
-          setEnrollments(prev => ({
-            ...prev,
-            [activeCourse.id]: enrollmentStatus
-          }));
-        }
-      } catch (err) {
-        console.error('Error fetching course details:', err);
-      }
-    };
-
-    fetchCourseDetails();
-  }, [activeCourse?.id, user]);
-
   const handlePayNow = (course) => {
     if (!user) {
       alert('Please log in to purchase this course');
@@ -71,14 +45,12 @@ const Courses = () => {
       alert('Please log in to enroll');
       return;
     }
-    setActiveCourse(course);
-    // Start trial enrollment
     enrollForTrial(course.id);
   };
 
   const enrollForTrial = async (courseId) => {
     try {
-      await api.enrollCourse(courseId, 'trial');
+      await api.enrollInCourse(courseId);
       setEnrollments(prev => ({
         ...prev,
         [courseId]: { status: 'trial' }
