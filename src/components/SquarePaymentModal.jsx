@@ -78,9 +78,6 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
     setError(null);
 
     try {
-      const payments = window.Square.payments(
-        process.env.REACT_APP_SQUARE_APP_ID
-      );
       const card = window.squareCard;
 
       // Request card nonce
