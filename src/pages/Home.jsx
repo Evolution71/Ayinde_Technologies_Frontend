@@ -6,8 +6,6 @@ import Captcha from '../components/Captcha';
 import { api } from '../api';
 import heroIllustration from '../assets/hero-illustration.svg';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
-
 // Scrolls to a section when arriving at "/" with a #hash — used when the
 // nav links are clicked from a different page (e.g. /about -> /#services).
 function useHashScroll() {
@@ -62,8 +60,7 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/services`)
-      .then(res => res.json())
+    api.getServices()
       .then(data => {
         setServices(data);
         setLoading(false);
@@ -118,8 +115,7 @@ const Team = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/api/team`)
-      .then(res => res.json())
+    api.getTeam()
       .then(data => {
         setTeam(data);
         setLoading(false);

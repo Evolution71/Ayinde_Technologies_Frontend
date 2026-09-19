@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { AlertCircle, CheckCircle2, Clock, Users, Loader } from "lucide-react";
+import { api, getToken } from "../api";
 
 /**
  * CourseEnrollmentCard - Professional course enrollment and payment component
@@ -50,20 +51,7 @@ export function CourseEnrollmentCard({
 
     try {
       // First, enroll in trial
-      const enrollResponse = await fetch("/api/courses/enroll", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify({ course_id: course.id }),
-      });
-
-      if (!enrollResponse.ok) {
-        throw new Error("Failed to start trial");
-      }
-
-      const enrollData = await enrollResponse.json();
+      const enrollData = await api.enrollInCourse(course.id);
       setSuccessMessage(
         `Trial started! Access until ${formatDate(enrollData.trial_ends_at)}`
       );
@@ -86,25 +74,8 @@ export function CourseEnrollmentCard({
     setError(null);
 
     try {
-      // Initiate payment via Flutterwave
-      const paymentResponse = await fetch("/api/payments/initiate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify({
-          course_id: course.id,
-          redirect_url: `${window.location.origin}/payment/verify`,
-        }),
-      });
-
-      if (!paymentResponse.ok) {
-        const errorData = await paymentResponse.json();
-        throw new Error(errorData.detail || "Failed to initiate payment");
-      }
-
-      const paymentData = await paymentResponse.json();
+      // Initiate payment
+      const paymentData = await api.initiatePayment(course.id);
 
       if (paymentData.status === "trial_active") {
         setError(paymentData.message);
@@ -117,7 +88,7 @@ export function CourseEnrollmentCard({
       }
 
       if (paymentData.payment_link) {
-        // Redirect to Flutterwave hosted payment page
+        // Redirect to payment page
         window.location.href = paymentData.payment_link;
       }
     } catch (err) {
