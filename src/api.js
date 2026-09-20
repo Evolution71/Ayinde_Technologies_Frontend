@@ -95,12 +95,12 @@ export const api = {
   },
 
   async getProjects() {
-    const res = await fetch(`${API_URL}/api/projects/`, { headers: authHeaders() });
+    const res = await fetch(`${API_URL}/api/projects/`);
     return parseOrThrow(res);
   },
 
   async getCourses() {
-    const res = await fetch(`${API_URL}/api/courses/`, { headers: authHeaders() });
+    const res = await fetch(`${API_URL}/api/courses/`);
     return parseOrThrow(res);
   },
 
@@ -113,7 +113,7 @@ export const api = {
   },
 
   async initiatePayment(courseId) {
-    const res = await fetch(`${API_URL}/api/payments/initiate/`, {
+    const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ course_id: courseId }),
