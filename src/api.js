@@ -95,7 +95,7 @@ export const api = {
   },
 
   async getProjects() {
-    const res = await fetch(`${API_URL}/api/projects/`);
+    const res = await fetch(`${API_URL}/api/projects/`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
