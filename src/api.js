@@ -1,6 +1,25 @@
-// Backend API URL — set REACT_APP_API_URL in a .env file for production;
-// falls back to localhost for local development.
-export const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
+// Backend API URL — HTTPS enforced, with fallback
+// Ensures the URL always starts with https://
+function getApiUrl() {
+  const envUrl = process.env.REACT_APP_API_URL;
+  
+  // If env var exists, use it
+  if (envUrl) {
+    // Ensure it has https:// protocol
+    if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+      // Already has protocol, return as-is
+      return envUrl;
+    } else {
+      // No protocol, add https://
+      return `https://${envUrl}`;
+    }
+  }
+  
+  // Fallback for development
+  return 'https://ayindetechnologiesbackend-production.up.railway.app';
+}
+
+export const API_URL = getApiUrl();
 
 const TOKEN_KEY = 'ayinde_token';
 
