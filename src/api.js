@@ -54,7 +54,7 @@ async function parseOrThrow(res) {
 
 export const api = {
   async register(name, email, password, captchaToken, captchaAnswer) {
-    const res = await fetch(`${API_URL}/api/auth/register/`, {
+    const res = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -67,7 +67,7 @@ export const api = {
   },
 
   async login(email, password, captchaToken, captchaAnswer) {
-    const res = await fetch(`${API_URL}/api/auth/login/`, {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -80,42 +80,40 @@ export const api = {
   },
 
   async me() {
-    const res = await fetch(`${API_URL}/api/auth/me/`, { headers: authHeaders() });
+    const res = await fetch(`${API_URL}/api/auth/me`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
   async getServices() {
-    const res = await fetch(`${API_URL}/api/services/`);
+    const res = await fetch(`${API_URL}/api/services`);
     return parseOrThrow(res);
   },
 
   async getTeam() {
-    const res = await fetch(`${API_URL}/api/team/`);
+    const res = await fetch(`${API_URL}/api/team`);
     return parseOrThrow(res);
   },
 
   async getProjects() {
-    const res = await fetch(`${API_URL}/api/projects/`, { headers: authHeaders() });
+    const res = await fetch(`${API_URL}/api/projects`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
   async getCourses() {
-    const res = await fetch(`${API_URL}/api/courses/`, { headers: authHeaders() });
+    const res = await fetch(`${API_URL}/api/courses`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
   async enrollInCourse(courseId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll`, {
       method: 'POST',
       headers: authHeaders(),
     });
     return parseOrThrow(res);
   },
 
-  // SQUARE PAYMENT - NEW FLOW
-  // Step 1: Create payment intent (get client token)
-  async createPaymentIntent(courseId) {
-    const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
+  async initiatePayment(courseId) {
+    const res = await fetch(`${API_URL}/api/payments/initiate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ course_id: courseId }),
@@ -123,35 +121,22 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // Step 2: Verify payment after Square SDK completes payment
-  async verifyPayment(paymentId, squarePaymentId, squareReceiptUrl) {
-    const res = await fetch(`${API_URL}/api/payments/verify/`, {
+  async verifyPayment(transactionId) {
+    const res = await fetch(`${API_URL}/api/payments/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({
-        payment_id: paymentId,
-        square_payment_id: squarePaymentId,
-        square_receipt_url: squareReceiptUrl,
-      }),
-    });
-    return parseOrThrow(res);
-  },
-
-  // Get payment status
-  async getPaymentStatus(paymentId) {
-    const res = await fetch(`${API_URL}/api/payments/${paymentId}/`, {
-      headers: authHeaders(),
+      body: JSON.stringify({ transaction_id: transactionId }),
     });
     return parseOrThrow(res);
   },
 
   async getCaptcha() {
-    const res = await fetch(`${API_URL}/api/captcha/`);
+    const res = await fetch(`${API_URL}/api/captcha`);
     return parseOrThrow(res);
   },
 
   async submitContact(payload) {
-    const res = await fetch(`${API_URL}/api/contact/`, {
+    const res = await fetch(`${API_URL}/api/contact`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
