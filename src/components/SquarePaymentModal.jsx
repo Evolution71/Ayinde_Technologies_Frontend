@@ -27,8 +27,8 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
           });
         }
 
-        // Create payment intent
-        const response = await api.createPaymentIntent(course.id);
+        // Create payment intent - FIXED: Use correct API function name
+        const response = await api.initiatePayment(course.id);
         
         if (response.status === 'success') {
           setClientToken(response.client_token);
