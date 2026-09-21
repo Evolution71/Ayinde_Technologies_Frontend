@@ -18,6 +18,22 @@ export default function Projects() {
       .finally(() => setLoading(false));
   }, [user]);
 
+  // Helper function to convert technologies string to array
+  const parseTechnologies = (technologies) => {
+    if (typeof technologies === 'string') {
+      return technologies.split(',').map(t => t.trim()).filter(t => t);
+    }
+    return Array.isArray(technologies) ? technologies : [];
+  };
+
+  // Helper function to convert results string to array
+  const parseResults = (results) => {
+    if (typeof results === 'string') {
+      return results.split(',').map(r => r.trim()).filter(r => r);
+    }
+    return Array.isArray(results) ? results : [];
+  };
+
   return (
     <section className="projects" id="projects">
       <div className="container">
@@ -39,29 +55,39 @@ export default function Projects() {
           <p className="error-text">{error}</p>
         ) : (
           <div className="projects-grid">
-            {projects.map((project) => (
-              <div key={project.id} className="project-card">
-                <div className="project-image">{project.image}</div>
-                <h3>{project.title}</h3>
-                <p className="project-client">{project.client}</p>
-                <p className="project-description">{project.description}</p>
-                <div className="technologies">
-                  {project.technologies.map((tech, idx) => (
-                    <span key={idx} className="tech-badge">{tech}</span>
-                  ))}
+            {projects.map((project) => {
+              const technologiesList = parseTechnologies(project.technologies);
+              const resultsList = parseResults(project.results);
+              
+              return (
+                <div key={project.id} className="project-card">
+                  <div className="project-image">{project.image}</div>
+                  <h3>{project.title}</h3>
+                  <p className="project-client">{project.client}</p>
+                  <p className="project-description">{project.description}</p>
+                  <div className="technologies">
+                    {technologiesList.map((tech, idx) => (
+                      <span key={idx} className="tech-badge">{tech}</span>
+                    ))}
+                  </div>
+                  <div className="results">
+                    {resultsList.map((result, idx) => (
+                      <p key={idx} className="result-item">✓ {result}</p>
+                    ))}
+                  </div>
+                  {project.app_url && (
+                    <a 
+                      href={project.app_url} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="btn btn-secondary"
+                    >
+                      Open app
+                    </a>
+                  )}
                 </div>
-                <div className="results">
-                  {project.results.map((result, idx) => (
-                    <p key={idx} className="result-item">✓ {result}</p>
-                  ))}
-                </div>
-                {project.app_url && (
-                  <a href={project.app_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
-                    Open app
-                  </a>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
