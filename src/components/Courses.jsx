@@ -31,9 +31,10 @@ const Courses = () => {
       try {
         setLoading(true);
         const data = await api.getCourses();
+        console.log('✅ Courses loaded:', data.length);
         setCourses(data);
       } catch (err) {
-        console.error('Error fetching courses:', err);
+        console.error('❌ Error fetching courses:', err);
         setError('Failed to load courses');
       } finally {
         setLoading(false);
@@ -94,67 +95,71 @@ const Courses = () => {
         <p>Learn from our expert instructors and advance your skills</p>
 
         <div className="courses-grid">
-          {courses.map(course => {
-            const isEnrolled = enrollments[course.id];
-            const hasPaid = isEnrolled?.status === 'active';
+          {courses.length === 0 ? (
+            <p>No courses available at the moment.</p>
+          ) : (
+            courses.map(course => {
+              const isEnrolled = enrollments[course.id];
+              const hasPaid = isEnrolled?.status === 'active';
 
-            return (
-              <div key={course.id} className="course-card">
-                <div className="course-header">
-                  <h3>{course.title}</h3>
-                </div>
-
-                <div className="course-body">
-                  <p className="course-description">{course.description}</p>
-                  <p className="course-instructor">
-                    <strong>Instructor:</strong> {course.instructor}
-                  </p>
-
-                  <div className="course-meta">
-                    <span className="level">{course.level}</span>
-                    <span className="duration">{course.duration_hours} hours</span>
+              return (
+                <div key={course.id} className="course-card">
+                  <div className="course-header">
+                    <h3>{course.title}</h3>
                   </div>
-                </div>
 
-                <div className="course-footer">
-                  <span className="price">${course.price}</span>
+                  <div className="course-body">
+                    <p className="course-description">{course.description}</p>
+                    <p className="course-instructor">
+                      <strong>Instructor:</strong> {course.instructor}
+                    </p>
 
-                  <div className="course-buttons">
-                    {!isEnrolled ? (
-                      <>
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => handleEnroll(course)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          Start Free Trial
+                    <div className="course-meta">
+                      <span className="level">{course.level}</span>
+                      <span className="duration">{course.duration}</span>
+                    </div>
+                  </div>
+
+                  <div className="course-footer">
+                    <span className="price">${course.price}</span>
+
+                    <div className="course-buttons">
+                      {!isEnrolled ? (
+                        <>
+                          <button
+                            className="btn btn-primary"
+                            onClick={() => handleEnroll(course)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Start Free Trial
+                          </button>
+                          <button
+                            className="btn btn-secondary"
+                            onClick={() => handlePayNow(course)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            Buy Now
+                          </button>
+                        </>
+                      ) : hasPaid ? (
+                        <button className="btn btn-success" disabled>
+                          ✓ Enrolled
                         </button>
+                      ) : (
                         <button
-                          className="btn btn-secondary"
+                          className="btn btn-warning"
                           onClick={() => handlePayNow(course)}
                           style={{ cursor: 'pointer' }}
                         >
-                          Buy Now
+                          Upgrade to Full Access
                         </button>
-                      </>
-                    ) : hasPaid ? (
-                      <button className="btn btn-success" disabled>
-                        ✓ Enrolled
-                      </button>
-                    ) : (
-                      <button
-                        className="btn btn-warning"
-                        onClick={() => handlePayNow(course)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        Upgrade to Full Access
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -167,13 +172,13 @@ const Courses = () => {
             </div>
             <div className="modal-body">
               <p>Price: <strong>${activeCourse.price}</strong></p>
-              <p>This is a placeholder for payment processing.</p>
+              <p>Complete your payment to access this course.</p>
               <button 
                 className="btn btn-primary"
                 onClick={handlePaymentSuccess}
                 style={{ cursor: 'pointer' }}
               >
-                Simulate Payment
+                Complete Payment
               </button>
             </div>
           </div>
