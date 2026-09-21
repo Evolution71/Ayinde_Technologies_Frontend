@@ -7,43 +7,65 @@ import { api } from '../api';
  * pull a new one (used after a failed submission).
  */
 const Captcha = forwardRef(function Captcha(_props, ref) {
-  const [token, setToken] = useState(null);
-  const [image, setImage] = useState(null);
+  const [captchaId, setCaptchaId] = useState(null);
+  const [challenge, setChallenge] = useState(null);
   const [answer, setAnswer] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   async function load() {
     try {
+      setLoading(true);
       const data = await api.getCaptcha();
-      setToken(data.token);
-      setImage(data.image);
+      // Backend returns: { captcha_id, captcha_image }
+      setCaptchaId(data.captcha_id);
+      setChallenge(data.captcha_image);
       setAnswer('');
       setError('');
     } catch (e) {
+      console.error('Captcha load error:', e);
       setError("Couldn't load the captcha — is the backend running?");
+    } finally {
+      setLoading(false);
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    load(); 
+  }, []);
 
   useImperativeHandle(ref, () => ({
-    getToken: () => token,
+    getToken: () => captchaId,
     getAnswer: () => answer,
     refresh: load,
   }));
 
+  if (loading) {
+    return <div className="captcha-widget"><p>Loading captcha...</p></div>;
+  }
+
   return (
     <div className="captcha-widget">
-      <label htmlFor="captcha-input">Type the code shown</label>
+      <label htmlFor="captcha-input">Solve this challenge</label>
       <div className="captcha-row">
-        {image && <img src={image} alt="Captcha challenge" className="captcha-image" />}
-        <button type="button" className="captcha-refresh" onClick={load} title="Get a new code">
+        {challenge && (
+          <div className="captcha-challenge">
+            {challenge}
+          </div>
+        )}
+        <button 
+          type="button" 
+          className="captcha-refresh" 
+          onClick={load} 
+          title="Get a new challenge"
+        >
           &#8635;
         </button>
       </div>
       <input
         id="captcha-input"
         type="text"
+        placeholder="Enter the answer"
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
         autoComplete="off"
