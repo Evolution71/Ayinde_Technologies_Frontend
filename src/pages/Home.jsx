@@ -80,6 +80,14 @@ const Services = () => {
     zap: '⚡'
   };
 
+  // Helper function to convert features string to array
+  const parseFeatures = (features) => {
+    if (typeof features === 'string') {
+      return features.split(',').map(f => f.trim()).filter(f => f);
+    }
+    return Array.isArray(features) ? features : [];
+  };
+
   return (
     <section className="services" id="services">
       <div className="container">
@@ -90,18 +98,21 @@ const Services = () => {
           <p className="loading">Loading services...</p>
         ) : (
           <div className="services-grid">
-            {services.map(service => (
-              <div key={service.id} className="service-card">
-                <div className="service-icon">{icons[service.icon]}</div>
-                <h3>{service.name}</h3>
-                <p>{service.description}</p>
-                <ul className="features-list">
-                  {service.features.map((feature, idx) => (
-                    <li key={idx}>✓ {feature}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {services.map(service => {
+              const featuresList = parseFeatures(service.features);
+              return (
+                <div key={service.id} className="service-card">
+                  <div className="service-icon">{icons[service.icon]}</div>
+                  <h3>{service.name}</h3>
+                  <p>{service.description}</p>
+                  <ul className="features-list">
+                    {featuresList.map((feature, idx) => (
+                      <li key={idx}>✓ {feature}</li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -126,6 +137,14 @@ const Team = () => {
       });
   }, []);
 
+  // Helper function to convert expertise string to array
+  const parseExpertise = (expertise) => {
+    if (typeof expertise === 'string') {
+      return expertise.split(',').map(e => e.trim()).filter(e => e);
+    }
+    return Array.isArray(expertise) ? expertise : [];
+  };
+
   return (
     <section className="team" id="team">
       <div className="container">
@@ -136,25 +155,28 @@ const Team = () => {
           <p className="loading">Loading team...</p>
         ) : (
           <div className="team-grid">
-            {team.map(member => (
-              <div key={member.id} className="team-card">
-                <div className="member-avatar">{member.image}</div>
-                <h3>{member.name}</h3>
-                <p className="member-role">{member.role}</p>
-                <p className="member-bio">{member.bio}</p>
-                <div className="expertise">
-                  {member.expertise.map((exp, idx) => (
-                    <span key={idx} className="expertise-badge">{exp}</span>
-                  ))}
-                </div>
-                {(member.email || member.phone) && (
-                  <div className="member-contact">
-                    {member.email && <a href={`mailto:${member.email}`}>{member.email}</a>}
-                    {member.phone && <span className="member-phone">{member.phone}</span>}
+            {team.map(member => {
+              const expertiseList = parseExpertise(member.expertise);
+              return (
+                <div key={member.id} className="team-card">
+                  <div className="member-avatar">{member.image}</div>
+                  <h3>{member.name}</h3>
+                  <p className="member-role">{member.role}</p>
+                  <p className="member-bio">{member.bio}</p>
+                  <div className="expertise">
+                    {expertiseList.map((exp, idx) => (
+                      <span key={idx} className="expertise-badge">{exp}</span>
+                    ))}
                   </div>
-                )}
-              </div>
-            ))}
+                  {(member.email || member.phone) && (
+                    <div className="member-contact">
+                      {member.email && <a href={`mailto:${member.email}`}>{member.email}</a>}
+                      {member.phone && <span className="member-phone">{member.phone}</span>}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
