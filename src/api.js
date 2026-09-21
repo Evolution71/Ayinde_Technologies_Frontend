@@ -112,20 +112,29 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  async initiatePayment(courseId) {
+  // FIXED: Now sends amount and currency along with course_id
+  async initiatePayment(courseId, amount, currency = 'USD') {
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ course_id: courseId }),
+      body: JSON.stringify({ 
+        course_id: courseId,
+        amount: amount,
+        currency: currency
+      }),
     });
     return parseOrThrow(res);
   },
 
-  async verifyPayment(transactionId) {
+  // FIXED: Now sends payment_id and nonce instead of transaction_id
+  async verifyPayment(paymentId, nonce) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ transaction_id: transactionId }),
+      body: JSON.stringify({ 
+        payment_id: paymentId,
+        nonce: nonce
+      }),
     });
     return parseOrThrow(res);
   },

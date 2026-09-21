@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 
-const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
+const SquarePaymentModal = ({ course, onClose }) => {
   const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -27,25 +27,28 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
           });
         }
 
-        // Create payment intent - FIXED: Use correct API function name
-        const response = await api.initiatePayment(course.id);
+        // Create payment intent with amount and currency
+        // FIXED: Pass amount and currency to initiatePayment
+        const response = await api.initiatePayment(
+          course.id,
+          course.price,
+          course.currency || 'USD'
+        );
         
-        if (response.status === 'success') {
-          setClientToken(response.client_token);
-          setPaymentId(response.payment_id);
-        } else {
-          setError(response.message || 'Failed to create payment intent');
-        }
+        // Response should have: { client_token, payment_id, ... }
+        setClientToken(response.client_token);
+        setPaymentId(response.payment_id);
+        setError(null);
       } catch (err) {
         console.error('Error initializing payment:', err);
-        setError('Failed to initialize payment. Please try again.');
+        setError(err.message || 'Failed to initialize payment. Please try again.');
       } finally {
         setLoading(false);
       }
     };
 
     initializePayment();
-  }, [course.id]);
+  }, [course.id, course.price, course.currency]);
 
   // Initialize Web Payments SDK when client token is ready
   useEffect(() => {
@@ -78,6 +81,10 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
     setError(null);
 
     try {
+      if (!window.squareCard) {
+        throw new Error('Card not initialized');
+      }
+
       const card = window.squareCard;
 
       // Request card nonce
@@ -87,23 +94,24 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
         const nonce = result.details.cardNonce;
 
         // Complete payment
+        // FIXED: Pass payment_id and nonce instead of transaction_id
         const paymentResult = await api.verifyPayment(
           paymentId,
           nonce
         );
 
-        if (paymentResult.status === 'success') {
-          onSuccess();
+        if (paymentResult.success || paymentResult.status === 'success') {
+          alert('✅ Payment successful! You are now enrolled in the course.');
           onClose();
         } else {
-          setError(paymentResult.message || 'Payment failed. Please try again.');
+          setError(paymentResult.message || 'Payment verification failed. Please try again.');
         }
       } else {
-        setError('Failed to process card. Please check your information.');
+        setError('Failed to process card. Please check your information and try again.');
       }
     } catch (err) {
       console.error('Payment error:', err);
-      setError('Payment failed. Please try again or contact support.');
+      setError(err.message || 'Payment failed. Please try again or contact support.');
     } finally {
       setProcessing(false);
     }
@@ -124,21 +132,40 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
               <span>Course:</span>
               <span className="summary-value">{course.title}</span>
             </div>
+            {course.description && (
+              <div className="summary-item">
+                <span>Description:</span>
+                <span className="summary-value">{course.description}</span>
+              </div>
+            )}
             <div className="summary-item">
               <span>Price:</span>
-              <span className="summary-value">${course.price}</span>
+              <span className="summary-value">
+                {course.currency || 'USD'} {course.price.toFixed(2)}
+              </span>
             </div>
-            <div className="summary-item">
-              <span>Instructor:</span>
-              <span className="summary-value">{course.instructor || 'Expert Instructor'}</span>
-            </div>
+            {course.instructor && (
+              <div className="summary-item">
+                <span>Instructor:</span>
+                <span className="summary-value">{course.instructor}</span>
+              </div>
+            )}
           </div>
 
           {/* Payment Form */}
           {loading ? (
-            <div className="loading">Initializing payment...</div>
+            <div className="loading">Initializing payment system...</div>
           ) : error ? (
-            <div className="error-message">{error}</div>
+            <div className="error-message">
+              <p>❌ {error}</p>
+              <button 
+                type="button"
+                className="btn btn-secondary" 
+                onClick={() => window.location.reload()}
+              >
+                Retry
+              </button>
+            </div>
           ) : (
             <form onSubmit={handlePayment}>
               <div className="form-group">
@@ -146,35 +173,26 @@ const SquarePaymentModal = ({ course, user, onClose, onSuccess }) => {
                 <div id="sq-card-container"></div>
               </div>
 
-              <div className="form-group">
-                <label>Email</label>
-                <input
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  value={user?.name || ''}
-                  disabled
-                  className="form-input"
-                />
-              </div>
-
               <button
                 type="submit"
                 disabled={processing || loading}
                 className="btn-pay"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  marginTop: '20px',
+                  backgroundColor: '#1e40af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  opacity: processing ? 0.7 : 1
+                }}
               >
-                {processing ? 'Processing...' : `Pay $${course.price}`}
+                {processing ? 'Processing...' : `Pay ${course.currency || 'USD'} ${course.price.toFixed(2)}`}
               </button>
 
-              <p className="payment-note">
+              <p className="payment-note" style={{ fontSize: '12px', marginTop: '12px', textAlign: 'center', color: '#666' }}>
                 Your payment is secure and encrypted. You will have immediate access to the course after payment.
               </p>
             </form>
