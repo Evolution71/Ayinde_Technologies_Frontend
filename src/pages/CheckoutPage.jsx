@@ -14,30 +14,8 @@ const CheckoutPage = () => {
   const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
 
-  // Fetch course data
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const courses = await api.getCourses();
-        const selected = courses.find(c => c.id === parseInt(courseId));
-        if (!selected) {
-          setError('Course not found');
-        } else {
-          setCourse(selected);
-          initializePayment(selected);
-        }
-      } catch (err) {
-        setError(err.message || 'Failed to load course');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourse();
-  }, [courseId]);
-
   // Initialize payment
-  const initializePayment = async (courseData) => {
+  const initializePayment = React.useCallback(async (courseData) => {
     try {
       console.log('[Checkout] Initializing payment...');
       
@@ -58,10 +36,31 @@ const CheckoutPage = () => {
       console.error('[Checkout] Payment init error:', err);
       setError(err.message || 'Failed to initialize payment');
     }
-  };
+  }, []);
+
+  // Fetch course data
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        const courses = await api.getCourses();
+        const selected = courses.find(c => c.id === parseInt(courseId));
+        if (!selected) {
+          setError('Course not found');
+        } else {
+          setCourse(selected);
+          initializePayment(selected);
+        }
+      } catch (err) {
+        setError(err.message || 'Failed to load course');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourse();
+  }, [courseId, initializePayment]);
 
   // Load and initialize Square SDK
-  const loadSquareSDK = async (token) => {
+  const loadSquareSDK = React.useCallback(async (token) => {
     try {
       console.log('[Checkout] Loading Square SDK...');
       
@@ -89,10 +88,10 @@ const CheckoutPage = () => {
       console.error('[Checkout] SDK loading error:', err);
       setError('Failed to initialize payment system');
     }
-  };
+  }, []);
 
   // Initialize card form
-  const initializeCard = async (token) => {
+  const initializeCard = React.useCallback(async (token) => {
     try {
       console.log('[Checkout] Initializing card form with token...');
       
@@ -119,7 +118,7 @@ const CheckoutPage = () => {
       console.error('[Checkout] Card initialization error:', err);
       setError(`Failed to initialize card form: ${err.message}`);
     }
-  };
+  }, []);
 
   const handlePayment = async (e) => {
     e.preventDefault();
