@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api';
-import '../styles/checkout.css';
+import '../checkout.css';
 
 const CheckoutPage = () => {
   const { courseId } = useParams();
@@ -38,18 +38,8 @@ const CheckoutPage = () => {
   // Initialize payment
   const initializePayment = async (courseData) => {
     try {
-      // Load Square SDK
-      if (!window.Square) {
-        const script = document.createElement('script');
-        script.src = 'https://web.squarecdn.com/v1/square.js';
-        script.async = true;
-        document.head.appendChild(script);
-
-        await new Promise(resolve => {
-          script.onload = resolve;
-        });
-      }
-
+      console.log('[Checkout] Initializing payment...');
+      
       // Create payment intent
       const response = await api.initiatePayment(
         courseData.id,
@@ -57,30 +47,78 @@ const CheckoutPage = () => {
         courseData.currency || 'USD'
       );
 
+      console.log('[Checkout] Payment response:', response);
       setClientToken(response.client_token);
       setPaymentId(response.payment_id);
+      
+      // Load Square SDK after getting client token
+      loadSquareSDK(response.client_token);
     } catch (err) {
+      console.error('[Checkout] Payment init error:', err);
       setError(err.message || 'Failed to initialize payment');
     }
   };
 
-  // Initialize card when client token is ready
-  useEffect(() => {
-    if (!clientToken || !window.Square) return;
-
-    const initializeCard = async () => {
-      try {
-        const payments = window.Square.payments(process.env.REACT_APP_SQUARE_APP_ID);
-        const card = await payments.card();
-        await card.attach('#sq-card-container');
-        window.squareCard = card;
-      } catch (err) {
-        setError('Failed to initialize payment form');
+  // Load and initialize Square SDK
+  const loadSquareSDK = async (token) => {
+    try {
+      console.log('[Checkout] Loading Square SDK...');
+      
+      if (!window.Square) {
+        const script = document.createElement('script');
+        script.src = 'https://web.squarecdn.com/v1/square.js';
+        script.async = true;
+        
+        script.onload = () => {
+          console.log('[Checkout] Square SDK loaded');
+          initializeCard(token);
+        };
+        
+        script.onerror = () => {
+          console.error('[Checkout] Failed to load Square SDK');
+          setError('Failed to load payment system. Please refresh and try again.');
+        };
+        
+        document.head.appendChild(script);
+      } else {
+        console.log('[Checkout] Square SDK already loaded');
+        initializeCard(token);
       }
-    };
+    } catch (err) {
+      console.error('[Checkout] SDK loading error:', err);
+      setError('Failed to initialize payment system');
+    }
+  };
 
-    initializeCard();
-  }, [clientToken]);
+  // Initialize card form
+  const initializeCard = async (token) => {
+    try {
+      console.log('[Checkout] Initializing card form with token...');
+      
+      const appId = process.env.REACT_APP_SQUARE_APP_ID;
+      console.log('[Checkout] Square App ID:', appId ? 'Set' : 'NOT SET ⚠️');
+      
+      if (!appId) {
+        setError('Payment system not configured. Contact support.');
+        return;
+      }
+
+      const payments = window.Square.payments(appId);
+      console.log('[Checkout] Payments instance created');
+      
+      const card = await payments.card();
+      console.log('[Checkout] Card form created');
+      
+      await card.attach('#sq-card-container');
+      console.log('[Checkout] Card form attached to DOM');
+      
+      window.squareCard = card;
+      setError(null);
+    } catch (err) {
+      console.error('[Checkout] Card initialization error:', err);
+      setError(`Failed to initialize card form: ${err.message}`);
+    }
+  };
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -89,20 +127,21 @@ const CheckoutPage = () => {
 
     try {
       if (!window.squareCard) {
-        throw new Error('Card not ready');
+        throw new Error('Payment form not ready');
       }
 
-      // Request nonce
+      console.log('[Checkout] Requesting card nonce...');
       const result = await window.squareCard.requestCardNonce();
 
       if (result.status === 'OK') {
         const nonce = result.details.cardNonce;
+        console.log('[Checkout] Nonce received, verifying payment...');
 
         // Verify payment
         const paymentResult = await api.verifyPayment(paymentId, nonce);
 
         if (paymentResult.success || paymentResult.status === 'success') {
-          // Success! Redirect to dashboard
+          console.log('[Checkout] Payment successful!');
           setTimeout(() => {
             navigate('/');
             alert('✅ Payment successful! You are now enrolled in the course.');
@@ -111,9 +150,11 @@ const CheckoutPage = () => {
           setError(paymentResult.message || 'Payment verification failed');
         }
       } else {
+        console.error('[Checkout] Card nonce error:', result);
         setError('Failed to process card. Please check your information.');
       }
     } catch (err) {
+      console.error('[Checkout] Payment error:', err);
       setError(err.message || 'Payment failed. Please try again.');
     } finally {
       setProcessing(false);
@@ -182,7 +223,7 @@ const CheckoutPage = () => {
             </div>
           )}
 
-          {clientToken ? (
+          {!error && clientToken ? (
             <form onSubmit={handlePayment}>
               <div className="form-group">
                 <label htmlFor="sq-card-container">Card Information</label>
