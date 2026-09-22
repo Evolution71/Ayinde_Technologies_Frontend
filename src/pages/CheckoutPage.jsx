@@ -16,6 +16,7 @@ const CheckoutPage = () => {
 
   // Refs to track component state
   const cardRef = useRef(null);
+  const paymentsRef = useRef(null);
   const isMountedRef = useRef(true);
 
   // Main initialization effect
@@ -132,7 +133,8 @@ const CheckoutPage = () => {
         
         if (!isActive) return;
 
-        // Store card instance for later attachment (after DOM renders)
+        // Store both payments and card instances
+        window.squarePayments = payments;
         window.squareCard = cardInstance;
 
         console.log('[Checkout] ✅ Checkout initialized successfully');
@@ -159,23 +161,37 @@ const CheckoutPage = () => {
 
   // Attach card form once clientToken is set and DOM is ready
   useEffect(() => {
-    if (!clientToken || !window.squareCard) return;
+    if (!clientToken || !window.squareCard) {
+      console.log('[Checkout] Waiting for clientToken or squareCard...');
+      return;
+    }
 
     const attachCard = async () => {
       try {
         console.log('[Checkout] Attaching card form to DOM...');
+        
+        // Verify container exists
         const container = document.getElementById('sq-card-container');
+        console.log('[Checkout] Container found?', !!container);
         
         if (!container) {
-          console.error('[Checkout] Card container not found in DOM');
+          console.error('[Checkout] ❌ Card container not found in DOM');
+          setError('Card form container not found');
           return;
         }
 
+        console.log('[Checkout] Attaching squareCard to container...');
         await window.squareCard.attach('#sq-card-container');
+        
+        console.log('[Checkout] Storing card reference for payment...');
         cardRef.current = window.squareCard;
+        paymentsRef.current = window.squarePayments;
+        
         console.log('[Checkout] ✅ Card form attached successfully');
+        setError(null);
       } catch (err) {
-        console.error('[Checkout] Card attachment error:', err);
+        console.error('[Checkout] ❌ Card attachment error:', err);
+        console.error('[Checkout] Error message:', err.message);
         setError(`Failed to attach card form: ${err.message}`);
       }
     };
@@ -190,8 +206,17 @@ const CheckoutPage = () => {
     setError(null);
 
     try {
+      console.log('[Checkout] Payment handler called');
+      console.log('[Checkout] cardRef.current exists?', !!cardRef.current);
+      console.log('[Checkout] cardRef.current.requestCardNonce exists?', !!cardRef.current?.requestCardNonce);
+      
       if (!cardRef.current) {
-        throw new Error('Payment form not ready');
+        throw new Error('Payment form not ready - card reference missing');
+      }
+
+      if (typeof cardRef.current.requestCardNonce !== 'function') {
+        console.error('[Checkout] cardRef.current methods:', Object.getOwnPropertyNames(cardRef.current));
+        throw new Error('Payment form not ready - requestCardNonce method not available');
       }
 
       console.log('[Checkout] Requesting card nonce...');
