@@ -63,7 +63,10 @@ const CheckoutPage = () => {
             const script = document.createElement('script');
             script.src = 'https://web.squarecdn.com/v1/square.js';
             script.async = true;
-            script.onload = resolve;
+            script.onload = () => {
+              // Give SDK time to fully initialize
+              setTimeout(resolve, 500);
+            };
             script.onerror = () => reject(new Error('Failed to load Square SDK'));
             document.head.appendChild(script);
           });
@@ -88,6 +91,11 @@ const CheckoutPage = () => {
 
         if (!appId) {
           throw new Error('Payment system not configured - REACT_APP_SQUARE_APP_ID is not set');
+        }
+
+        // Ensure Square.payments is available
+        if (!window.Square || !window.Square.payments) {
+          throw new Error('Square SDK not properly loaded');
         }
 
         const payments = window.Square.payments(appId);
