@@ -74,9 +74,15 @@ const CheckoutPage = () => {
         // Step 4: Initialize card form
         console.log('[Checkout] Initializing card form...');
         const appId = process.env.REACT_APP_SQUARE_APP_ID;
+        
+        // Debug: Log environment variable
+        console.log('[Checkout] DEBUG - appId value:', appId);
+        console.log('[Checkout] DEBUG - appId type:', typeof appId);
+        console.log('[Checkout] DEBUG - appId is set?', !!appId);
+        console.log('[Checkout] DEBUG - appId length:', appId?.length);
 
         if (!appId) {
-          throw new Error('Payment system not configured');
+          throw new Error('Payment system not configured - REACT_APP_SQUARE_APP_ID is not set');
         }
 
         const payments = window.Square.payments(appId);
