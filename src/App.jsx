@@ -8,7 +8,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
-// PaymentComplete removed - Square uses modal instead
+import CheckoutPage from './pages/CheckoutPage';
 
 function AppContent() {
   return (
@@ -19,7 +19,7 @@ function AppContent() {
         <Route path="/about" element={<About />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
-        {/* /payment-complete removed - using Square modal now */}
+        <Route path="/checkout/:courseId" element={<CheckoutPage />} />
       </Routes>
       <Footer />
     </div>

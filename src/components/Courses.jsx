@@ -1,153 +1,94 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
-import SquarePaymentModal from './SquarePaymentModal';
-import AuthForms from './AuthForms';
+import { useAuth } from '../context/AuthContext';
 
-export default function Courses() {
+const Courses = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
-  // Payment modal state
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    api.getCourses()
-      .then(data => {
-        setCourses(data);
+    const fetchCourses = async () => {
+      try {
+        const data = await api.getCourses();
+        setCourses(data || []);
+      } catch (err) {
+        console.error('Failed to load courses:', err);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error('❌ Error fetching courses:', err);
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    };
+    fetchCourses();
   }, []);
 
-  const handleBuyNow = (course) => {
-    // Check if user is logged in
+  const handleEnroll = (courseId) => {
     if (!user) {
-      // Show auth modal if not logged in
-      setShowAuthModal(true);
+      alert('Please log in to enroll in a course');
       return;
     }
-
-    // User is logged in - open payment modal
-    setSelectedCourse(course);
-    setShowPaymentModal(true);
-  };
-
-  const handleClosePaymentModal = () => {
-    setShowPaymentModal(false);
-    setSelectedCourse(null);
-  };
-
-  const handleCloseAuthModal = () => {
-    setShowAuthModal(false);
+    // Navigate to checkout page
+    navigate(`/checkout/${courseId}`);
   };
 
   if (loading) {
-    return (
-      <section className="courses" id="courses">
-        <div className="container">
-          <h2 className="section-title">Our Courses</h2>
-          <p className="loading">Loading courses...</p>
-        </div>
-      </section>
-    );
+    return <div className="courses-container"><p>Loading courses...</p></div>;
   }
 
   return (
-    <section className="courses" id="courses">
-      <div className="container">
-        <h2 className="section-title">Our Courses</h2>
-        <p className="section-subtitle">Level up your skills with expert-led training</p>
-
-        {error ? (
-          <p className="error-text">Failed to load courses: {error}</p>
-        ) : courses.length === 0 ? (
-          <p className="no-courses">No courses available at the moment</p>
-        ) : (
-          <div className="courses-grid">
-            {courses.map(course => (
-              <div key={course.id} className="course-card" style={{ cursor: 'pointer' }}>
-                {/* Course Icon/Image */}
-                {course.icon && (
-                  <div className="course-icon">
-                    <img 
-                      src={course.icon} 
-                      alt={course.title}
-                      style={{ maxWidth: '100%', height: 'auto' }}
-                    />
-                  </div>
-                )}
-
-                {/* Course Title */}
-                <h3 className="course-title">{course.title}</h3>
-
-                {/* Course Description */}
-                <p className="course-description">{course.description}</p>
-
-                {/* Course Meta */}
-                <div className="course-meta">
-                  <span className="course-level">{course.level}</span>
-                  <span className="course-duration">{course.duration}</span>
-                </div>
-
-                {/* Course Details */}
-                <div className="course-details">
-                  {course.instructor && (
-                    <p><strong>Instructor:</strong> {course.instructor}</p>
-                  )}
-                  {course.trial_duration_days && (
-                    <p><strong>Free Trial:</strong> {course.trial_duration_days} days</p>
-                  )}
-                </div>
-
-                {/* Pricing */}
-                <div className="course-pricing">
-                  <span className="price">
-                    {course.currency} {course.price.toFixed(2)}
-                  </span>
-                </div>
-
-                {/* CTA Button */}
-                <button
-                  className="btn btn-primary"
-                  onClick={() => handleBuyNow(course)}
-                  style={{ width: '100%', cursor: 'pointer' }}
-                >
-                  {course.trial_duration_days ? 'Start Free Trial' : 'Enroll Now'}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="courses-container" id="courses">
+      <div className="section-header">
+        <h2>Our Courses</h2>
+        <p>Learn from industry experts at your own pace</p>
       </div>
 
-      {/* Auth Modal - Show when not logged in */}
-      {showAuthModal && (
-        <div className="modal-overlay" onClick={handleCloseAuthModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleCloseAuthModal}>✕</button>
-            <h2>Log in to Enroll</h2>
-            <p>Please log in or create an account to enroll in this course.</p>
-            <AuthForms onSuccess={handleCloseAuthModal} />
-          </div>
-        </div>
-      )}
+      <div className="courses-grid">
+        {courses.map((course) => (
+          <div key={course.id} className="course-card">
+            {course.icon && (
+              <div className="course-icon">
+                <img src={course.icon} alt={course.title} />
+              </div>
+            )}
 
-      {/* Payment Modal - Show when logged in and course selected */}
-      {showPaymentModal && selectedCourse && (
-        <SquarePaymentModal
-          course={selectedCourse}
-          onClose={handleClosePaymentModal}
-        />
-      )}
-    </section>
+            <div className="course-content">
+              <h3>{course.title}</h3>
+              
+              <p className="course-description">{course.description}</p>
+
+              <div className="course-meta">
+                {course.level && (
+                  <span className="badge badge-level">{course.level}</span>
+                )}
+                {course.duration && (
+                  <span className="badge badge-duration">⏱️ {course.duration}</span>
+                )}
+              </div>
+
+              {course.instructor && (
+                <p className="course-instructor">👨‍🏫 {course.instructor}</p>
+              )}
+
+              <div className="course-footer">
+                <div className="price-section">
+                  <span className="currency">{course.currency || 'USD'}</span>
+                  <span className="price">{course.price.toFixed(2)}</span>
+                </div>
+
+                <button
+                  className="btn-enroll"
+                  onClick={() => handleEnroll(course.id)}
+                >
+                  Enroll Now
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
-}
+};
+
+export default Courses;
