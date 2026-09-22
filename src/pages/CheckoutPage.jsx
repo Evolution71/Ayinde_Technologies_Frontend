@@ -208,83 +208,40 @@ const CheckoutPage = () => {
     try {
       console.log('[Checkout] Payment handler called');
       console.log('[Checkout] cardRef.current exists?', !!cardRef.current);
-      console.log('[Checkout] paymentsRef.current exists?', !!paymentsRef.current);
-      
-      // Debug: Log all methods on card
-      if (cardRef.current) {
-        const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(cardRef.current));
-        console.log('[Checkout] Card methods available:', methods);
-      }
-      
       console.log('[Checkout] cardRef.current.requestCardNonce exists?', !!cardRef.current?.requestCardNonce);
       
       if (!cardRef.current) {
         throw new Error('Payment form not ready - card reference missing');
       }
 
-      if (!paymentsRef.current) {
-        throw new Error('Payment form not ready - payments reference missing');
+      if (typeof cardRef.current.requestCardNonce !== 'function') {
+        console.error('[Checkout] cardRef.current methods:', Object.getOwnPropertyNames(cardRef.current));
+        throw new Error('Payment form not ready - requestCardNonce method not available');
       }
 
-      if (typeof cardRef.current.requestCardNonce !== 'function') {
-        console.error('[Checkout] cardRef.current has these properties:', Object.keys(cardRef.current));
-        console.error('[Checkout] Trying to use paymentsRef instead...');
+      console.log('[Checkout] Requesting card nonce...');
+      const result = await cardRef.current.requestCardNonce();
+
+      if (result.status !== 'OK') {
+        throw new Error('Failed to process card');
+      }
+
+      const nonce = result.details.cardNonce;
+      console.log('[Checkout] Verifying payment...');
+
+      const verifyResult = await api.verifyPayment(paymentId, nonce);
+
+      if (verifyResult.success || verifyResult.status === 'success') {
+        console.log('[Checkout] ✅ Payment successful');
         
-        // Try using payments instance instead
-        if (typeof paymentsRef.current.requestCardNonce === 'function') {
-          console.log('[Checkout] Using paymentsRef.requestCardNonce...');
-          const result = await paymentsRef.current.requestCardNonce();
-          
-          if (result.status !== 'OK') {
-            throw new Error('Failed to process card');
-          }
-
-          const nonce = result.details.cardNonce;
-          console.log('[Checkout] Verifying payment...');
-
-          const verifyResult = await api.verifyPayment(paymentId, nonce);
-
-          if (verifyResult.success || verifyResult.status === 'success') {
-            console.log('[Checkout] ✅ Payment successful');
-            
-            if (isMountedRef.current) {
-              setTimeout(() => {
-                navigate('/');
-                alert('✅ Payment successful! You are now enrolled in the course.');
-              }, 500);
-            }
-          } else {
-            throw new Error(verifyResult.message || 'Payment verification failed');
-          }
-        } else {
-          throw new Error('Payment form not ready - requestCardNonce method not available');
+        if (isMountedRef.current) {
+          setTimeout(() => {
+            navigate('/');
+            alert('✅ Payment successful! You are now enrolled in the course.');
+          }, 500);
         }
       } else {
-        // Use cardRef as normal
-        console.log('[Checkout] Requesting card nonce...');
-        const result = await cardRef.current.requestCardNonce();
-
-        if (result.status !== 'OK') {
-          throw new Error('Failed to process card');
-        }
-
-        const nonce = result.details.cardNonce;
-        console.log('[Checkout] Verifying payment...');
-
-        const verifyResult = await api.verifyPayment(paymentId, nonce);
-
-        if (verifyResult.success || verifyResult.status === 'success') {
-          console.log('[Checkout] ✅ Payment successful');
-          
-          if (isMountedRef.current) {
-            setTimeout(() => {
-              navigate('/');
-              alert('✅ Payment successful! You are now enrolled in the course.');
-            }, 500);
-          }
-        } else {
-          throw new Error(verifyResult.message || 'Payment verification failed');
-        }
+        throw new Error(verifyResult.message || 'Payment verification failed');
       }
     } catch (err) {
       console.error('[Checkout] Payment error:', err);
