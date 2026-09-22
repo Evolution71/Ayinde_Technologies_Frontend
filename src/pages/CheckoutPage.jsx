@@ -15,6 +15,7 @@ const CheckoutPage = () => {
   const [paymentId, setPaymentId] = useState(null);
 
   // Fetch course data
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const fetchCourse = async () => {
       try {
