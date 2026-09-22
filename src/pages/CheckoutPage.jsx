@@ -13,6 +13,7 @@ const CheckoutPage = () => {
   const [processing, setProcessing] = useState(false);
   const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
+  const [cardReady, setCardReady] = useState(false);  // ← NEW!
 
   // Refs to track component state
   const cardRef = useRef(null);
@@ -139,6 +140,7 @@ const CheckoutPage = () => {
 
         console.log('[Checkout] ✅ Checkout initialized successfully');
         setError(null);
+        setCardReady(true);  // ← SIGNAL THAT CARD IS READY!
       } catch (err) {
         if (isActive) {
           console.error('[Checkout] Initialization error:', err);
@@ -159,10 +161,10 @@ const CheckoutPage = () => {
     };
   }, [courseId]);
 
-  // Attach card form once clientToken is set and DOM is ready
+  // Attach card form once card is ready
   useEffect(() => {
-    if (!clientToken || !window.squareCard) {
-      console.log('[Checkout] Waiting for clientToken or squareCard...');
+    if (!cardReady || !window.squareCard) {
+      console.log('[Checkout] Card not ready yet, waiting...');
       return;
     }
 
@@ -197,7 +199,7 @@ const CheckoutPage = () => {
     };
 
     attachCard();
-  }, [clientToken]);
+  }, [cardReady]);
 
   // Handle payment submission
   const handlePayment = async (e) => {
