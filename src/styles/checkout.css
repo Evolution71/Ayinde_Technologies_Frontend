@@ -138,6 +138,27 @@
   color: #1a1a1a;
 }
 
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group input {
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
 .card-container {
   border: 2px solid #ddd;
   border-radius: 6px;
@@ -290,6 +311,10 @@
 
   .checkout-form {
     padding-left: 0;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 
   .checkout-summary h1,

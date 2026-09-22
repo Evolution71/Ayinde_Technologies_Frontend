@@ -13,7 +13,13 @@ const CheckoutPage = () => {
   const [processing, setProcessing] = useState(false);
   const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
-  const [cardReady, setCardReady] = useState(false);  // ← NEW!
+  const [cardReady, setCardReady] = useState(false);
+  
+  // Billing address state
+  const [billingAddress, setBillingAddress] = useState({
+    postalCode: '',
+    country: 'US'
+  });  // ← NEW!
 
   // Refs to track component state
   const cardRef = useRef(null);
@@ -66,9 +72,9 @@ const CheckoutPage = () => {
             script.src = 'https://web.squarecdn.com/v1/square.js';
             script.async = true;
             script.onload = () => {
-              // Give SDK much more time to fully initialize
-              console.log('[Checkout] Square SDK loaded, waiting for initialization...');
-              setTimeout(resolve, 1500);
+              // Give SDK MUCH more time to fully initialize (slow network)
+              console.log('[Checkout] Square SDK loaded, waiting for full initialization...');
+              setTimeout(resolve, 3000);  // ← Increased from 1500 to 3000ms
             };
             script.onerror = () => reject(new Error('Failed to load Square SDK'));
             document.head.appendChild(script);
@@ -121,7 +127,7 @@ const CheckoutPage = () => {
           } catch (err) {
             console.log('[Checkout] Card creation attempt', attempt, 'failed:', err.message);
             if (attempt < 3) {
-              await new Promise(resolve => setTimeout(resolve, 500));
+              await new Promise(resolve => setTimeout(resolve, 1000));  // ← Increased from 500 to 1000ms
             } else {
               throw err;
             }
@@ -208,40 +214,88 @@ const CheckoutPage = () => {
     try {
       console.log('[Checkout] Payment handler called');
       console.log('[Checkout] cardRef.current exists?', !!cardRef.current);
+      console.log('[Checkout] paymentsRef.current exists?', !!paymentsRef.current);
+      
+      // Debug: Log all methods on card
+      if (cardRef.current) {
+        const methods = Object.getOwnPropertyNames(Object.getPrototypeOf(cardRef.current));
+        console.log('[Checkout] Card methods available:', methods);
+      }
+      
       console.log('[Checkout] cardRef.current.requestCardNonce exists?', !!cardRef.current?.requestCardNonce);
       
       if (!cardRef.current) {
         throw new Error('Payment form not ready - card reference missing');
       }
 
+      if (!paymentsRef.current) {
+        throw new Error('Payment form not ready - payments reference missing');
+      }
+
       if (typeof cardRef.current.requestCardNonce !== 'function') {
-        console.error('[Checkout] cardRef.current methods:', Object.getOwnPropertyNames(cardRef.current));
-        throw new Error('Payment form not ready - requestCardNonce method not available');
-      }
-
-      console.log('[Checkout] Requesting card nonce...');
-      const result = await cardRef.current.requestCardNonce();
-
-      if (result.status !== 'OK') {
-        throw new Error('Failed to process card');
-      }
-
-      const nonce = result.details.cardNonce;
-      console.log('[Checkout] Verifying payment...');
-
-      const verifyResult = await api.verifyPayment(paymentId, nonce);
-
-      if (verifyResult.success || verifyResult.status === 'success') {
-        console.log('[Checkout] ✅ Payment successful');
+        console.error('[Checkout] cardRef.current has these properties:', Object.keys(cardRef.current));
+        console.error('[Checkout] Trying to use paymentsRef instead...');
         
-        if (isMountedRef.current) {
-          setTimeout(() => {
-            navigate('/');
-            alert('✅ Payment successful! You are now enrolled in the course.');
-          }, 500);
+        // Try using payments instance instead
+        if (typeof paymentsRef.current.requestCardNonce === 'function') {
+          console.log('[Checkout] Using paymentsRef.requestCardNonce...');
+          const result = await paymentsRef.current.requestCardNonce();
+          
+          if (result.status !== 'OK') {
+            throw new Error('Failed to process card');
+          }
+
+          const nonce = result.details.cardNonce;
+          console.log('[Checkout] Verifying payment...');
+
+          const verifyResult = await api.verifyPayment(paymentId, nonce);
+
+          if (verifyResult.success || verifyResult.status === 'success') {
+            console.log('[Checkout] ✅ Payment successful');
+            
+            if (isMountedRef.current) {
+              setTimeout(() => {
+                navigate('/');
+                alert('✅ Payment successful! You are now enrolled in the course.');
+              }, 500);
+            }
+          } else {
+            throw new Error(verifyResult.message || 'Payment verification failed');
+          }
+        } else {
+          throw new Error('Payment form not ready - requestCardNonce method not available');
         }
       } else {
-        throw new Error(verifyResult.message || 'Payment verification failed');
+        // Use cardRef as normal
+        console.log('[Checkout] Requesting card nonce with billing address...');
+        const result = await cardRef.current.requestCardNonce({
+          billingContact: {
+            postalCode: billingAddress.postalCode,
+            country: billingAddress.country
+          }
+        });
+
+        if (result.status !== 'OK') {
+          throw new Error('Failed to process card');
+        }
+
+        const nonce = result.details.cardNonce;
+        console.log('[Checkout] Verifying payment...');
+
+        const verifyResult = await api.verifyPayment(paymentId, nonce);
+
+        if (verifyResult.success || verifyResult.status === 'success') {
+          console.log('[Checkout] ✅ Payment successful');
+          
+          if (isMountedRef.current) {
+            setTimeout(() => {
+              navigate('/');
+              alert('✅ Payment successful! You are now enrolled in the course.');
+            }, 500);
+          }
+        } else {
+          throw new Error(verifyResult.message || 'Payment verification failed');
+        }
       }
     } catch (err) {
       console.error('[Checkout] Payment error:', err);
@@ -339,6 +393,31 @@ const CheckoutPage = () => {
               <div className="form-group">
                 <label htmlFor="sq-card-container">Card Information</label>
                 <div id="sq-card-container" className="card-container"></div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="postal-code">Postal Code</label>
+                  <input
+                    type="text"
+                    id="postal-code"
+                    placeholder="12345"
+                    value={billingAddress.postalCode}
+                    onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="country">Country</label>
+                  <input
+                    type="text"
+                    id="country"
+                    placeholder="US"
+                    value={billingAddress.country}
+                    onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
+                    required
+                  />
+                </div>
               </div>
 
               <button
