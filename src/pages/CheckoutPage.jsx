@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import '../styles/checkout.css';
@@ -14,156 +14,157 @@ const CheckoutPage = () => {
   const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
 
-  // Initialize payment
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initializePayment = React.useCallback(async (courseData) => {
-    try {
-      console.log('[Checkout] Initializing payment...');
-      
-      // Create payment intent
-      const response = await api.initiatePayment(
-        courseData.id,
-        courseData.price,
-        courseData.currency || 'USD'
-      );
+  // Refs to track component state
+  const cardRef = useRef(null);
+  const isMountedRef = useRef(true);
 
-      console.log('[Checkout] Payment response:', response);
-      setClientToken(response.client_token);
-      setPaymentId(response.payment_id);
-      
-      // Load Square SDK after getting client token
-      loadSquareSDK(response.client_token);
-    } catch (err) {
-      console.error('[Checkout] Payment init error:', err);
-      setError(err.message || 'Failed to initialize payment');
-    }
-  }, []);
-
-  // Fetch course data
+  // Main initialization effect
   useEffect(() => {
-    const fetchCourse = async () => {
+    let isActive = true;
+
+    const initializeCheckout = async () => {
       try {
+        setLoading(true);
+        setError(null);
+
+        // Step 1: Fetch course
+        console.log('[Checkout] Fetching course...');
         const courses = await api.getCourses();
         const selected = courses.find(c => c.id === parseInt(courseId));
+
+        if (!isActive) return;
+
         if (!selected) {
           setError('Course not found');
-        } else {
-          setCourse(selected);
-          initializePayment(selected);
+          setLoading(false);
+          return;
         }
+
+        setCourse(selected);
+
+        // Step 2: Initialize payment
+        console.log('[Checkout] Initializing payment...');
+        const paymentResponse = await api.initiatePayment(
+          selected.id,
+          selected.price,
+          selected.currency || 'USD'
+        );
+
+        if (!isActive) return;
+
+        console.log('[Checkout] Payment initialized:', paymentResponse);
+        setClientToken(paymentResponse.client_token);
+        setPaymentId(paymentResponse.payment_id);
+
+        // Step 3: Load Square SDK
+        console.log('[Checkout] Loading Square SDK...');
+        if (!window.Square) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://web.squarecdn.com/v1/square.js';
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load Square SDK'));
+            document.head.appendChild(script);
+          });
+        }
+
+        if (!isActive) return;
+
+        // Step 4: Initialize card form
+        console.log('[Checkout] Initializing card form...');
+        const appId = process.env.REACT_APP_SQUARE_APP_ID;
+
+        if (!appId) {
+          throw new Error('Payment system not configured');
+        }
+
+        const payments = window.Square.payments(appId);
+        const card = await payments.card();
+        
+        if (!isActive) return;
+
+        await card.attach('#sq-card-container');
+        cardRef.current = card;
+
+        console.log('[Checkout] ✅ Checkout initialized successfully');
+        setError(null);
       } catch (err) {
-        setError(err.message || 'Failed to load course');
+        if (isActive) {
+          console.error('[Checkout] Initialization error:', err);
+          setError(err.message || 'Failed to initialize checkout');
+        }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
-    fetchCourse();
-  }, [courseId, initializePayment]);
 
-  // Load and initialize Square SDK
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const loadSquareSDK = React.useCallback(async (token) => {
-    try {
-      console.log('[Checkout] Loading Square SDK...');
-      
-      if (!window.Square) {
-        const script = document.createElement('script');
-        script.src = 'https://web.squarecdn.com/v1/square.js';
-        script.async = true;
-        
-        script.onload = () => {
-          console.log('[Checkout] Square SDK loaded');
-          initializeCard(token);
-        };
-        
-        script.onerror = () => {
-          console.error('[Checkout] Failed to load Square SDK');
-          setError('Failed to load payment system. Please refresh and try again.');
-        };
-        
-        document.head.appendChild(script);
-      } else {
-        console.log('[Checkout] Square SDK already loaded');
-        initializeCard(token);
-      }
-    } catch (err) {
-      console.error('[Checkout] SDK loading error:', err);
-      setError('Failed to initialize payment system');
-    }
-  }, []);
+    initializeCheckout();
 
-  // Initialize card form
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const initializeCard = React.useCallback(async (token) => {
-    try {
-      console.log('[Checkout] Initializing card form with token...');
-      
-      const appId = process.env.REACT_APP_SQUARE_APP_ID;
-      console.log('[Checkout] Square App ID:', appId ? 'Set' : 'NOT SET ⚠️');
-      
-      if (!appId) {
-        setError('Payment system not configured. Contact support.');
-        return;
-      }
+    // Cleanup
+    return () => {
+      isActive = false;
+    };
+  }, [courseId]);
 
-      const payments = window.Square.payments(appId);
-      console.log('[Checkout] Payments instance created');
-      
-      const card = await payments.card();
-      console.log('[Checkout] Card form created');
-      
-      await card.attach('#sq-card-container');
-      console.log('[Checkout] Card form attached to DOM');
-      
-      window.squareCard = card;
-      setError(null);
-    } catch (err) {
-      console.error('[Checkout] Card initialization error:', err);
-      setError(`Failed to initialize card form: ${err.message}`);
-    }
-  }, []);
-
+  // Handle payment submission
   const handlePayment = async (e) => {
     e.preventDefault();
     setProcessing(true);
     setError(null);
 
     try {
-      if (!window.squareCard) {
+      if (!cardRef.current) {
         throw new Error('Payment form not ready');
       }
 
       console.log('[Checkout] Requesting card nonce...');
-      const result = await window.squareCard.requestCardNonce();
+      const result = await cardRef.current.requestCardNonce();
 
-      if (result.status === 'OK') {
-        const nonce = result.details.cardNonce;
-        console.log('[Checkout] Nonce received, verifying payment...');
+      if (result.status !== 'OK') {
+        throw new Error('Failed to process card');
+      }
 
-        // Verify payment
-        const paymentResult = await api.verifyPayment(paymentId, nonce);
+      const nonce = result.details.cardNonce;
+      console.log('[Checkout] Verifying payment...');
 
-        if (paymentResult.success || paymentResult.status === 'success') {
-          console.log('[Checkout] Payment successful!');
+      const verifyResult = await api.verifyPayment(paymentId, nonce);
+
+      if (verifyResult.success || verifyResult.status === 'success') {
+        console.log('[Checkout] ✅ Payment successful');
+        
+        if (isMountedRef.current) {
           setTimeout(() => {
             navigate('/');
             alert('✅ Payment successful! You are now enrolled in the course.');
           }, 500);
-        } else {
-          setError(paymentResult.message || 'Payment verification failed');
         }
       } else {
-        console.error('[Checkout] Card nonce error:', result);
-        setError('Failed to process card. Please check your information.');
+        throw new Error(verifyResult.message || 'Payment verification failed');
       }
     } catch (err) {
       console.error('[Checkout] Payment error:', err);
-      setError(err.message || 'Payment failed. Please try again.');
+      
+      if (isMountedRef.current) {
+        setError(err.message || 'Payment failed. Please try again.');
+      }
     } finally {
-      setProcessing(false);
+      if (isMountedRef.current) {
+        setProcessing(false);
+      }
     }
   };
 
+  // Track component mount state
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Render loading state
   if (loading) {
     return (
       <div className="checkout-container">
@@ -172,6 +173,7 @@ const CheckoutPage = () => {
     );
   }
 
+  // Render error state
   if (!course) {
     return (
       <div className="checkout-container">
@@ -183,6 +185,7 @@ const CheckoutPage = () => {
     );
   }
 
+  // Render checkout page
   return (
     <div className="checkout-page">
       <div className="checkout-container">
@@ -198,7 +201,9 @@ const CheckoutPage = () => {
 
           <div className="course-details">
             <h2>{course.title}</h2>
-            {course.instructor && <p className="instructor">Instructor: {course.instructor}</p>}
+            {course.instructor && (
+              <p className="instructor">Instructor: {course.instructor}</p>
+            )}
             <p className="description">{course.description}</p>
             {course.duration && <p className="duration">Duration: {course.duration}</p>}
             {course.level && <p className="level">Level: {course.level}</p>}
@@ -207,11 +212,15 @@ const CheckoutPage = () => {
           <div className="price-breakdown">
             <div className="price-item">
               <span>Course Price:</span>
-              <span className="amount">{course.currency || 'USD'} {course.price.toFixed(2)}</span>
+              <span className="amount">
+                {course.currency || 'USD'} {course.price.toFixed(2)}
+              </span>
             </div>
             <div className="price-item total">
               <span>Total:</span>
-              <span className="amount">{course.currency || 'USD'} {course.price.toFixed(2)}</span>
+              <span className="amount">
+                {course.currency || 'USD'} {course.price.toFixed(2)}
+              </span>
             </div>
           </div>
         </div>
