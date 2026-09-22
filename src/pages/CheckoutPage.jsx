@@ -134,9 +134,9 @@ const CheckoutPage = () => {
         
         if (!isActive) return;
 
-        // Store both payments and card instances
-        window.squarePayments = payments;
-        window.squareCard = cardInstance;
+        // Store both payments and card instances in refs (not window)
+        paymentsRef.current = payments;
+        cardRef.current = cardInstance;
 
         console.log('[Checkout] ✅ Checkout initialized successfully');
         setError(null);
@@ -163,7 +163,7 @@ const CheckoutPage = () => {
 
   // Attach card form once card is ready
   useEffect(() => {
-    if (!cardReady || !window.squareCard) {
+    if (!cardReady || !cardRef.current) {
       console.log('[Checkout] Card not ready yet, waiting...');
       return;
     }
@@ -182,12 +182,10 @@ const CheckoutPage = () => {
           return;
         }
 
-        console.log('[Checkout] Attaching squareCard to container...');
-        await window.squareCard.attach('#sq-card-container');
+        console.log('[Checkout] Attaching card to container...');
+        console.log('[Checkout] cardRef.current has attach?', typeof cardRef.current?.attach);
         
-        console.log('[Checkout] Storing card reference for payment...');
-        cardRef.current = window.squareCard;
-        paymentsRef.current = window.squarePayments;
+        await cardRef.current.attach('#sq-card-container');
         
         console.log('[Checkout] ✅ Card form attached successfully');
         setError(null);
