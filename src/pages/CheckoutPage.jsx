@@ -64,8 +64,9 @@ const CheckoutPage = () => {
             script.src = 'https://web.squarecdn.com/v1/square.js';
             script.async = true;
             script.onload = () => {
-              // Give SDK time to fully initialize
-              setTimeout(resolve, 500);
+              // Give SDK much more time to fully initialize
+              console.log('[Checkout] Square SDK loaded, waiting for initialization...');
+              setTimeout(resolve, 1500);
             };
             script.onerror = () => reject(new Error('Failed to load Square SDK'));
             document.head.appendChild(script);
@@ -73,6 +74,13 @@ const CheckoutPage = () => {
         }
 
         if (!isActive) return;
+
+        // Verify Square.payments is available
+        if (!window.Square || typeof window.Square.payments !== 'function') {
+          throw new Error('Square SDK not properly initialized - payments function not available');
+        }
+
+        console.log('[Checkout] Square SDK ready');
 
         // Step 4: Initialize card form
         console.log('[Checkout] Initializing card form...');
@@ -99,12 +107,33 @@ const CheckoutPage = () => {
         }
 
         const payments = window.Square.payments(appId);
-        const card = await payments.card();
+        console.log('[Checkout] Creating card instance...');
+        
+        // Retry card creation up to 3 times
+        let cardInstance = null;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          try {
+            cardInstance = await payments.card();
+            console.log('[Checkout] Card instance created on attempt', attempt);
+            break;
+          } catch (err) {
+            console.log('[Checkout] Card creation attempt', attempt, 'failed:', err.message);
+            if (attempt < 3) {
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } else {
+              throw err;
+            }
+          }
+        }
+        
+        if (!cardInstance) {
+          throw new Error('Failed to create card instance after 3 attempts');
+        }
         
         if (!isActive) return;
 
         // Store card instance for later attachment (after DOM renders)
-        window.squareCard = card;
+        window.squareCard = cardInstance;
 
         console.log('[Checkout] ✅ Checkout initialized successfully');
         setError(null);
