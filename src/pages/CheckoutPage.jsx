@@ -103,6 +103,19 @@ const CheckoutPage = () => {
         
         if (!isActive) return;
 
+        // Wait for the DOM element to exist before attaching
+        console.log('[Checkout] Waiting for card container element...');
+        let attempts = 0;
+        while (!document.getElementById('sq-card-container') && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          attempts++;
+        }
+
+        if (!document.getElementById('sq-card-container')) {
+          throw new Error('Card container element did not appear in DOM');
+        }
+
+        console.log('[Checkout] Card container found, attaching card form...');
         await card.attach('#sq-card-container');
         cardRef.current = card;
 
