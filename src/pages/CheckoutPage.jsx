@@ -103,21 +103,8 @@ const CheckoutPage = () => {
         
         if (!isActive) return;
 
-        // Wait for the DOM element to exist before attaching
-        console.log('[Checkout] Waiting for card container element...');
-        let attempts = 0;
-        while (!document.getElementById('sq-card-container') && attempts < 50) {
-          await new Promise(resolve => setTimeout(resolve, 50));
-          attempts++;
-        }
-
-        if (!document.getElementById('sq-card-container')) {
-          throw new Error('Card container element did not appear in DOM');
-        }
-
-        console.log('[Checkout] Card container found, attaching card form...');
-        await card.attach('#sq-card-container');
-        cardRef.current = card;
+        // Store card instance for later attachment (after DOM renders)
+        window.squareCard = card;
 
         console.log('[Checkout] ✅ Checkout initialized successfully');
         setError(null);
@@ -140,6 +127,32 @@ const CheckoutPage = () => {
       isActive = false;
     };
   }, [courseId]);
+
+  // Attach card form once clientToken is set and DOM is ready
+  useEffect(() => {
+    if (!clientToken || !window.squareCard) return;
+
+    const attachCard = async () => {
+      try {
+        console.log('[Checkout] Attaching card form to DOM...');
+        const container = document.getElementById('sq-card-container');
+        
+        if (!container) {
+          console.error('[Checkout] Card container not found in DOM');
+          return;
+        }
+
+        await window.squareCard.attach('#sq-card-container');
+        cardRef.current = window.squareCard;
+        console.log('[Checkout] ✅ Card form attached successfully');
+      } catch (err) {
+        console.error('[Checkout] Card attachment error:', err);
+        setError(`Failed to attach card form: ${err.message}`);
+      }
+    };
+
+    attachCard();
+  }, [clientToken]);
 
   // Handle payment submission
   const handlePayment = async (e) => {
