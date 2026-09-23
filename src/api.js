@@ -144,7 +144,7 @@ export const api = {
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({
         payment_id: paymentId,
-        source_id: token,
+        nonce: token,
         billing_postal_code: billingData.billingPostalCode || '',
         billing_country: billingData.billingCountry || ''
       })
