@@ -1,206 +1,318 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
-import TrialWarningModal from '../components/TrialWarningModal';
 
 const CourseDetailPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const [course, setCourse] = useState(null);
-  const [lessons, setLessons] = useState([]);
-  const [selectedLesson, setSelectedLesson] = useState(null);
-  const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [trialDaysRemaining, setTrialDaysRemaining] = useState(null);
-  const [showPaymentWall, setShowPaymentWall] = useState(false);
+  const [enrollment, setEnrollment] = useState(null);
+  const [lessons, setLessons] = useState([]);
+  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [progress, setProgress] = useState(0);
 
+  // Save card modal state
+  const [showSaveCardModal, setShowSaveCardModal] = useState(false);
+  const [cardReady, setCardReady] = useState(false);
+  const [savingCard, setSavingCard] = useState(false);
+  const cardRef = useRef(null);
+  const paymentsRef = useRef(null);
+
+  // Load course and enrollment status
   useEffect(() => {
-    const fetchCourseData = async () => {
+    const init = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        setShowPaymentWall(false);
-
         if (!user) {
           navigate('/login');
           return;
         }
 
-        // Try to get course details
-        try {
-          const courseData = await api.getCourseDetail(courseId);
-          console.log('[CourseDetail] Course:', courseData);
-          
-          setCourse(courseData);
-          setLessons(courseData.lessons || []);
-          
-          if (courseData.lessons && courseData.lessons.length > 0) {
-            setSelectedLesson(courseData.lessons[0]);
-          }
+        // Get course
+        const courseData = await api.getCourseDetail(courseId);
+        setCourse(courseData);
 
-          // Get progress
-          const progressData = await api.getCourseProgress(courseId);
-          setProgress(progressData);
-          console.log('[CourseDetail] Progress:', progressData);
+        // Get enrollment status
+        const statusData = await api.getEnrollmentStatus(courseId);
+        setEnrollment(statusData);
 
-          // Calculate trial days remaining
-          if (courseData.trial_ends_at) {
-            const now = new Date();
-            const trialEnds = new Date(courseData.trial_ends_at);
-            const daysLeft = Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24));
-            setTrialDaysRemaining(daysLeft);
-            console.log('[CourseDetail] Trial days remaining:', daysLeft);
-          }
-        } catch (err) {
-          console.error('[CourseDetail] Error fetching course:', err);
-          
-          // CHECK IF 403 (TRIAL EXPIRED)
-          if (err.message && err.message.includes('403')) {
-            console.log('[CourseDetail] Trial expired - showing payment wall');
-            
-            // Try to get enrollments to show which course expired
-            try {
-              const enrollmentsData = await api.getMyEnrollments();
-              const enrollment = enrollmentsData.enrollments?.find(e => e.course_id === courseId);
-              
-              if (enrollment) {
-                console.log('[CourseDetail] Enrollment found:', enrollment);
-                // Try to fetch course basic info
-                const coursesData = await api.getCourses();
-                const courseInfo = coursesData.find(c => c.id === courseId);
-                
-                if (courseInfo) {
-                  setCourse(courseInfo);
-                  setTrialDaysRemaining(0);  // Trial expired
-                  setShowPaymentWall(true);
-                  return;
-                }
-              }
-            } catch (innerErr) {
-              console.warn('[CourseDetail] Could not get enrollment info:', innerErr);
-            }
-            
-            // Fallback: show generic payment wall
-            setError('Trial expired. Please subscribe to continue.');
-            setShowPaymentWall(true);
-            setTrialDaysRemaining(0);
-            return;
-          }
-          
-          // OTHER ERROR
-          setError(err.message || 'Failed to load course');
-          if (err.message && (err.message.includes('403') || err.message.includes('Forbidden'))) {
-            setTimeout(() => navigate('/courses'), 2000);
-          }
+        // Show save-card modal if trial and card not saved
+        if (statusData.status === 'trial' && !statusData.card_saved && statusData.days_remaining > 0) {
+          setShowSaveCardModal(true);
         }
+
+        // Set default lesson
+        if (courseData.lessons && courseData.lessons.length > 0) {
+          setSelectedLesson(courseData.lessons[0]);
+        }
+
+        setLoading(false);
       } catch (err) {
-        console.error('[CourseDetail] Unexpected error:', err);
-        setError('Unexpected error occurred');
-      } finally {
+        setError(err.message);
         setLoading(false);
       }
     };
 
-    fetchCourseData();
+    init();
   }, [courseId, user, navigate]);
 
-  const handleLessonComplete = async () => {
-    if (!selectedLesson) return;
-    
+  // Initialize card form when modal opens
+  useEffect(() => {
+    if (!showSaveCardModal || cardReady) return;
+
+    const initCard = async () => {
+      try {
+        // Wait for Square SDK to load
+        if (!window.Square) {
+          const script = document.createElement('script');
+          script.src = 'https://web.squarecdn.com/v1/square.js';
+          script.async = true;
+          script.onload = async () => {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            initializeSquareCard();
+          };
+          document.head.appendChild(script);
+        } else {
+          initializeSquareCard();
+        }
+      } catch (err) {
+        setError('Failed to initialize card form');
+      }
+    };
+
+    const initializeSquareCard = async () => {
+      try {
+        const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
+        if (!appId) throw new Error('Square App ID not configured');
+
+        const payments = window.Square.payments(appId);
+        paymentsRef.current = payments;
+
+        const card = await payments.card();
+        cardRef.current = card;
+
+        await card.attach('#sq-card-container-modal');
+        setCardReady(true);
+      } catch (err) {
+        setError('Card initialization failed: ' + err.message);
+      }
+    };
+
+    initCard();
+  }, [showSaveCardModal, cardReady]);
+
+  // Handle save card
+  const handleSaveCard = async () => {
+    if (!cardRef.current) {
+      setError('Card not initialized');
+      return;
+    }
+
+    try {
+      setSavingCard(true);
+
+      // ✅ Tokenize card
+      const tokenResult = await cardRef.current.tokenize();
+
+      if (tokenResult.status !== 'OK') {
+        setError('Card error: ' + tokenResult.errors?.[0]?.message);
+        setSavingCard(false);
+        return;
+      }
+
+      const token = tokenResult.token;
+
+      // Save to backend
+      const saveResult = await api.savePaymentMethod(courseId, token);
+
+      if (saveResult.success) {
+        alert('✅ ' + saveResult.message);
+        setShowSaveCardModal(false);
+        
+        // Refresh enrollment status
+        const updatedStatus = await api.getEnrollmentStatus(courseId);
+        setEnrollment(updatedStatus);
+      } else {
+        setError(saveResult.message || 'Failed to save card');
+      }
+
+      setSavingCard(false);
+    } catch (err) {
+      setError('Payment error: ' + err.message);
+      setSavingCard(false);
+    }
+  };
+
+  // Handle complete lesson
+  const handleCompleteLesson = async () => {
     try {
       await api.completeLesson(courseId, selectedLesson.id);
-      alert('✅ Lesson marked as complete!');
-      
-      // Refresh progress
-      const progressData = await api.getCourseProgress(courseId);
-      setProgress(progressData);
-      
-      // Move to next lesson
-      const currentIndex = lessons.findIndex(l => l.id === selectedLesson.id);
-      if (currentIndex < lessons.length - 1) {
-        setSelectedLesson(lessons[currentIndex + 1]);
-      }
+      alert('✅ Lesson marked complete!');
     } catch (err) {
-      console.error('[CourseDetail] Error completing lesson:', err);
-      alert('Error: ' + err.message);
+      setError('Failed to complete lesson');
     }
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading course...</div>;
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
   }
 
-  // SHOW PAYMENT WALL IF TRIAL EXPIRED
-  if (showPaymentWall && course) {
+  if (!course) {
     return (
-      <TrialWarningModal
-        course={course}
-        daysRemaining={0}  // Trial expired
-        onUpgrade={() => navigate(`/checkout/${courseId}`)}
-        onContinue={() => {}}
-      />
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
-        <h3>Error: {error}</h3>
-        <p>Redirecting to courses...</p>
+      <div style={{ padding: '40px', textAlign: 'center' }}>
+        <h2>Course not found</h2>
+        <button onClick={() => navigate('/courses')}>Back to Courses</button>
       </div>
     );
   }
 
-  if (!course) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Course not found</div>;
-  }
-
-  const progressPercentage = progress?.overall_progress || 0;
-  const totalLessons = lessons.length;
-  const completedLessons = lessons.filter(l => 
-    progress?.lessons?.some(pl => pl.lesson_id === l.id && pl.completed)
-  ).length;
+  const daysRemaining = enrollment?.days_remaining || 0;
+  const isExpired = enrollment?.status === 'payment_failed' || daysRemaining <= 0;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5', padding: '40px 20px' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        
-        {/* Trial Warning Banner */}
-        {course && trialDaysRemaining !== null && trialDaysRemaining > 0 && trialDaysRemaining <= 3 && (
+    <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5', padding: '20px' }}>
+      {/* Save Card Modal */}
+      {showSaveCardModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
           <div style={{
-            backgroundColor: '#fef3c7',
-            border: '2px solid #f59e0b',
-            borderRadius: '8px',
-            padding: '16px',
-            marginBottom: '20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '40px',
+            maxWidth: '500px',
+            width: '90%'
           }}>
-            <div>
-              <h4 style={{ margin: '0 0 5px 0', color: '#d97706' }}>
-                ⚠️ Trial ending in {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''}
-              </h4>
-              <p style={{ margin: 0, fontSize: '14px', color: '#92400e' }}>
-                Subscribe now to keep your progress and continue learning
-              </p>
+            <h2>💳 Save Your Card</h2>
+            <p>Your 30-day trial ends on <strong>{enrollment?.auto_charge_date}</strong></p>
+            <p style={{ color: '#666', marginBottom: '20px' }}>
+              Save your card now and we'll automatically continue your subscription. No charges today!
+            </p>
+
+            <div id="sq-card-container-modal" style={{
+              border: '1px solid #ddd',
+              padding: '12px',
+              borderRadius: '6px',
+              marginBottom: '20px',
+              minHeight: '50px'
+            }} />
+
+            {error && (
+              <div style={{
+                padding: '10px',
+                backgroundColor: '#fee2e2',
+                borderRadius: '6px',
+                marginBottom: '15px',
+                color: '#991b1b'
+              }}>
+                ❌ {error}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={handleSaveCard}
+                disabled={savingCard || !cardReady}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: savingCard || !cardReady ? '#ccc' : '#1e40af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold'
+                }}
+              >
+                {savingCard ? 'Saving...' : '✅ Save Card'}
+              </button>
+              <button
+                onClick={() => setShowSaveCardModal(false)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  backgroundColor: '#e5e7eb',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                Skip for Now
+              </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ marginBottom: '30px' }}>
+          <button onClick={() => navigate('/courses')} style={{ marginBottom: '15px', cursor: 'pointer' }}>
+            ← Back to Courses
+          </button>
+          <h1>{course.title}</h1>
+        </div>
+
+        {/* Trial Warning */}
+        {enrollment?.status === 'trial' && daysRemaining > 0 && (
+          <div style={{
+            padding: '15px',
+            backgroundColor: daysRemaining <= 3 ? '#fee2e2' : '#fef3c7',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            color: daysRemaining <= 3 ? '#991b1b' : '#92400e'
+          }}>
+            <strong>⏰ Trial ends in {daysRemaining} days</strong> - 
+            {enrollment?.card_saved ? (
+              <span> ✅ Card saved for auto-renewal</span>
+            ) : (
+              <button
+                onClick={() => setShowSaveCardModal(true)}
+                style={{
+                  marginLeft: '10px',
+                  padding: '5px 15px',
+                  backgroundColor: '#1e40af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                💳 Save Card Now
+              </button>
+            )}
+          </div>
+        )}
+
+        {isExpired && (
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#fee2e2',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            color: '#991b1b'
+          }}>
+            <strong>❌ Your trial has expired</strong>
             <button
               onClick={() => navigate(`/checkout/${courseId}`)}
               style={{
-                padding: '10px 20px',
-                backgroundColor: '#f59e0b',
+                marginLeft: '10px',
+                padding: '8px 20px',
+                backgroundColor: '#dc2626',
                 color: 'white',
                 border: 'none',
-                borderRadius: '6px',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                marginLeft: '20px'
+                borderRadius: '4px',
+                cursor: 'pointer'
               }}
             >
               Subscribe Now
@@ -208,233 +320,79 @@ const CourseDetailPage = () => {
           </div>
         )}
 
-        {/* Back Button */}
-        <button
-          onClick={() => navigate('/courses')}
-          style={{
-            padding: '10px 20px',
-            marginBottom: '20px',
-            backgroundColor: '#e0e0e0',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px'
-          }}
-        >
-          ← Back to Courses
-        </button>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px' }}>
-          
-          {/* Left: Lessons List */}
+        {/* Main Content */}
+        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '20px' }}>
+          {/* Left: Lessons */}
           <div style={{
             backgroundColor: 'white',
             borderRadius: '8px',
             padding: '20px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             height: 'fit-content'
           }}>
-            <h3 style={{ marginTop: 0 }}>📚 Lessons ({completedLessons}/{totalLessons})</h3>
-            
-            {/* Progress Bar */}
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{
-                backgroundColor: '#e0e0e0',
-                borderRadius: '4px',
-                overflow: 'hidden',
-                height: '8px'
-              }}>
-                <div style={{
-                  backgroundColor: '#4ade80',
-                  height: '100%',
-                  width: `${progressPercentage}%`,
-                  transition: 'width 0.3s'
-                }} />
-              </div>
-              <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
-                {progressPercentage.toFixed(0)}% Complete
-              </p>
-            </div>
-
-            {/* Lessons */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {lessons.map((lesson) => {
-                const isCompleted = progress?.lessons?.some(
-                  pl => pl.lesson_id === lesson.id && pl.completed
-                );
-                const isSelected = selectedLesson?.id === lesson.id;
-
-                return (
-                  <button
-                    key={lesson.id}
-                    onClick={() => setSelectedLesson(lesson)}
-                    style={{
-                      padding: '12px',
-                      textAlign: 'left',
-                      border: isSelected ? '2px solid #1e40af' : '1px solid #ddd',
-                      borderRadius: '6px',
-                      backgroundColor: isSelected ? '#eff6ff' : 'white',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      fontSize: '14px'
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '18px' }}>
-                        {isCompleted ? '✅' : `${lesson.order}`}
-                      </span>
-                      <div>
-                        <div style={{ fontWeight: isSelected ? 'bold' : 'normal' }}>
-                          {lesson.title}
-                        </div>
-                        {lesson.duration_minutes && (
-                          <div style={{ fontSize: '12px', color: '#666' }}>
-                            ⏱️ {lesson.duration_minutes} min
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            <h3>📚 Lessons</h3>
+            {course.lessons?.map((lesson, idx) => (
+              <button
+                key={lesson.id}
+                onClick={() => setSelectedLesson(lesson)}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '12px',
+                  marginBottom: '8px',
+                  backgroundColor: selectedLesson?.id === lesson.id ? '#1e40af' : '#f3f4f6',
+                  color: selectedLesson?.id === lesson.id ? 'white' : 'black',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  textAlign: 'left'
+                }}
+              >
+                <div>{idx + 1}. {lesson.title}</div>
+              </button>
+            ))}
           </div>
 
           {/* Right: Lesson Content */}
           <div style={{
             backgroundColor: 'white',
             borderRadius: '8px',
-            padding: '30px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            padding: '30px'
           }}>
             {selectedLesson ? (
               <>
-                <h2 style={{ marginTop: 0, marginBottom: '10px' }}>
-                  {selectedLesson.title}
-                </h2>
-                
-                {selectedLesson.duration_minutes && (
-                  <p style={{ fontSize: '14px', color: '#666', marginBottom: '20px' }}>
-                    ⏱️ {selectedLesson.duration_minutes} minutes
-                  </p>
+                <h2>{selectedLesson.title}</h2>
+
+                {selectedLesson.video_url && (
+                  <iframe
+                    width="100%"
+                    height="400"
+                    src={selectedLesson.video_url}
+                    frameBorder="0"
+                    allowFullScreen
+                    style={{ marginBottom: '20px', borderRadius: '8px' }}
+                  />
                 )}
 
-                {/* Video Placeholder */}
-                {selectedLesson.video_url ? (
-                  <div style={{
-                    width: '100%',
-                    paddingBottom: '56.25%',
-                    position: 'relative',
-                    marginBottom: '30px',
-                    backgroundColor: '#000',
-                    borderRadius: '8px'
-                  }}>
-                    <iframe
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        border: 'none',
-                        borderRadius: '8px'
-                      }}
-                      src={selectedLesson.video_url}
-                      title={selectedLesson.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                ) : (
-                  <div style={{
-                    width: '100%',
-                    height: '400px',
-                    backgroundColor: '#f0f0f0',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '30px',
-                    color: '#999'
-                  }}>
-                    Video coming soon
-                  </div>
-                )}
+                <p>{selectedLesson.description}</p>
 
-                {/* Description */}
-                {selectedLesson.description && (
-                  <div style={{ marginBottom: '30px' }}>
-                    <h4>📖 About this lesson</h4>
-                    <p style={{ lineHeight: '1.6', color: '#555' }}>
-                      {selectedLesson.description}
-                    </p>
-                  </div>
-                )}
-
-                {/* Content HTML */}
-                {selectedLesson.content_html && (
-                  <div style={{
-                    marginBottom: '30px',
-                    padding: '20px',
-                    backgroundColor: '#f9f9f9',
-                    borderRadius: '6px',
-                    border: '1px solid #eee'
-                  }}>
-                    <h4>📝 Lesson Content</h4>
-                    <div 
-                      dangerouslySetInnerHTML={{ __html: selectedLesson.content_html }}
-                      style={{ lineHeight: '1.8', color: '#333' }}
-                    />
-                  </div>
-                )}
-
-                {/* Resources */}
-                {selectedLesson.resources && selectedLesson.resources.length > 0 && (
-                  <div style={{ marginBottom: '30px' }}>
-                    <h4>📎 Resources</h4>
-                    <ul style={{ listStyle: 'none', padding: 0 }}>
-                      {selectedLesson.resources.map((resource, idx) => (
-                        <li key={idx} style={{ marginBottom: '10px' }}>
-                          <a
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                              color: '#1e40af',
-                              textDecoration: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '8px'
-                            }}
-                          >
-                            📥 {resource.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Complete Button */}
                 <button
-                  onClick={handleLessonComplete}
+                  onClick={handleCompleteLesson}
                   style={{
                     padding: '12px 30px',
-                    backgroundColor: '#4ade80',
+                    backgroundColor: '#16a34a',
                     color: 'white',
                     border: 'none',
                     borderRadius: '6px',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
                     cursor: 'pointer',
-                    marginTop: '20px'
+                    marginTop: '20px',
+                    fontWeight: 'bold'
                   }}
                 >
-                  ✓ Mark as Complete
+                  ✅ Mark as Complete
                 </button>
               </>
             ) : (
-              <p style={{ textAlign: 'center', color: '#999' }}>Select a lesson to start learning</p>
+              <p>Select a lesson to start learning</p>
             )}
           </div>
         </div>

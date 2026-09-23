@@ -1,199 +1,59 @@
-// Backend API URL — HTTPS enforced, with fallback
-// Ensures the URL always starts with https://
-function getApiUrl() {
-  const envUrl = process.env.REACT_APP_API_URL;
-  
-  // If env var exists, use it
-  if (envUrl) {
-    // Ensure it has https:// protocol
-    if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
-      // Already has protocol, return as-is
-      return envUrl;
-    } else {
-      // No protocol, add https://
-      return `https://${envUrl}`;
-    }
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+});
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-  
-  // Fallback for development
-  return 'https://ayindetechnologiesbackend-production.up.railway.app';
-}
+  return config;
+});
 
-export const API_URL = getApiUrl();
-
-const TOKEN_KEY = 'ayinde_token';
-
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-export function setToken(token) {
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY);
-}
-
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
-async function parseOrThrow(res) {
-  if (res.ok) return res.json();
-  let detail = 'Something went wrong.';
-  try {
-    const body = await res.json();
-    detail = body.detail || detail;
-  } catch (_) {
-    // ignore — use default message
-  }
-  throw new Error(detail);
-}
-
-export const api = {
-  async register(name, email, password, captchaToken, captchaAnswer) {
-    const res = await fetch(`${API_URL}/api/auth/register/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name, email, password,
-        captcha_token: captchaToken,
-        captcha_answer: captchaAnswer,
-      }),
-    });
-    return parseOrThrow(res);
-  },
-
-  async login(email, password, captchaToken, captchaAnswer) {
-    const res = await fetch(`${API_URL}/api/auth/login/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email, password,
-        captcha_token: captchaToken,
-        captcha_answer: captchaAnswer,
-      }),
-    });
-    return parseOrThrow(res);
-  },
-
-  async me() {
-    const res = await fetch(`${API_URL}/api/auth/me/`, { headers: authHeaders() });
-    return parseOrThrow(res);
-  },
-
-  async getServices() {
-    const res = await fetch(`${API_URL}/api/services/`);
-    return parseOrThrow(res);
-  },
-
-  async getTeam() {
-    const res = await fetch(`${API_URL}/api/team/`);
-    return parseOrThrow(res);
-  },
-
-  async getProjects() {
-    const res = await fetch(`${API_URL}/api/projects/`, { headers: authHeaders() });
-    return parseOrThrow(res);
-  },
-
-  async getCourses() {
-    const res = await fetch(`${API_URL}/api/courses/`, { headers: authHeaders() });
-    return parseOrThrow(res);
-  },
-
-  async getMyEnrollments() {
-    const res = await fetch(`${API_URL}/api/courses/me/enrollments/`, { headers: authHeaders() });
-    return parseOrThrow(res);
-  },
-
-  async getCourseDetail(courseId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/`, { headers: authHeaders() });
-    return parseOrThrow(res);
-  },
-
-  async getCourseProgress(courseId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/progress/`, { headers: authHeaders() });
-    return parseOrThrow(res);
-  },
-
-  async completeLesson(courseId, lessonId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/complete/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() }
-    });
-    return parseOrThrow(res);
-  },
-
-  async enrollInCourse(courseId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
-      method: 'POST',
-      headers: authHeaders(),
-    });
-    return parseOrThrow(res);
-  },
-
-  // SQUARE PAYMENT - NEW FLOW
-  // Step 1: Create payment intent (get client token)
-  async createPaymentIntent(courseId) {
-    const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ course_id: courseId }),
-    });
-    return parseOrThrow(res);
-  },
-
-  // Alias for initiatePayment
-  async initiatePayment(courseId, amount, currency = 'USD') {
-    const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ 
-        course_id: courseId,
-        amount: amount,
-        currency: currency 
-      }),
-    });
-    return parseOrThrow(res);
-  },
-
-  // Step 2: Verify payment after Square SDK completes payment
-  async verifyPayment(paymentId, token, billingData = {}) {
-    const res = await fetch(`${API_URL}/api/payments/verify/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({
-        payment_id: paymentId,
-        nonce: token,
-        billing_postal_code: billingData.billingPostalCode || '',
-        billing_country: billingData.billingCountry || ''
-      })
-    });
-    return parseOrThrow(res);
-  },
-
-  // Get payment status
-  async getPaymentStatus(paymentId) {
-    const res = await fetch(`${API_URL}/api/payments/${paymentId}/`, {
-      headers: authHeaders(),
-    });
-    return parseOrThrow(res);
-  },
-
-  async getCaptcha() {
-    const res = await fetch(`${API_URL}/api/captcha/`);
-    return parseOrThrow(res);
-  },
-
-  async submitContact(payload) {
-    const res = await fetch(`${API_URL}/api/contact/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    return parseOrThrow(res);
-  },
+// Auth
+export const login = (email, password) => api.post('/api/auth/login/', { email, password });
+export const register = (email, password) => api.post('/api/auth/register/', { email, password });
+export const logout = () => {
+  localStorage.removeItem('token');
+  return Promise.resolve();
 };
+
+// Courses
+export const getCourses = () => api.get('/api/courses/').then(r => r.data);
+export const getCourseDetail = (courseId) => api.get(`/api/courses/${courseId}/`).then(r => r.data);
+export const getMyEnrollments = () => api.get('/api/courses/me/enrollments/').then(r => r.data);
+export const getCourseProgress = (courseId) => api.get(`/api/courses/${courseId}/progress/`).then(r => r.data);
+
+// Lessons
+export const completeLesson = (courseId, lessonId) => 
+  api.post(`/api/courses/${courseId}/lessons/${lessonId}/complete/`).then(r => r.data);
+
+// Payments - ONE-TIME
+export const initiatePayment = (courseId, amount, currency = 'USD') =>
+  api.post('/api/payments/create-intent/', { course_id: courseId, amount, currency }).then(r => r.data);
+
+export const verifyPayment = (paymentId, nonce, billingData = {}) =>
+  api.post('/api/payments/verify/', {
+    payment_id: paymentId,
+    nonce,
+    billing_postal_code: billingData.billingPostalCode,
+    billing_country: billingData.billingCountry
+  }).then(r => r.data);
+
+// ✅ NEW: Save card for auto-charge subscription
+export const savePaymentMethod = (courseId, nonce) =>
+  api.post(`/api/courses/${courseId}/save-card/`, { nonce }).then(r => r.data);
+
+// ✅ NEW: Get enrollment status (trial, active, payment_failed)
+export const getEnrollmentStatus = (courseId) =>
+  api.get(`/api/courses/${courseId}/enrollment-status/`).then(r => r.data);
+
+// Projects
+export const getProjects = () => api.get('/api/projects/').then(r => r.data);
+
+export default api;
