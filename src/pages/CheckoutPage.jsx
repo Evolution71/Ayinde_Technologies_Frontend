@@ -209,25 +209,25 @@ const CheckoutPage = () => {
         throw new Error('Payment form not ready - payments reference missing');
       }
 
-      if (typeof paymentsRef.current.requestCardNonce !== 'function') {
-        throw new Error('Payment form not ready - requestCardNonce not available');
+      console.log('[Checkout] Requesting card token using card.tokenize()...');
+      
+      let tokenResult;
+      try {
+        tokenResult = await cardRef.current.tokenize({
+          postalCode: billingAddress.postalCode
+        });
+      } catch (err) {
+        console.error('[Checkout] Tokenize error:', err);
+        throw new Error(`Failed to tokenize card: ${err.message}`);
       }
 
-      console.log('[Checkout] Requesting card nonce using payments...');
-      const result = await paymentsRef.current.requestCardNonce({
-        billingContact: {
-          postalCode: billingAddress.postalCode,
-          country: billingAddress.country
-        }
-      });
-
-      if (result.status !== 'OK') {
-        console.error('[Checkout] Card nonce request failed:', result.errors);
-        throw new Error('Failed to process card');
+      if (tokenResult.status !== 'OK') {
+        console.error('[Checkout] Card tokenize failed:', tokenResult.errors);
+        throw new Error('Failed to tokenize card - ' + (tokenResult.errors?.[0]?.message || 'Unknown error'));
       }
 
-      const nonce = result.details.cardNonce;
-      console.log('[Checkout] Nonce received, verifying payment...');
+      const nonce = tokenResult.token;
+      console.log('[Checkout] Token received, verifying payment...');
 
       const verifyResult = await api.verifyPayment(paymentId, nonce);
 
