@@ -257,10 +257,13 @@ const CheckoutPage = () => {
         console.log('[Checkout] ✅ Payment successful');
         
         if (isMountedRef.current) {
+          // Show success alert first
+          alert('✅ Payment successful! You are now enrolled in the course.');
+          
+          // Then navigate after a brief delay
           setTimeout(() => {
             navigate('/');
-            alert('✅ Payment successful! You are now enrolled in the course.');
-          }, 500);
+          }, 1000);
         }
       } else {
         throw new Error(verifyResult.message || 'Payment verification failed');
