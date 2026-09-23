@@ -214,7 +214,12 @@ const CheckoutPage = () => {
       let tokenResult;
       try {
         tokenResult = await cardRef.current.tokenize({
-          postalCode: billingAddress.postalCode
+          verificationDetails: {
+            billingContact: {
+              postalCode: billingAddress.postalCode,
+              country: billingAddress.country
+            }
+          }
         });
       } catch (err) {
         console.error('[Checkout] Tokenize error:', err);
