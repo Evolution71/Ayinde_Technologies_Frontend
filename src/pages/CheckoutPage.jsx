@@ -37,7 +37,7 @@ const CheckoutPage = () => {
 
         // Get course
         const courses = await api.getCourses();
-        const foundCourse = courses.find(c => c.id === courseId);
+        const foundCourse = courses.find(c => c.id == courseId);
         if (!foundCourse) {
           setError('Course not found');
           return;
