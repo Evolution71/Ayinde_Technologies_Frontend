@@ -1,421 +1,350 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
-import '../styles/checkout.css';
 
 const CheckoutPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  
+  const { user } = useAuth();
+
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [processing, setProcessing] = useState(false);
-  const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
-  const [cardReady, setCardReady] = useState(false);
-  
+  const [processing, setProcessing] = useState(false);
+
   // Billing address state
-  const [billingAddress, setBillingAddress] = useState({
-    postalCode: '',
-    country: 'US'
-  });  // ← NEW!
+  const [billingPostalCode, setBillingPostalCode] = useState('');
+  const [billingCountry, setBillingCountry] = useState('US');
 
-  // Refs to track component state
-  const cardRef = useRef(null);
+  // Square references
   const paymentsRef = useRef(null);
-  const isMountedRef = useRef(true);
+  const cardRef = useRef(null);
+  const [cardReady, setCardReady] = useState(false);
 
-  // Main initialization effect
+  // Initialize payment
   useEffect(() => {
-    let isActive = true;
-
-    const initializeCheckout = async () => {
+    const initializePayment = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
-        // Step 1: Fetch course
         console.log('[Checkout] Fetching course...');
-        const courses = await api.getCourses();
-        const selected = courses.find(c => c.id === parseInt(courseId));
+        setLoading(true);
 
-        if (!isActive) return;
-
-        if (!selected) {
-          setError('Course not found');
-          setLoading(false);
+        if (!user) {
+          navigate('/login');
           return;
         }
 
-        setCourse(selected);
+        // Get course
+        const courses = await api.getCourses();
+        const foundCourse = courses.find(c => c.id == courseId);
+        if (!foundCourse) {
+          setError('Course not found');
+          return;
+        }
+        setCourse(foundCourse);
 
-        // Step 2: Initialize payment
+        // Initiate payment (get payment_id)
         console.log('[Checkout] Initializing payment...');
-        const paymentResponse = await api.initiatePayment(
-          selected.id,
-          selected.price,
-          selected.currency || 'USD'
-        );
+        const paymentData = await api.initiatePayment(courseId, foundCourse.price, 'USD');
+        console.log('[Checkout] Payment initialized:', paymentData);
+        setPaymentId(paymentData.payment_id);
 
-        if (!isActive) return;
-
-        console.log('[Checkout] Payment initialized:', paymentResponse);
-        setClientToken(paymentResponse.client_token);
-        setPaymentId(paymentResponse.payment_id);
-
-        // Step 3: Load Square SDK
+        // Load Square SDK
         console.log('[Checkout] Loading Square SDK...');
-        if (!window.Square) {
-          await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://web.squarecdn.com/v1/square.js';
-            script.async = true;
-            script.onload = () => {
-              // Give SDK MUCH more time to fully initialize (slow network)
-              console.log('[Checkout] Square SDK loaded, waiting for full initialization...');
-              setTimeout(resolve, 3000);  // ← Increased from 1500 to 3000ms
-            };
-            script.onerror = () => reject(new Error('Failed to load Square SDK'));
-            document.head.appendChild(script);
-          });
-        }
-
-        if (!isActive) return;
-
-        // Verify Square.payments is available
-        if (!window.Square || typeof window.Square.payments !== 'function') {
-          throw new Error('Square SDK not properly initialized - payments function not available');
-        }
-
-        console.log('[Checkout] Square SDK ready');
-
-        // Step 4: Initialize card form
-        console.log('[Checkout] Initializing card form...');
-        let appId = process.env.REACT_APP_SQUARE_APP_ID;
-        
-        // Debug: Log environment variable
-        console.log('[Checkout] DEBUG - Raw appId:', JSON.stringify(appId));
-        console.log('[Checkout] DEBUG - appId type:', typeof appId);
-        console.log('[Checkout] DEBUG - appId is set?', !!appId);
-        
-        // TRIM whitespace
-        appId = appId?.trim();
-        
-        console.log('[Checkout] DEBUG - Trimmed appId:', JSON.stringify(appId));
-        console.log('[Checkout] DEBUG - Trimmed length:', appId?.length);
-
-        if (!appId) {
-          throw new Error('Payment system not configured - REACT_APP_SQUARE_APP_ID is not set');
-        }
-
-        // Ensure Square.payments is available
-        if (!window.Square || !window.Square.payments) {
-          throw new Error('Square SDK not properly loaded');
-        }
-
-        const payments = window.Square.payments(appId);
-        console.log('[Checkout] Creating card instance...');
-        
-        // Retry card creation up to 3 times
-        let cardInstance = null;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          try {
-            cardInstance = await payments.card();
-            console.log('[Checkout] Card instance created on attempt', attempt);
-            break;
-          } catch (err) {
-            console.log('[Checkout] Card creation attempt', attempt, 'failed:', err.message);
-            if (attempt < 3) {
-              await new Promise(resolve => setTimeout(resolve, 1000));  // ← Increased from 500 to 1000ms
-            } else {
-              throw err;
-            }
-          }
-        }
-        
-        if (!cardInstance) {
-          throw new Error('Failed to create card instance after 3 attempts');
-        }
-        
-        if (!isActive) return;
-
-        // Store both payments and card instances in refs (not window)
-        paymentsRef.current = payments;
-        cardRef.current = cardInstance;
-
-        console.log('[Checkout] ✅ Checkout initialized successfully');
-        setError(null);
-        setCardReady(true);  // ← SIGNAL THAT CARD IS READY!
+        return new Promise((resolve) => {
+          const script = document.createElement('script');
+          script.src = 'https://web.squarecdn.com/v1/square.js';
+          script.onload = () => {
+            console.log('[Checkout] Square SDK ready');
+            resolve();
+          };
+          script.onerror = () => {
+            setError('Failed to load Square SDK');
+            resolve();
+          };
+          document.head.appendChild(script);
+        });
       } catch (err) {
-        if (isActive) {
-          console.error('[Checkout] Initialization error:', err);
-          setError(err.message || 'Failed to initialize checkout');
-        }
-      } finally {
-        if (isActive) {
-          setLoading(false);
-        }
+        console.error('[Checkout] Init error:', err);
+        setError(err.message);
       }
     };
 
-    initializeCheckout();
+    initializePayment().then(() => setLoading(false));
+  }, [courseId, user, navigate]);
 
-    // Cleanup
-    return () => {
-      isActive = false;
-    };
-  }, [courseId]);
-
-  // Attach card form once card is ready
+  // Initialize card after SDK loads
   useEffect(() => {
-    if (!cardReady || !cardRef.current) {
-      console.log('[Checkout] Card not ready yet, waiting...');
-      return;
-    }
+    if (!window.Square || !paymentId) return;
 
-    const attachCard = async () => {
+    const initCard = async () => {
       try {
+        console.log('[Checkout] Initializing card form...');
+
+        const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
+        console.log('[Checkout] DEBUG - Raw appId:', appId);
+        console.log('[Checkout] DEBUG - appId type:', typeof appId);
+        console.log('[Checkout] DEBUG - appId is set?', !!appId);
+
+        if (!appId) {
+          setError('Square App ID not configured');
+          return;
+        }
+
+        console.log('[Checkout] DEBUG - Trimmed appId:', appId);
+        console.log('[Checkout] DEBUG - Trimmed length:', appId.length);
+
+        // Create payments instance
+        console.log('[Checkout] Creating payments instance...');
+        const payments = window.Square.payments(appId);
+        paymentsRef.current = payments;
+
+        // Create card instance
+        console.log('[Checkout] Creating card instance...');
+        const card = await payments.card();
+        cardRef.current = card;
+        console.log('[Checkout] Card instance created');
+
+        // Attach card to DOM
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
         console.log('[Checkout] Attaching card form to DOM...');
-        
-        // Verify container exists
         const container = document.getElementById('sq-card-container');
         console.log('[Checkout] Container found?', !!container);
-        
+
         if (!container) {
-          console.error('[Checkout] ❌ Card container not found in DOM');
-          setError('Card form container not found');
+          setError('Card container not found');
           return;
         }
 
         console.log('[Checkout] Attaching card to container...');
         console.log('[Checkout] cardRef.current has attach?', typeof cardRef.current?.attach);
-        
+
         await cardRef.current.attach('#sq-card-container');
-        
         console.log('[Checkout] ✅ Card form attached successfully');
-        setError(null);
+
+        setCardReady(true);
       } catch (err) {
-        console.error('[Checkout] ❌ Card attachment error:', err);
-        console.error('[Checkout] Error message:', err.message);
-        setError(`Failed to attach card form: ${err.message}`);
+        console.error('[Checkout] Card init error:', err);
+        setError('Failed to initialize card: ' + err.message);
       }
     };
 
-    attachCard();
-  }, [cardReady]);
+    initCard();
+  }, [paymentId]);
 
-  // Handle payment submission
   const handlePayment = async (e) => {
     e.preventDefault();
-    setProcessing(true);
-    setError(null);
+
+    if (!cardRef.current) {
+      setError('Card not initialized');
+      return;
+    }
 
     try {
-      console.log('[Checkout] Payment handler called');
-      console.log('[Checkout] cardRef.current exists?', !!cardRef.current);
-      console.log('[Checkout] paymentsRef.current exists?', !!paymentsRef.current);
-      
-      if (!cardRef.current) {
-        throw new Error('Payment form not ready - card reference missing');
+      setProcessing(true);
+      console.log('[Checkout] Processing payment...');
+
+      // ✅ CORRECT METHOD: card.tokenize()
+      console.log('[Checkout] Calling card.tokenize()...');
+      const tokenResult = await cardRef.current.tokenize();
+
+      if (tokenResult.status !== 'OK') {
+        setError('Card tokenization failed: ' + tokenResult.errors?.[0]?.message);
+        setProcessing(false);
+        return;
       }
 
-      if (!paymentsRef.current) {
-        throw new Error('Payment form not ready - payments reference missing');
-      }
+      const token = tokenResult.token;
+      console.log('[Checkout] ✅ Token received:', token.substring(0, 20) + '...');
 
-      if (typeof paymentsRef.current.requestCardNonce !== 'function') {
-        throw new Error('Payment form not ready - requestCardNonce method not available');
-      }
-
-      console.log('[Checkout] Requesting card nonce using payments...');
-      const result = await paymentsRef.current.requestCardNonce({
-        billingContact: {
-          postalCode: billingAddress.postalCode,
-          country: billingAddress.country
-        }
+      // Verify payment with backend
+      console.log('[Checkout] Verifying payment with backend...');
+      const result = await api.verifyPayment(paymentId, token, {
+        billingPostalCode,
+        billingCountry
       });
 
-      if (result.status !== 'OK') {
-        console.error('[Checkout] Card nonce request failed:', result.errors);
-        throw new Error('Failed to process card');
-      }
+      console.log('[Checkout] ✅ Payment verified:', result);
 
-      const nonce = result.details.cardNonce;
-      console.log('[Checkout] Nonce received, verifying payment...');
-
-      const verifyResult = await api.verifyPayment(paymentId, nonce);
-
-      if (verifyResult.success || verifyResult.status === 'success') {
-        console.log('[Checkout] ✅ Payment successful');
-        
-        if (isMountedRef.current) {
-          setTimeout(() => {
-            navigate('/');
-            alert('✅ Payment successful! You are now enrolled in the course.');
-          }, 500);
-        }
-      } else {
-        throw new Error(verifyResult.message || 'Payment verification failed');
-      }
+      alert('✅ Payment successful! Welcome to the course!');
+      navigate('/courses');
     } catch (err) {
       console.error('[Checkout] Payment error:', err);
-      
-      if (isMountedRef.current) {
-        setError(err.message || 'Payment failed. Please try again.');
-      }
-    } finally {
-      if (isMountedRef.current) {
-        setProcessing(false);
-      }
+      setError('Payment failed: ' + err.message);
+      setProcessing(false);
     }
   };
 
-  // Track component mount state
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  // Render loading state
   if (loading) {
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading checkout...</div>;
+  }
+
+  if (error) {
     return (
-      <div className="checkout-container">
-        <div className="checkout-loading">Loading checkout...</div>
+      <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto' }}>
+        <h2 style={{ color: 'red' }}>Error: {error}</h2>
+        <button
+          onClick={() => navigate('/courses')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#1e40af',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          ← Back to Courses
+        </button>
       </div>
     );
   }
 
-  // Render error state
-  if (!course) {
-    return (
-      <div className="checkout-container">
-        <div className="checkout-error">
-          {error || 'Course not found'}
-          <button onClick={() => navigate('/')}>Back to Home</button>
-        </div>
-      </div>
-    );
-  }
-
-  // Render checkout page
   return (
-    <div className="checkout-page">
-      <div className="checkout-container">
-        {/* Left Side: Course Summary */}
-        <div className="checkout-summary">
-          <h1>Review Your Purchase</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5', padding: '40px 20px' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', padding: '40px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+        
+        <h1 style={{ marginTop: 0 }}>💳 Checkout</h1>
 
-          {course.icon && (
-            <div className="course-image">
-              <img src={course.icon} alt={course.title} />
+        {course && (
+          <>
+            <div style={{ marginBottom: '30px', paddingBottom: '30px', borderBottom: '1px solid #eee' }}>
+              <h3 style={{ margin: '0 0 10px 0' }}>{course.title}</h3>
+              <p style={{ color: '#666', margin: 0 }}>30-day free trial, then ${course.price}/year</p>
             </div>
-          )}
 
-          <div className="course-details">
-            <h2>{course.title}</h2>
-            {course.instructor && (
-              <p className="instructor">Instructor: {course.instructor}</p>
-            )}
-            <p className="description">{course.description}</p>
-            {course.duration && <p className="duration">Duration: {course.duration}</p>}
-            {course.level && <p className="level">Level: {course.level}</p>}
-          </div>
-
-          <div className="price-breakdown">
-            <div className="price-item">
-              <span>Course Price:</span>
-              <span className="amount">
-                {course.currency || 'USD'} {course.price.toFixed(2)}
-              </span>
-            </div>
-            <div className="price-item total">
-              <span>Total:</span>
-              <span className="amount">
-                {course.currency || 'USD'} {course.price.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side: Payment Form */}
-        <div className="checkout-form">
-          <h2>Payment Details</h2>
-
-          {error && (
-            <div className="error-message">
-              <span>❌ {error}</span>
-            </div>
-          )}
-
-          {!error && clientToken ? (
             <form onSubmit={handlePayment}>
-              <div className="form-group">
-                <label htmlFor="sq-card-container">Card Information</label>
-                <div id="sq-card-container" className="card-container"></div>
+              {/* Card */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  Card Details
+                </label>
+                <div
+                  id="sq-card-container"
+                  style={{
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    padding: '12px',
+                    minHeight: '50px',
+                    backgroundColor: '#fafafa'
+                  }}
+                />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="postal-code">Postal Code</label>
-                  <input
-                    type="text"
-                    id="postal-code"
-                    placeholder="12345"
-                    value={billingAddress.postalCode}
-                    onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="country">Country</label>
-                  <input
-                    type="text"
-                    id="country"
-                    placeholder="US"
-                    value={billingAddress.country}
-                    onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
-                    required
-                  />
+              {/* Postal Code */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  Postal Code
+                </label>
+                <input
+                  type="text"
+                  value={billingPostalCode}
+                  onChange={(e) => setBillingPostalCode(e.target.value)}
+                  placeholder="12345"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              {/* Country */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  Country
+                </label>
+                <select
+                  value={billingCountry}
+                  onChange={(e) => setBillingCountry(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <option value="US">United States</option>
+                  <option value="CA">Canada</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="AU">Australia</option>
+                  <option value="NG">Nigeria</option>
+                </select>
+              </div>
+
+              {/* Amount */}
+              <div style={{
+                padding: '15px',
+                backgroundColor: '#f0f9ff',
+                borderRadius: '6px',
+                marginBottom: '20px',
+                border: '1px solid #bfdbfe'
+              }}>
+                <p style={{ margin: '0 0 5px 0', color: '#666' }}>Total Amount</p>
+                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e40af' }}>
+                  ${course.price}
                 </div>
               </div>
 
+              {/* Error */}
+              {error && (
+                <div style={{
+                  padding: '12px',
+                  backgroundColor: '#fee2e2',
+                  borderRadius: '6px',
+                  marginBottom: '20px',
+                  color: '#dc2626',
+                  fontSize: '14px'
+                }}>
+                  {error}
+                </div>
+              )}
+
+              {/* Pay Button */}
               <button
                 type="submit"
-                disabled={processing || !clientToken}
-                className="btn-pay-large"
+                disabled={processing || !cardReady}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  backgroundColor: processing || !cardReady ? '#ccc' : '#1e40af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: processing || !cardReady ? 'default' : 'pointer'
+                }}
               >
-                {processing ? (
-                  <>
-                    <span className="spinner"></span>
-                    Processing...
-                  </>
-                ) : (
-                  `Pay ${course.currency || 'USD'} ${course.price.toFixed(2)}`
-                )}
+                {processing ? 'Processing...' : `Pay $${course.price}`}
               </button>
 
-              <p className="security-note">
-                🔒 Your payment is secure and encrypted by Square
-              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/courses')}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  marginTop: '10px',
+                  backgroundColor: '#e5e7eb',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                ← Back to Courses
+              </button>
             </form>
-          ) : (
-            <div className="loading-form">
-              <span className="spinner"></span>
-              Initializing payment form...
-            </div>
-          )}
-
-          <button
-            type="button"
-            className="btn-cancel-checkout"
-            onClick={() => navigate('/')}
-            disabled={processing}
-          >
-            Cancel & Go Back
-          </button>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
