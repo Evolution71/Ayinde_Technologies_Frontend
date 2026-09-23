@@ -219,23 +219,32 @@ const CheckoutPage = () => {
       }
 
       console.log('[Checkout] Billing address:', billingAddress);
+      console.log('[Checkout] Postal Code value:', billingAddress.postalCode);
+      console.log('[Checkout] Country value:', billingAddress.country);
+      console.log('[Checkout] Postal Code type:', typeof billingAddress.postalCode);
+      console.log('[Checkout] Country type:', typeof billingAddress.country);
       console.log('[Checkout] Requesting card token using card.tokenize()...');
       
       let tokenResult;
       try {
+        const billingContact = {
+          postalCode: String(billingAddress.postalCode).trim(),
+          country: String(billingAddress.country).trim()
+        };
+
+        console.log('[Checkout] Billing contact object:', billingContact);
+        
         const tokenizeOptions = {
           verificationDetails: {
-            billingContact: {
-              postalCode: billingAddress.postalCode.trim(),
-              country: billingAddress.country.trim()
-            }
+            billingContact: billingContact
           }
         };
         
-        console.log('[Checkout] Tokenize options:', tokenizeOptions);
+        console.log('[Checkout] Final tokenize options:', JSON.stringify(tokenizeOptions));
         tokenResult = await cardRef.current.tokenize(tokenizeOptions);
       } catch (err) {
         console.error('[Checkout] Tokenize error:', err);
+        console.error('[Checkout] Error details:', err.message);
         throw new Error(`Failed to tokenize card: ${err.message}`);
       }
 
@@ -362,7 +371,10 @@ const CheckoutPage = () => {
                     id="postal-code"
                     placeholder="12345"
                     value={billingAddress.postalCode}
-                    onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
+                    onChange={(e) => {
+                      console.log('[Checkout] Postal code changed:', e.target.value);
+                      setBillingAddress({...billingAddress, postalCode: e.target.value});
+                    }}
                     required
                   />
                 </div>
@@ -373,7 +385,10 @@ const CheckoutPage = () => {
                     id="country"
                     placeholder="US"
                     value={billingAddress.country}
-                    onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
+                    onChange={(e) => {
+                      console.log('[Checkout] Country changed:', e.target.value);
+                      setBillingAddress({...billingAddress, country: e.target.value});
+                    }}
                     required
                   />
                 </div>
