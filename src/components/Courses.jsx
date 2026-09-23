@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
-import '../styles/courses.css';
 
 const Courses = ({ user }) => {
   const navigate = useNavigate();
