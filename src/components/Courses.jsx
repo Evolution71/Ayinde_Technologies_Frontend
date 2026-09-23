@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
+import { AuthContext } from '../context/AuthContext';
 
-const Courses = ({ user }) => {
+const Courses = () => {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
