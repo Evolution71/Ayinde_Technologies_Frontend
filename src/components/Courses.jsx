@@ -77,14 +77,28 @@ const Courses = () => {
                   {course.duration && <div>⏱️ {course.duration}</div>}
                   {course.level && <div>📊 {course.level}</div>}
                 </div>
+
+                {/* Trial Status */}
+                {course.trial_duration_days && (
+                  <div style={{
+                    fontSize: '12px',
+                    padding: '8px',
+                    backgroundColor: '#fef3c7',
+                    borderRadius: '4px',
+                    marginBottom: '15px',
+                    color: '#92400e'
+                  }}>
+                    🆓 {course.trial_duration_days}-day free trial
+                  </div>
+                )}
                 
                 <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#1e40af' }}>
                   {course.currency || 'USD'} {course.price?.toFixed(2) || '0.00'}
                 </div>
                 
                 <button
-                  onClick={() => !isEnrolled && handleEnroll(course.id)}
-                  disabled={isEnrolled}
+                  onClick={() => isEnrolled ? navigate(`/course/${course.id}`) : handleEnroll(course.id)}
+                  disabled={false}
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -92,12 +106,12 @@ const Courses = () => {
                     border: 'none',
                     fontSize: '16px',
                     fontWeight: 'bold',
-                    cursor: isEnrolled ? 'default' : 'pointer',
+                    cursor: 'pointer',
                     backgroundColor: isEnrolled ? '#4ade80' : '#1e40af',
                     color: 'white'
                   }}
                 >
-                  {isEnrolled ? '✅ Enrolled' : 'Enroll Now'}
+                  {isEnrolled ? '✅ Continue Learning' : 'Enroll Now'}
                 </button>
               </div>
             );

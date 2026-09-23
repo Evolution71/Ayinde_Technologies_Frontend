@@ -15,16 +15,18 @@ const CheckoutPage = () => {
   const [paymentId, setPaymentId] = useState(null);
   const [cardReady, setCardReady] = useState(false);
   
+  // Billing address state
   const [billingAddress, setBillingAddress] = useState({
     postalCode: '',
     country: 'US'
-  });
+  });  // ← NEW!
 
+  // Refs to track component state
   const cardRef = useRef(null);
   const paymentsRef = useRef(null);
   const isMountedRef = useRef(true);
 
-  // Main initialization
+  // Main initialization effect
   useEffect(() => {
     let isActive = true;
 
@@ -33,6 +35,7 @@ const CheckoutPage = () => {
         setLoading(true);
         setError(null);
 
+        // Step 1: Fetch course
         console.log('[Checkout] Fetching course...');
         const courses = await api.getCourses();
         const selected = courses.find(c => c.id === parseInt(courseId));
@@ -47,6 +50,7 @@ const CheckoutPage = () => {
 
         setCourse(selected);
 
+        // Step 2: Initialize payment
         console.log('[Checkout] Initializing payment...');
         const paymentResponse = await api.initiatePayment(
           selected.id,
@@ -60,6 +64,7 @@ const CheckoutPage = () => {
         setClientToken(paymentResponse.client_token);
         setPaymentId(paymentResponse.payment_id);
 
+        // Step 3: Load Square SDK
         console.log('[Checkout] Loading Square SDK...');
         if (!window.Square) {
           await new Promise((resolve, reject) => {
@@ -67,8 +72,9 @@ const CheckoutPage = () => {
             script.src = 'https://web.squarecdn.com/v1/square.js';
             script.async = true;
             script.onload = () => {
-              console.log('[Checkout] Square SDK loaded, waiting for initialization...');
-              setTimeout(resolve, 3000);
+              // Give SDK MUCH more time to fully initialize (slow network)
+              console.log('[Checkout] Square SDK loaded, waiting for full initialization...');
+              setTimeout(resolve, 3000);  // ← Increased from 1500 to 3000ms
             };
             script.onerror = () => reject(new Error('Failed to load Square SDK'));
             document.head.appendChild(script);
@@ -77,28 +83,33 @@ const CheckoutPage = () => {
 
         if (!isActive) return;
 
+        // Verify Square.payments is available
         if (!window.Square || typeof window.Square.payments !== 'function') {
-          throw new Error('Square SDK not properly initialized');
+          throw new Error('Square SDK not properly initialized - payments function not available');
         }
 
         console.log('[Checkout] Square SDK ready');
 
+        // Step 4: Initialize card form
         console.log('[Checkout] Initializing card form...');
         let appId = process.env.REACT_APP_SQUARE_APP_ID;
         
+        // Debug: Log environment variable
         console.log('[Checkout] DEBUG - Raw appId:', JSON.stringify(appId));
         console.log('[Checkout] DEBUG - appId type:', typeof appId);
         console.log('[Checkout] DEBUG - appId is set?', !!appId);
         
+        // TRIM whitespace
         appId = appId?.trim();
         
         console.log('[Checkout] DEBUG - Trimmed appId:', JSON.stringify(appId));
         console.log('[Checkout] DEBUG - Trimmed length:', appId?.length);
 
         if (!appId) {
-          throw new Error('REACT_APP_SQUARE_APP_ID is not set');
+          throw new Error('Payment system not configured - REACT_APP_SQUARE_APP_ID is not set');
         }
 
+        // Ensure Square.payments is available
         if (!window.Square || !window.Square.payments) {
           throw new Error('Square SDK not properly loaded');
         }
@@ -106,6 +117,7 @@ const CheckoutPage = () => {
         const payments = window.Square.payments(appId);
         console.log('[Checkout] Creating card instance...');
         
+        // Retry card creation up to 3 times
         let cardInstance = null;
         for (let attempt = 1; attempt <= 3; attempt++) {
           try {
@@ -115,7 +127,7 @@ const CheckoutPage = () => {
           } catch (err) {
             console.log('[Checkout] Card creation attempt', attempt, 'failed:', err.message);
             if (attempt < 3) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
+              await new Promise(resolve => setTimeout(resolve, 1000));  // ← Increased from 500 to 1000ms
             } else {
               throw err;
             }
@@ -128,12 +140,13 @@ const CheckoutPage = () => {
         
         if (!isActive) return;
 
+        // Store both payments and card instances in refs (not window)
         paymentsRef.current = payments;
         cardRef.current = cardInstance;
 
         console.log('[Checkout] ✅ Checkout initialized successfully');
         setError(null);
-        setCardReady(true);
+        setCardReady(true);  // ← SIGNAL THAT CARD IS READY!
       } catch (err) {
         if (isActive) {
           console.error('[Checkout] Initialization error:', err);
@@ -148,12 +161,13 @@ const CheckoutPage = () => {
 
     initializeCheckout();
 
+    // Cleanup
     return () => {
       isActive = false;
     };
   }, [courseId]);
 
-  // Attach card form
+  // Attach card form once card is ready
   useEffect(() => {
     if (!cardReady || !cardRef.current) {
       console.log('[Checkout] Card not ready yet, waiting...');
@@ -164,11 +178,12 @@ const CheckoutPage = () => {
       try {
         console.log('[Checkout] Attaching card form to DOM...');
         
+        // Verify container exists
         const container = document.getElementById('sq-card-container');
         console.log('[Checkout] Container found?', !!container);
         
         if (!container) {
-          console.error('[Checkout] Card container not found in DOM');
+          console.error('[Checkout] ❌ Card container not found in DOM');
           setError('Card form container not found');
           return;
         }
@@ -181,7 +196,7 @@ const CheckoutPage = () => {
         console.log('[Checkout] ✅ Card form attached successfully');
         setError(null);
       } catch (err) {
-        console.error('[Checkout] Card attachment error:', err);
+        console.error('[Checkout] ❌ Card attachment error:', err);
         console.error('[Checkout] Error message:', err.message);
         setError(`Failed to attach card form: ${err.message}`);
       }
@@ -190,7 +205,7 @@ const CheckoutPage = () => {
     attachCard();
   }, [cardReady]);
 
-  // Handle payment
+  // Handle payment submission
   const handlePayment = async (e) => {
     e.preventDefault();
     setProcessing(true);
@@ -209,61 +224,36 @@ const CheckoutPage = () => {
         throw new Error('Payment form not ready - payments reference missing');
       }
 
-      // Validate billing address
-      if (!billingAddress.postalCode || billingAddress.postalCode.trim() === '') {
-        throw new Error('Postal code is required');
+      if (typeof paymentsRef.current.requestCardNonce !== 'function') {
+        throw new Error('Payment form not ready - requestCardNonce method not available');
       }
 
-      if (!billingAddress.country || billingAddress.country.trim() === '') {
-        throw new Error('Country is required');
-      }
-
-      console.log('[Checkout] Billing address:', billingAddress);
-      console.log('[Checkout] Postal Code value:', billingAddress.postalCode);
-      console.log('[Checkout] Country value:', billingAddress.country);
-      console.log('[Checkout] Postal Code type:', typeof billingAddress.postalCode);
-      console.log('[Checkout] Country type:', typeof billingAddress.country);
-      console.log('[Checkout] Requesting card token using card.tokenize()...');
-      
-      let tokenResult;
-      try {
-        console.log('[Checkout] Calling card.tokenize() without verification details...');
-        tokenResult = await cardRef.current.tokenize();
-        
-        if (!tokenResult || !tokenResult.token) {
-          throw new Error('No token returned from tokenize()');
+      console.log('[Checkout] Requesting card nonce using payments...');
+      const result = await paymentsRef.current.requestCardNonce({
+        billingContact: {
+          postalCode: billingAddress.postalCode,
+          country: billingAddress.country
         }
-      } catch (err) {
-        console.error('[Checkout] Tokenize error:', err);
-        console.error('[Checkout] Error details:', err.message);
-        throw new Error(`Failed to tokenize card: ${err.message}`);
-      }
-
-      if (tokenResult.status !== 'OK') {
-        console.error('[Checkout] Card tokenize failed:', tokenResult.errors);
-        throw new Error('Failed to tokenize card - ' + (tokenResult.errors?.[0]?.message || 'Unknown error'));
-      }
-
-      const nonce = tokenResult.token;
-      console.log('[Checkout] Token received:', nonce);
-      console.log('[Checkout] Verifying payment with billing address...');
-
-      const verifyResult = await api.verifyPayment(paymentId, nonce, {
-        billingPostalCode: billingAddress.postalCode,
-        billingCountry: billingAddress.country
       });
+
+      if (result.status !== 'OK') {
+        console.error('[Checkout] Card nonce request failed:', result.errors);
+        throw new Error('Failed to process card');
+      }
+
+      const nonce = result.details.cardNonce;
+      console.log('[Checkout] Nonce received, verifying payment...');
+
+      const verifyResult = await api.verifyPayment(paymentId, nonce);
 
       if (verifyResult.success || verifyResult.status === 'success') {
         console.log('[Checkout] ✅ Payment successful');
         
         if (isMountedRef.current) {
-          // Show success alert first
-          alert('✅ Payment successful! You are now enrolled in the course.');
-          
-          // Then navigate after a brief delay
           setTimeout(() => {
             navigate('/');
-          }, 1000);
+            alert('✅ Payment successful! You are now enrolled in the course.');
+          }, 500);
         }
       } else {
         throw new Error(verifyResult.message || 'Payment verification failed');
@@ -281,13 +271,14 @@ const CheckoutPage = () => {
     }
   };
 
-  // Track mount state
+  // Track component mount state
   useEffect(() => {
     return () => {
       isMountedRef.current = false;
     };
   }, []);
 
+  // Render loading state
   if (loading) {
     return (
       <div className="checkout-container">
@@ -296,6 +287,7 @@ const CheckoutPage = () => {
     );
   }
 
+  // Render error state
   if (!course) {
     return (
       <div className="checkout-container">
@@ -307,9 +299,11 @@ const CheckoutPage = () => {
     );
   }
 
+  // Render checkout page
   return (
     <div className="checkout-page">
       <div className="checkout-container">
+        {/* Left Side: Course Summary */}
         <div className="checkout-summary">
           <h1>Review Your Purchase</h1>
 
@@ -345,6 +339,7 @@ const CheckoutPage = () => {
           </div>
         </div>
 
+        {/* Right Side: Payment Form */}
         <div className="checkout-form">
           <h2>Payment Details</h2>
 
@@ -369,10 +364,7 @@ const CheckoutPage = () => {
                     id="postal-code"
                     placeholder="12345"
                     value={billingAddress.postalCode}
-                    onChange={(e) => {
-                      console.log('[Checkout] Postal code changed:', e.target.value);
-                      setBillingAddress({...billingAddress, postalCode: e.target.value});
-                    }}
+                    onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
                     required
                   />
                 </div>
@@ -383,10 +375,7 @@ const CheckoutPage = () => {
                     id="country"
                     placeholder="US"
                     value={billingAddress.country}
-                    onChange={(e) => {
-                      console.log('[Checkout] Country changed:', e.target.value);
-                      setBillingAddress({...billingAddress, country: e.target.value});
-                    }}
+                    onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
                     required
                   />
                 </div>

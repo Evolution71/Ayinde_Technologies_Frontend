@@ -9,6 +9,7 @@ import About from './pages/About';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import CheckoutPage from './pages/CheckoutPage';
+import CourseDetailPage from './pages/CourseDetailPage';
 
 function AppContent() {
   return (
@@ -20,6 +21,7 @@ function AppContent() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/checkout/:courseId" element={<CheckoutPage />} />
+        <Route path="/course/:courseId" element={<CourseDetailPage />} />
       </Routes>
       <Footer />
     </div>

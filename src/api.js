@@ -109,6 +109,24 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  async getCourseDetail(courseId) {
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
+  async getCourseProgress(courseId) {
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/progress/`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
+  async completeLesson(courseId, lessonId) {
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/complete/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() }
+    });
+    return parseOrThrow(res);
+  },
+
   async enrollInCourse(courseId) {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
       method: 'POST',
