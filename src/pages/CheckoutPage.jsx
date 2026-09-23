@@ -145,7 +145,7 @@ const CheckoutPage = () => {
       const token = tokenResult.token;
 
       // Verify payment
-      const result = await api.verifyPayment(paymentId, token, {
+      await api.verifyPayment(paymentId, token, {
         billingPostalCode,
         billingCountry
       });
