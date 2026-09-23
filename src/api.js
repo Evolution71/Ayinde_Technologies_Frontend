@@ -100,7 +100,7 @@ export const api = {
   },
 
   async getCourses() {
-    const res = await fetch(`${API_URL}/api/courses/`);
+    const res = await fetch(`${API_URL}/api/courses/`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
@@ -112,7 +112,18 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // FIXED: Now sends amount and currency along with course_id
+  // SQUARE PAYMENT - NEW FLOW
+  // Step 1: Create payment intent (get client token)
+  async createPaymentIntent(courseId) {
+    const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ course_id: courseId }),
+    });
+    return parseOrThrow(res);
+  },
+
+  // Alias for initiatePayment
   async initiatePayment(courseId, amount, currency = 'USD') {
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
@@ -120,21 +131,31 @@ export const api = {
       body: JSON.stringify({ 
         course_id: courseId,
         amount: amount,
-        currency: currency
+        currency: currency 
       }),
     });
     return parseOrThrow(res);
   },
 
-  // FIXED: Now sends payment_id and nonce instead of transaction_id
-  async verifyPayment(paymentId, nonce) {
+  // Step 2: Verify payment after Square SDK completes payment
+  async verifyPayment(paymentId, token, billingData = {}) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         payment_id: paymentId,
-        nonce: nonce
-      }),
+        source_id: token,
+        billing_postal_code: billingData.billingPostalCode || '',
+        billing_country: billingData.billingCountry || ''
+      })
+    });
+    return parseOrThrow(res);
+  },
+
+  // Get payment status
+  async getPaymentStatus(paymentId) {
+    const res = await fetch(`${API_URL}/api/payments/${paymentId}/`, {
+      headers: authHeaders(),
     });
     return parseOrThrow(res);
   },

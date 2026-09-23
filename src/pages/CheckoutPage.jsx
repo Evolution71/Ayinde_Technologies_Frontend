@@ -227,21 +227,12 @@ const CheckoutPage = () => {
       
       let tokenResult;
       try {
-        const billingContact = {
-          postalCode: String(billingAddress.postalCode).trim(),
-          country: String(billingAddress.country).trim()
-        };
-
-        console.log('[Checkout] Billing contact object:', billingContact);
+        console.log('[Checkout] Calling card.tokenize() without verification details...');
+        tokenResult = await cardRef.current.tokenize();
         
-        const tokenizeOptions = {
-          verificationDetails: {
-            billingContact: billingContact
-          }
-        };
-        
-        console.log('[Checkout] Final tokenize options:', JSON.stringify(tokenizeOptions));
-        tokenResult = await cardRef.current.tokenize(tokenizeOptions);
+        if (!tokenResult || !tokenResult.token) {
+          throw new Error('No token returned from tokenize()');
+        }
       } catch (err) {
         console.error('[Checkout] Tokenize error:', err);
         console.error('[Checkout] Error details:', err.message);
@@ -254,9 +245,13 @@ const CheckoutPage = () => {
       }
 
       const nonce = tokenResult.token;
-      console.log('[Checkout] Token received, verifying payment...');
+      console.log('[Checkout] Token received:', nonce);
+      console.log('[Checkout] Verifying payment with billing address...');
 
-      const verifyResult = await api.verifyPayment(paymentId, nonce);
+      const verifyResult = await api.verifyPayment(paymentId, nonce, {
+        billingPostalCode: billingAddress.postalCode,
+        billingCountry: billingAddress.country
+      });
 
       if (verifyResult.success || verifyResult.status === 'success') {
         console.log('[Checkout] ✅ Payment successful');
