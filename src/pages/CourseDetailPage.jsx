@@ -65,13 +65,13 @@ const CourseDetailPage = () => {
             // Try to get enrollments to show which course expired
             try {
               const enrollmentsData = await api.getMyEnrollments();
-              const enrollment = enrollmentsData.enrollments?.find(e => e.course_id == courseId);
+              const enrollment = enrollmentsData.enrollments?.find(e => e.course_id === courseId);
               
               if (enrollment) {
                 console.log('[CourseDetail] Enrollment found:', enrollment);
                 // Try to fetch course basic info
                 const coursesData = await api.getCourses();
-                const courseInfo = coursesData.find(c => c.id == courseId);
+                const courseInfo = coursesData.find(c => c.id === courseId);
                 
                 if (courseInfo) {
                   setCourse(courseInfo);
