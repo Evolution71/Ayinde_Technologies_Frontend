@@ -209,18 +209,31 @@ const CheckoutPage = () => {
         throw new Error('Payment form not ready - payments reference missing');
       }
 
+      // Validate billing address
+      if (!billingAddress.postalCode || billingAddress.postalCode.trim() === '') {
+        throw new Error('Postal code is required');
+      }
+
+      if (!billingAddress.country || billingAddress.country.trim() === '') {
+        throw new Error('Country is required');
+      }
+
+      console.log('[Checkout] Billing address:', billingAddress);
       console.log('[Checkout] Requesting card token using card.tokenize()...');
       
       let tokenResult;
       try {
-        tokenResult = await cardRef.current.tokenize({
+        const tokenizeOptions = {
           verificationDetails: {
             billingContact: {
-              postalCode: billingAddress.postalCode,
-              country: billingAddress.country
+              postalCode: billingAddress.postalCode.trim(),
+              country: billingAddress.country.trim()
             }
           }
-        });
+        };
+        
+        console.log('[Checkout] Tokenize options:', tokenizeOptions);
+        tokenResult = await cardRef.current.tokenize(tokenizeOptions);
       } catch (err) {
         console.error('[Checkout] Tokenize error:', err);
         throw new Error(`Failed to tokenize card: ${err.message}`);
