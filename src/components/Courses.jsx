@@ -22,9 +22,9 @@ const Courses = () => {
 
         if (user && user.id) {
           try {
-            const projects = await api.getProjects();
+            const enrollmentsData = await api.getMyEnrollments();
             const enrolledIds = new Set(
-              projects.filter(p => p.course_id).map(p => p.course_id)
+              enrollmentsData.enrollments.map(e => e.course_id)
             );
             setEnrolledCourseIds(enrolledIds);
             console.log('[Courses] Enrolled:', Array.from(enrolledIds));

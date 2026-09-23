@@ -104,6 +104,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  async getMyEnrollments() {
+    const res = await fetch(`${API_URL}/api/courses/me/enrollments/`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
   async enrollInCourse(courseId) {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
       method: 'POST',
