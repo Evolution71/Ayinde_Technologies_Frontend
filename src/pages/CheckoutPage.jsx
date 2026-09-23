@@ -1,421 +1,296 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
-import '../styles/checkout.css';
 
 const CheckoutPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  
+  const { user } = useAuth();
+
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [processing, setProcessing] = useState(false);
-  const [clientToken, setClientToken] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
-  const [cardReady, setCardReady] = useState(false);
-  
-  // Billing address state
-  const [billingAddress, setBillingAddress] = useState({
-    postalCode: '',
-    country: 'US'
-  });  // ← NEW!
+  const [processing, setProcessing] = useState(false);
+  const [billingPostalCode, setBillingPostalCode] = useState('');
+  const [billingCountry, setBillingCountry] = useState('US');
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
 
-  // Refs to track component state
-  const cardRef = useRef(null);
   const paymentsRef = useRef(null);
-  const isMountedRef = useRef(true);
+  const cardRef = useRef(null);
+  const [cardReady, setCardReady] = useState(false);
 
-  // Main initialization effect
+  // Step 1: Initialize payment and load Square SDK
   useEffect(() => {
-    let isActive = true;
-
-    const initializeCheckout = async () => {
+    const init = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        if (!user) {
+          navigate('/login');
+          return;
+        }
 
-        // Step 1: Fetch course
-        console.log('[Checkout] Fetching course...');
-        const courses = await api.getCourses();
-        const selected = courses.find(c => c.id === parseInt(courseId));
+        // Try to get course
+        let foundCourse = null;
+        try {
+          const courses = await api.getCourses();
+          foundCourse = courses.find(c => c.id === parseInt(courseId));
+        } catch (err) {
+          console.log('[Checkout] Could not fetch all courses:', err);
+        }
 
-        if (!isActive) return;
+        // If not found, get enrolled courses
+        if (!foundCourse) {
+          try {
+            const enrollmentsData = await api.getMyEnrollments();
+            const enrollmentIds = enrollmentsData.enrollments.map(e => e.course_id);
+            
+            // Get all courses and filter by enrollment
+            const allCourses = await api.getCourses();
+            const enrolled = allCourses.filter(c => enrollmentIds.includes(c.id));
+            setEnrolledCourses(enrolled);
 
-        if (!selected) {
-          setError('Course not found');
+            // Try to find course in enrollments
+            if (parseInt(courseId) && enrolled.length > 0) {
+              foundCourse = enrolled.find(c => c.id === parseInt(courseId));
+            }
+
+            // If still not found, use first enrolled course
+            if (!foundCourse && enrolled.length > 0) {
+              foundCourse = enrolled[0];
+            }
+          } catch (err) {
+            console.log('[Checkout] Could not get enrollments:', err);
+          }
+        }
+
+        if (!foundCourse) {
+          setError('Course not found - showing your enrolled courses below');
           setLoading(false);
           return;
         }
 
-        setCourse(selected);
+        setCourse(foundCourse);
 
-        // Step 2: Initialize payment
-        console.log('[Checkout] Initializing payment...');
-        const paymentResponse = await api.initiatePayment(
-          selected.id,
-          selected.price,
-          selected.currency || 'USD'
-        );
+        // Initiate payment
+        const payData = await api.initiatePayment(foundCourse.id, foundCourse.price, 'USD');
+        setPaymentId(payData.payment_id);
 
-        if (!isActive) return;
+        // Load Square SDK
+        const script = document.createElement('script');
+        script.src = 'https://web.squarecdn.com/v1/square.js';
+        script.async = true;
+        script.onload = () => {
+          setLoading(false);
+        };
+        document.head.appendChild(script);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+    init();
+  }, [courseId, user, navigate]);
 
-        console.log('[Checkout] Payment initialized:', paymentResponse);
-        setClientToken(paymentResponse.client_token);
-        setPaymentId(paymentResponse.payment_id);
+  // Step 2: Initialize card when SDK ready
+  useEffect(() => {
+    if (!window.Square || !paymentId || cardReady) return;
 
-        // Step 3: Load Square SDK
-        console.log('[Checkout] Loading Square SDK...');
-        if (!window.Square) {
-          await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://web.squarecdn.com/v1/square.js';
-            script.async = true;
-            script.onload = () => {
-              // Give SDK MUCH more time to fully initialize (slow network)
-              console.log('[Checkout] Square SDK loaded, waiting for full initialization...');
-              setTimeout(resolve, 3000);  // ← Increased from 1500 to 3000ms
-            };
-            script.onerror = () => reject(new Error('Failed to load Square SDK'));
-            document.head.appendChild(script);
-          });
-        }
-
-        if (!isActive) return;
-
-        // Verify Square.payments is available
-        if (!window.Square || typeof window.Square.payments !== 'function') {
-          throw new Error('Square SDK not properly initialized - payments function not available');
-        }
-
-        console.log('[Checkout] Square SDK ready');
-
-        // Step 4: Initialize card form
-        console.log('[Checkout] Initializing card form...');
-        let appId = process.env.REACT_APP_SQUARE_APP_ID;
-        
-        // Debug: Log environment variable
-        console.log('[Checkout] DEBUG - Raw appId:', JSON.stringify(appId));
-        console.log('[Checkout] DEBUG - appId type:', typeof appId);
-        console.log('[Checkout] DEBUG - appId is set?', !!appId);
-        
-        // TRIM whitespace
-        appId = appId?.trim();
-        
-        console.log('[Checkout] DEBUG - Trimmed appId:', JSON.stringify(appId));
-        console.log('[Checkout] DEBUG - Trimmed length:', appId?.length);
-
+    const initCard = async () => {
+      try {
+        const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
         if (!appId) {
-          throw new Error('Payment system not configured - REACT_APP_SQUARE_APP_ID is not set');
-        }
-
-        // Ensure Square.payments is available
-        if (!window.Square || !window.Square.payments) {
-          throw new Error('Square SDK not properly loaded');
+          setError('Square App ID not configured');
+          return;
         }
 
         const payments = window.Square.payments(appId);
-        console.log('[Checkout] Creating card instance...');
-        
-        // Retry card creation up to 3 times
-        let cardInstance = null;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          try {
-            cardInstance = await payments.card();
-            console.log('[Checkout] Card instance created on attempt', attempt);
-            break;
-          } catch (err) {
-            console.log('[Checkout] Card creation attempt', attempt, 'failed:', err.message);
-            if (attempt < 3) {
-              await new Promise(resolve => setTimeout(resolve, 1000));  // ← Increased from 500 to 1000ms
-            } else {
-              throw err;
-            }
-          }
-        }
-        
-        if (!cardInstance) {
-          throw new Error('Failed to create card instance after 3 attempts');
-        }
-        
-        if (!isActive) return;
-
-        // Store both payments and card instances in refs (not window)
         paymentsRef.current = payments;
-        cardRef.current = cardInstance;
 
-        console.log('[Checkout] ✅ Checkout initialized successfully');
-        setError(null);
-        setCardReady(true);  // ← SIGNAL THAT CARD IS READY!
+        const card = await payments.card();
+        cardRef.current = card;
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await cardRef.current.attach('#sq-card-container');
+        setCardReady(true);
       } catch (err) {
-        if (isActive) {
-          console.error('[Checkout] Initialization error:', err);
-          setError(err.message || 'Failed to initialize checkout');
-        }
-      } finally {
-        if (isActive) {
-          setLoading(false);
-        }
+        setError('Card initialization failed: ' + err.message);
       }
     };
 
-    initializeCheckout();
+    initCard();
+  }, [paymentId, cardReady]);
 
-    // Cleanup
-    return () => {
-      isActive = false;
-    };
-  }, [courseId]);
+  // Step 3: Handle payment
+  const handlePayment = async (e) => {
+    e.preventDefault();
 
-  // Attach card form once card is ready
-  useEffect(() => {
-    if (!cardReady || !cardRef.current) {
-      console.log('[Checkout] Card not ready yet, waiting...');
+    if (!cardRef.current) {
+      setError('Card not initialized');
       return;
     }
 
-    const attachCard = async () => {
-      try {
-        console.log('[Checkout] Attaching card form to DOM...');
-        
-        // Verify container exists
-        const container = document.getElementById('sq-card-container');
-        console.log('[Checkout] Container found?', !!container);
-        
-        if (!container) {
-          console.error('[Checkout] ❌ Card container not found in DOM');
-          setError('Card form container not found');
-          return;
-        }
-
-        console.log('[Checkout] Attaching card to container...');
-        console.log('[Checkout] cardRef.current has attach?', typeof cardRef.current?.attach);
-        
-        await cardRef.current.attach('#sq-card-container');
-        
-        console.log('[Checkout] ✅ Card form attached successfully');
-        setError(null);
-      } catch (err) {
-        console.error('[Checkout] ❌ Card attachment error:', err);
-        console.error('[Checkout] Error message:', err.message);
-        setError(`Failed to attach card form: ${err.message}`);
-      }
-    };
-
-    attachCard();
-  }, [cardReady]);
-
-  // Handle payment submission
-  const handlePayment = async (e) => {
-    e.preventDefault();
-    setProcessing(true);
-    setError(null);
-
     try {
-      console.log('[Checkout] Payment handler called');
-      console.log('[Checkout] cardRef.current exists?', !!cardRef.current);
-      console.log('[Checkout] paymentsRef.current exists?', !!paymentsRef.current);
-      
-      if (!cardRef.current) {
-        throw new Error('Payment form not ready - card reference missing');
+      setProcessing(true);
+
+      // ✅ CORRECT: Use card.tokenize()
+      const tokenResult = await cardRef.current.tokenize();
+
+      if (tokenResult.status !== 'OK') {
+        setError('Card error: ' + tokenResult.errors?.[0]?.message);
+        setProcessing(false);
+        return;
       }
 
-      if (!paymentsRef.current) {
-        throw new Error('Payment form not ready - payments reference missing');
-      }
+      const token = tokenResult.token;
 
-      if (typeof paymentsRef.current.requestCardNonce !== 'function') {
-        throw new Error('Payment form not ready - requestCardNonce method not available');
-      }
-
-      console.log('[Checkout] Requesting card nonce using payments...');
-      const result = await paymentsRef.current.requestCardNonce({
-        billingContact: {
-          postalCode: billingAddress.postalCode,
-          country: billingAddress.country
-        }
+      // Verify payment
+      const result = await api.verifyPayment(paymentId, token, {
+        billingPostalCode,
+        billingCountry
       });
 
-      if (result.status !== 'OK') {
-        console.error('[Checkout] Card nonce request failed:', result.errors);
-        throw new Error('Failed to process card');
-      }
-
-      const nonce = result.details.cardNonce;
-      console.log('[Checkout] Nonce received, verifying payment...');
-
-      const verifyResult = await api.verifyPayment(paymentId, nonce);
-
-      if (verifyResult.success || verifyResult.status === 'success') {
-        console.log('[Checkout] ✅ Payment successful');
-        
-        if (isMountedRef.current) {
-          setTimeout(() => {
-            navigate('/');
-            alert('✅ Payment successful! You are now enrolled in the course.');
-          }, 500);
-        }
-      } else {
-        throw new Error(verifyResult.message || 'Payment verification failed');
-      }
+      alert('✅ Payment successful!');
+      navigate('/courses');
     } catch (err) {
-      console.error('[Checkout] Payment error:', err);
-      
-      if (isMountedRef.current) {
-        setError(err.message || 'Payment failed. Please try again.');
-      }
-    } finally {
-      if (isMountedRef.current) {
-        setProcessing(false);
-      }
+      setError('Payment failed: ' + err.message);
+      setProcessing(false);
     }
   };
 
-  // Track component mount state
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
-  // Render loading state
   if (loading) {
-    return (
-      <div className="checkout-container">
-        <div className="checkout-loading">Loading checkout...</div>
-      </div>
-    );
+    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
   }
 
-  // Render error state
-  if (!course) {
-    return (
-      <div className="checkout-container">
-        <div className="checkout-error">
-          {error || 'Course not found'}
-          <button onClick={() => navigate('/')}>Back to Home</button>
-        </div>
-      </div>
-    );
-  }
-
-  // Render checkout page
   return (
-    <div className="checkout-page">
-      <div className="checkout-container">
-        {/* Left Side: Course Summary */}
-        <div className="checkout-summary">
-          <h1>Review Your Purchase</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5', padding: '40px 20px' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: 'white', borderRadius: '8px', padding: '40px' }}>
+        <h1>💳 Checkout</h1>
 
-          {course.icon && (
-            <div className="course-image">
-              <img src={course.icon} alt={course.title} />
-            </div>
-          )}
-
-          <div className="course-details">
-            <h2>{course.title}</h2>
-            {course.instructor && (
-              <p className="instructor">Instructor: {course.instructor}</p>
-            )}
-            <p className="description">{course.description}</p>
-            {course.duration && <p className="duration">Duration: {course.duration}</p>}
-            {course.level && <p className="level">Level: {course.level}</p>}
+        {error && (
+          <div style={{ padding: '15px', backgroundColor: '#fef3c7', borderRadius: '6px', marginBottom: '20px', color: '#92400e' }}>
+            ⚠️ {error}
           </div>
+        )}
 
-          <div className="price-breakdown">
-            <div className="price-item">
-              <span>Course Price:</span>
-              <span className="amount">
-                {course.currency || 'USD'} {course.price.toFixed(2)}
-              </span>
+        {/* Show enrolled courses if course not found */}
+        {!course && enrolledCourses.length > 0 && (
+          <div style={{ marginBottom: '30px' }}>
+            <h3>Your Enrolled Courses:</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {enrolledCourses.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => navigate(`/checkout/${c.id}`)}
+                  style={{
+                    padding: '15px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    backgroundColor: '#f9fafb',
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  <div style={{ fontWeight: 'bold' }}>{c.title}</div>
+                  <div style={{ fontSize: '14px', color: '#666' }}>${c.price}</div>
+                </button>
+              ))}
             </div>
-            <div className="price-item total">
-              <span>Total:</span>
-              <span className="amount">
-                {course.currency || 'USD'} {course.price.toFixed(2)}
-              </span>
-            </div>
+            <button
+              onClick={() => navigate('/courses')}
+              style={{
+                width: '100%',
+                padding: '12px',
+                marginTop: '15px',
+                backgroundColor: '#e5e7eb',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              ← Back to All Courses
+            </button>
           </div>
-        </div>
+        )}
 
-        {/* Right Side: Payment Form */}
-        <div className="checkout-form">
-          <h2>Payment Details</h2>
-
-          {error && (
-            <div className="error-message">
-              <span>❌ {error}</span>
+        {course && (
+          <>
+            <div style={{ marginBottom: '30px', paddingBottom: '30px', borderBottom: '1px solid #eee' }}>
+              <h3>{course.title}</h3>
+              <p>${course.price}</p>
             </div>
-          )}
 
-          {!error && clientToken ? (
             <form onSubmit={handlePayment}>
-              <div className="form-group">
-                <label htmlFor="sq-card-container">Card Information</label>
-                <div id="sq-card-container" className="card-container"></div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>Card</label>
+                <div id="sq-card-container" style={{ border: '1px solid #ddd', padding: '12px', borderRadius: '6px', minHeight: '50px' }} />
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="postal-code">Postal Code</label>
-                  <input
-                    type="text"
-                    id="postal-code"
-                    placeholder="12345"
-                    value={billingAddress.postalCode}
-                    onChange={(e) => setBillingAddress({...billingAddress, postalCode: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="country">Country</label>
-                  <input
-                    type="text"
-                    id="country"
-                    placeholder="US"
-                    value={billingAddress.country}
-                    onChange={(e) => setBillingAddress({...billingAddress, country: e.target.value})}
-                    required
-                  />
-                </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>Postal Code</label>
+                <input
+                  type="text"
+                  value={billingPostalCode}
+                  onChange={(e) => setBillingPostalCode(e.target.value)}
+                  placeholder="12345"
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px' }}>Country</label>
+                <select
+                  value={billingCountry}
+                  onChange={(e) => setBillingCountry(e.target.value)}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', boxSizing: 'border-box' }}
+                >
+                  <option value="US">US</option>
+                  <option value="NG">Nigeria</option>
+                  <option value="CA">Canada</option>
+                  <option value="GB">UK</option>
+                </select>
+              </div>
+
+              <div style={{ padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '6px', marginBottom: '20px' }}>
+                <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1e40af' }}>${course.price}</div>
               </div>
 
               <button
                 type="submit"
-                disabled={processing || !clientToken}
-                className="btn-pay-large"
+                disabled={processing || !cardReady}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  backgroundColor: processing || !cardReady ? '#ccc' : '#1e40af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: processing || !cardReady ? 'default' : 'pointer'
+                }}
               >
-                {processing ? (
-                  <>
-                    <span className="spinner"></span>
-                    Processing...
-                  </>
-                ) : (
-                  `Pay ${course.currency || 'USD'} ${course.price.toFixed(2)}`
-                )}
+                {processing ? 'Processing...' : `Pay $${course.price}`}
               </button>
 
-              <p className="security-note">
-                🔒 Your payment is secure and encrypted by Square
-              </p>
+              <button
+                type="button"
+                onClick={() => navigate('/courses')}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  marginTop: '10px',
+                  backgroundColor: '#e5e7eb',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer'
+                }}
+              >
+                ← Back to Courses
+              </button>
             </form>
-          ) : (
-            <div className="loading-form">
-              <span className="spinner"></span>
-              Initializing payment form...
-            </div>
-          )}
-
-          <button
-            type="button"
-            className="btn-cancel-checkout"
-            onClick={() => navigate('/')}
-            disabled={processing}
-          >
-            Cancel & Go Back
-          </button>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );
