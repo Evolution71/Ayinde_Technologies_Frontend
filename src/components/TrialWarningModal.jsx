@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../api';
+import React from 'react';
 
 const TrialWarningModal = ({ course, daysRemaining, onContinue, onUpgrade }) => {
   if (daysRemaining <= 0) {

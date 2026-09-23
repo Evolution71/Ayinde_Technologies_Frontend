@@ -16,49 +16,90 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [trialDaysRemaining, setTrialDaysRemaining] = useState(null);
+  const [showPaymentWall, setShowPaymentWall] = useState(false);
 
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
         setLoading(true);
         setError(null);
+        setShowPaymentWall(false);
 
         if (!user) {
           navigate('/login');
           return;
         }
 
-        // Get course details with lessons
-        const courseData = await api.getCourseDetail(courseId);
-        console.log('[CourseDetail] Course:', courseData);
-        
-        setCourse(courseData);
-        setLessons(courseData.lessons || []);
-        
-        // Set first lesson as selected
-        if (courseData.lessons && courseData.lessons.length > 0) {
-          setSelectedLesson(courseData.lessons[0]);
-        }
+        // Try to get course details
+        try {
+          const courseData = await api.getCourseDetail(courseId);
+          console.log('[CourseDetail] Course:', courseData);
+          
+          setCourse(courseData);
+          setLessons(courseData.lessons || []);
+          
+          if (courseData.lessons && courseData.lessons.length > 0) {
+            setSelectedLesson(courseData.lessons[0]);
+          }
 
-        // Get user's progress
-        const progressData = await api.getCourseProgress(courseId);
-        setProgress(progressData);
-        console.log('[CourseDetail] Progress:', progressData);
+          // Get progress
+          const progressData = await api.getCourseProgress(courseId);
+          setProgress(progressData);
+          console.log('[CourseDetail] Progress:', progressData);
 
-        // Calculate trial days remaining
-        if (courseData.trial_ends_at) {
-          const now = new Date();
-          const trialEnds = new Date(courseData.trial_ends_at);
-          const daysLeft = Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24));
-          setTrialDaysRemaining(daysLeft);
-          console.log('[CourseDetail] Trial days remaining:', daysLeft);
+          // Calculate trial days remaining
+          if (courseData.trial_ends_at) {
+            const now = new Date();
+            const trialEnds = new Date(courseData.trial_ends_at);
+            const daysLeft = Math.ceil((trialEnds - now) / (1000 * 60 * 60 * 24));
+            setTrialDaysRemaining(daysLeft);
+            console.log('[CourseDetail] Trial days remaining:', daysLeft);
+          }
+        } catch (err) {
+          console.error('[CourseDetail] Error fetching course:', err);
+          
+          // CHECK IF 403 (TRIAL EXPIRED)
+          if (err.message && err.message.includes('403')) {
+            console.log('[CourseDetail] Trial expired - showing payment wall');
+            
+            // Try to get enrollments to show which course expired
+            try {
+              const enrollmentsData = await api.getMyEnrollments();
+              const enrollment = enrollmentsData.enrollments?.find(e => e.course_id == courseId);
+              
+              if (enrollment) {
+                console.log('[CourseDetail] Enrollment found:', enrollment);
+                // Try to fetch course basic info
+                const coursesData = await api.getCourses();
+                const courseInfo = coursesData.find(c => c.id == courseId);
+                
+                if (courseInfo) {
+                  setCourse(courseInfo);
+                  setTrialDaysRemaining(0);  // Trial expired
+                  setShowPaymentWall(true);
+                  return;
+                }
+              }
+            } catch (innerErr) {
+              console.warn('[CourseDetail] Could not get enrollment info:', innerErr);
+            }
+            
+            // Fallback: show generic payment wall
+            setError('Trial expired. Please subscribe to continue.');
+            setShowPaymentWall(true);
+            setTrialDaysRemaining(0);
+            return;
+          }
+          
+          // OTHER ERROR
+          setError(err.message || 'Failed to load course');
+          if (err.message && (err.message.includes('403') || err.message.includes('Forbidden'))) {
+            setTimeout(() => navigate('/courses'), 2000);
+          }
         }
       } catch (err) {
-        console.error('[CourseDetail] Error:', err);
-        setError(err.message || 'Failed to load course');
-        if (err.message.includes('403') || err.message.includes('Forbidden')) {
-          setTimeout(() => navigate('/courses'), 2000);
-        }
+        console.error('[CourseDetail] Unexpected error:', err);
+        setError('Unexpected error occurred');
       } finally {
         setLoading(false);
       }
@@ -93,6 +134,18 @@ const CourseDetailPage = () => {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Loading course...</div>;
   }
 
+  // SHOW PAYMENT WALL IF TRIAL EXPIRED
+  if (showPaymentWall && course) {
+    return (
+      <TrialWarningModal
+        course={course}
+        daysRemaining={0}  // Trial expired
+        onUpgrade={() => navigate(`/checkout/${courseId}`)}
+        onContinue={() => {}}
+      />
+    );
+  }
+
   if (error) {
     return (
       <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>
@@ -114,18 +167,48 @@ const CourseDetailPage = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5', padding: '40px 20px' }}>
-      {/* Trial Warning */}
-      {course && (
-        <TrialWarningModal
-          course={course}
-          daysRemaining={trialDaysRemaining}
-          onUpgrade={() => navigate(`/checkout/${courseId}`)}
-          onContinue={() => {}}
-        />
-      )}
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         
-        {/* Header */}
+        {/* Trial Warning Banner */}
+        {course && trialDaysRemaining !== null && trialDaysRemaining > 0 && trialDaysRemaining <= 3 && (
+          <div style={{
+            backgroundColor: '#fef3c7',
+            border: '2px solid #f59e0b',
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div>
+              <h4 style={{ margin: '0 0 5px 0', color: '#d97706' }}>
+                ⚠️ Trial ending in {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''}
+              </h4>
+              <p style={{ margin: 0, fontSize: '14px', color: '#92400e' }}>
+                Subscribe now to keep your progress and continue learning
+              </p>
+            </div>
+            <button
+              onClick={() => navigate(`/checkout/${courseId}`)}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#f59e0b',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                marginLeft: '20px'
+              }}
+            >
+              Subscribe Now
+            </button>
+          </div>
+        )}
+
+        {/* Back Button */}
         <button
           onClick={() => navigate('/courses')}
           style={{
