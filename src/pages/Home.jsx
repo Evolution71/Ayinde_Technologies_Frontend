@@ -12,6 +12,7 @@ const Home = () => {
   const [courses, setCourses] = useState([]);
   const [services, setServices] = useState([]);
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
+  const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
@@ -51,18 +52,23 @@ const Home = () => {
           setServices([]);
         }
         let enrollmentCount = 0;
+        let enrolledIds = [];
         
         // ✅ Only fetch enrollments if user is logged in
         if (user) {
           try {
             const enrollments = await api.getMyEnrollments();
             enrollmentCount = enrollments.enrollments?.length || 0;
+            // Extract course IDs from enrollments
+            enrolledIds = enrollments.enrollments?.map(e => e.course_id) || [];
           } catch (err) {
             // Silently fail - user may not have enrollments
             enrollmentCount = 0;
+            enrolledIds = [];
           }
         }
 
+        setEnrolledCourseIds(enrolledIds);
         setStats({
           totalCourses: Array.isArray(coursesData) ? coursesData.length : 0,
           userEnrollments: enrollmentCount
@@ -309,11 +315,17 @@ const Home = () => {
                       ${course.price}
                     </div>
                     <button
-                      onClick={() => handleEnrollClick(course.id, course.title)}
+                      onClick={() => {
+                        if (enrolledCourseIds.includes(course.id)) {
+                          navigate(`/courses/${course.id}`);
+                        } else {
+                          handleEnrollClick(course.id, course.title);
+                        }
+                      }}
                       disabled={enrollingCourseId === course.id}
                       style={{
                         padding: '8px 16px',
-                        backgroundColor: enrollingCourseId === course.id ? '#999' : '#1e40af',
+                        backgroundColor: enrolledCourseIds.includes(course.id) ? '#10b981' : (enrollingCourseId === course.id ? '#999' : '#1e40af'),
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
@@ -322,7 +334,7 @@ const Home = () => {
                         fontWeight: 'bold'
                       }}
                     >
-                      {enrollingCourseId === course.id ? 'Enrolling...' : 'Enroll Now'}
+                      {enrollingCourseId === course.id ? 'Enrolling...' : (enrolledCourseIds.includes(course.id) ? '✅ Dashboard' : 'Enroll Now')}
                     </button>
                   </div>
                 </div>
