@@ -107,26 +107,31 @@ export const api = {
   },
 
   async getCourses() {
-    const res = await fetch(`${API_URL}/api/courses/`, { headers: authHeaders() });
+    // PUBLIC - no auth needed
+    const res = await fetch(`${API_URL}/api/courses/`);
     return parseOrThrow(res);
   },
 
   async getMyEnrollments() {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/courses/me/enrollments/`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
   async getCourseDetail(courseId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/`, { headers: authHeaders() });
+    // PUBLIC - no auth needed
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/`);
     return parseOrThrow(res);
   },
 
   async getCourseProgress(courseId) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/courses/${courseId}/progress/`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
   async completeLesson(courseId, lessonId) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/complete/`, {
       method: 'POST',
       headers: authHeaders()
@@ -135,6 +140,7 @@ export const api = {
   },
 
   async enrollInCourse(courseId) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
       method: 'POST',
       headers: authHeaders(),
@@ -143,6 +149,7 @@ export const api = {
   },
 
   async createPaymentIntent(courseId) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: authHeaders(),
@@ -152,6 +159,7 @@ export const api = {
   },
 
   async initiatePayment(courseId, amount, currency = 'USD') {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: authHeaders(),
@@ -165,6 +173,7 @@ export const api = {
   },
 
   async verifyPayment(paymentId, token, billingData = {}) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: authHeaders(),
@@ -179,6 +188,7 @@ export const api = {
   },
 
   async getPaymentStatus(paymentId) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/payments/${paymentId}/`, {
       headers: authHeaders(),
     });
@@ -186,11 +196,13 @@ export const api = {
   },
 
   async getCaptcha() {
+    // PUBLIC
     const res = await fetch(`${API_URL}/api/captcha/`);
     return parseOrThrow(res);
   },
 
   async submitContact(payload) {
+    // PUBLIC
     const res = await fetch(`${API_URL}/api/contact/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -200,6 +212,7 @@ export const api = {
   },
 
   async savePaymentMethod(courseId, nonce) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/courses/${courseId}/save-card/`, {
       method: 'POST',
       headers: authHeaders(),
@@ -209,6 +222,7 @@ export const api = {
   },
 
   async getEnrollmentStatus(courseId) {
+    // AUTHENTICATED
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enrollment-status/`, {
       headers: authHeaders(),
     });
