@@ -9,7 +9,7 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import CheckoutPage from './pages/CheckoutPage';
 import CourseDetailPage from './pages/CourseDetailPage';
-import Login from './pages/Login';
+import login from './pages/login';
 
 const App = () => {
   return (
@@ -18,7 +18,7 @@ const App = () => {
         <Navigation />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<login />} />
           <Route path="/about" element={<About />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
