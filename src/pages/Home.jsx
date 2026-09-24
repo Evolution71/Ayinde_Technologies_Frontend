@@ -10,7 +10,6 @@ const Home = () => {
   const [stats, setStats] = useState({ totalCourses: 0, userEnrollments: 0 });
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
-  const [projects, setProjects] = useState([]);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
