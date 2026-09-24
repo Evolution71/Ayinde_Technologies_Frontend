@@ -12,7 +12,6 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
-import Courses from './pages/Courses';
 
 // NEW: Premium Services Pages
 import PricingPage from './pages/PricingPage';
@@ -40,7 +39,6 @@ const App = () => {
             <Route path="/login" element={<Login />} />
 
             {/* Courses */}
-            <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseId" element={<CourseDetailPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
 
