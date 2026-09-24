@@ -10,6 +10,7 @@ const Home = () => {
   const [stats, setStats] = useState({ totalCourses: 0, userEnrollments: 0 });
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
+  const [services, setServices] = useState([]);
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
 
   // Scroll to hash on mount or when location changes
@@ -36,6 +37,19 @@ const Home = () => {
         
         coursesData = coursesData || [];
         setCourses(coursesData);
+
+        // ✅ Fetch services (public endpoint)
+        try {
+          let servicesData = await api.getServices();
+          if (servicesData && typeof servicesData === 'object' && !Array.isArray(servicesData)) {
+            servicesData = servicesData.services || servicesData.data || [];
+          }
+          servicesData = servicesData || [];
+          setServices(servicesData);
+        } catch (err) {
+          console.error('Error fetching services:', err);
+          setServices([]);
+        }
         let enrollmentCount = 0;
         
         // ✅ Only fetch enrollments if user is logged in
@@ -74,10 +88,15 @@ const Home = () => {
     // If logged in, start trial enrollment
     try {
       setEnrollingCourseId(courseId);
-      await api.enrollInCourse(courseId);
+      const response = await api.post(`/courses/${courseId}/enroll/`, {});
       
-      alert(`✅ You've successfully enrolled in ${courseName}! 30-day trial starts now.`);
-      navigate(`/courses/${courseId}`);
+      if (response.status === 'success') {
+        alert(`✅ You've successfully enrolled in ${courseName}! 30-day trial starts now.`);
+        navigate(`/courses/${courseId}`);
+      } else if (response.status === 'already_enrolled') {
+        alert(`You're already enrolled in ${courseName}. Redirecting...`);
+        navigate(`/courses/${courseId}`);
+      }
     } catch (err) {
       console.error('Error enrolling:', err);
       alert('Error enrolling in course. Please try again.');
@@ -199,7 +218,7 @@ const Home = () => {
             gap: '30px'
           }}
         >
-          {[
+          {(services && services.length > 0 ? services : [
             { 
               icon: '💻', 
               title: 'AI App Development', 
@@ -220,7 +239,7 @@ const Home = () => {
               title: 'Training & Education', 
               desc: 'Expert-led courses to upskill your team' 
             }
-          ].map((service, i) => (
+          ]).map((service, i) => (
             <div
               key={i}
               style={{
@@ -235,9 +254,9 @@ const Home = () => {
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
               onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon}</div>
-              <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title}</h3>
-              <p style={{ color: '#666' }}>{service.desc}</p>
+              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon || '🚀'}</div>
+              <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title || service.name}</h3>
+              <p style={{ color: '#666' }}>{service.desc || service.description}</p>
             </div>
           ))}
         </div>
