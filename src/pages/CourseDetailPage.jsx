@@ -12,9 +12,7 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [enrollment, setEnrollment] = useState(null);
-  const [lessons, setLessons] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
-  const [progress, setProgress] = useState(0);
 
   // Save card modal state
   const [showSaveCardModal, setShowSaveCardModal] = useState(false);
@@ -364,6 +362,7 @@ const CourseDetailPage = () => {
 
                 {selectedLesson.video_url && (
                   <iframe
+                    title={selectedLesson.title}
                     width="100%"
                     height="400"
                     src={selectedLesson.video_url}

@@ -98,7 +98,7 @@ export const getEnrollmentStatus = (courseId) =>
 export const getProjects = () =>
   fetchAPI('/api/projects/').then(r => r.data || r);
 
-export default {
+const api = {
   getToken,
   login,
   register,
@@ -114,3 +114,5 @@ export default {
   getEnrollmentStatus,
   getProjects,
 };
+
+export default api;
