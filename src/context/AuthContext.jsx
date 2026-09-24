@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../api';  // ✅ FIXED: Default import
+import { api } from '../api';  // ✅ NAMED import
 
 const AuthContext = createContext();
 
@@ -24,9 +24,9 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, captchaToken, captchaAnswer) => {
     try {
-      const response = await api.login(email, password);
+      const response = await api.login(email, password, captchaToken, captchaAnswer);
       localStorage.setItem('token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
@@ -37,9 +37,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password) => {
+  const register = async (name, email, password, captchaToken, captchaAnswer) => {
     try {
-      const response = await api.register(email, password);
+      const response = await api.register(name, email, password, captchaToken, captchaAnswer);
       localStorage.setItem('token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-    api.logout();
+    api.logout?.();
   };
 
   return (

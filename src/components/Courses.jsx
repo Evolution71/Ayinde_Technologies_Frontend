@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api';  // ✅ FIXED: Default import
+import { api } from '../api';  // ✅ NAMED import (your original structure)
 
 const Courses = () => {
   const navigate = useNavigate();
@@ -40,7 +40,6 @@ const Courses = () => {
 
   const handleEnroll = async (courseId) => {
     try {
-      // Navigate to checkout to complete enrollment
       navigate(`/checkout/${courseId}`);
     } catch (err) {
       setError(err.message);
