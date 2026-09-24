@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../api';  // ✅ FIXED: Import as default, not named
+import { api } from '../api';  // ✅ FIXED: Named import
 
 const CourseDetailPage = () => {
   const { courseId } = useParams();
