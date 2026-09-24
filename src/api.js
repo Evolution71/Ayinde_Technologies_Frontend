@@ -2,7 +2,7 @@
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
 
-const getToken = () => localStorage.getItem('token');
+export const getToken = () => localStorage.getItem('token');
 
 const fetchAPI = async (endpoint, options = {}) => {
   const token = getToken();
@@ -99,6 +99,7 @@ export const getProjects = () =>
   fetchAPI('/api/projects/').then(r => r.data || r);
 
 export default {
+  getToken,
   login,
   register,
   logout,
