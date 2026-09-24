@@ -74,15 +74,10 @@ const Home = () => {
     // If logged in, start trial enrollment
     try {
       setEnrollingCourseId(courseId);
-      const response = await api.post(`/courses/${courseId}/enroll/`, {});
+      await api.enrollInCourse(courseId);
       
-      if (response.status === 'success') {
-        alert(`✅ You've successfully enrolled in ${courseName}! 30-day trial starts now.`);
-        navigate(`/courses/${courseId}`);
-      } else if (response.status === 'already_enrolled') {
-        alert(`You're already enrolled in ${courseName}. Redirecting...`);
-        navigate(`/courses/${courseId}`);
-      }
+      alert(`✅ You've successfully enrolled in ${courseName}! 30-day trial starts now.`);
+      navigate(`/courses/${courseId}`);
     } catch (err) {
       console.error('Error enrolling:', err);
       alert('Error enrolling in course. Please try again.');
