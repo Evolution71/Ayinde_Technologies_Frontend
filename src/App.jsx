@@ -1,33 +1,60 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
+
+// Pages
 import Home from './pages/Home';
 import About from './pages/About';
+import Login from './pages/login';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
-import CheckoutPage from './pages/CheckoutPage';
 import CourseDetailPage from './pages/CourseDetailPage';
-import Login from './pages/login';
+import CheckoutPage from './pages/CheckoutPage';
+import Courses from './pages/Courses';
+
+// NEW: Premium Services Pages
+import PricingPage from './pages/PricingPage';
+import ServiceCheckoutPage from './pages/ServiceCheckoutPage';
 
 const App = () => {
+  useEffect(() => {
+    // Set page title
+    document.title = 'Ayinde Technologies - Premium Tech Solutions';
+  }, []);
+
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <Router>
+      <AuthProvider>
         <Navigation />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/checkout/:courseId" element={<CheckoutPage />} />
-          <Route path="/course/:courseId" element={<CourseDetailPage />} />
-        </Routes>
+        <main style={{ minHeight: 'calc(100vh - 120px)' }}>
+          <Routes>
+            {/* Main Pages */}
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+
+            {/* Authentication */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Courses */}
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+
+            {/* NEW: Premium Services */}
+            <Route path="/services" element={<PricingPage />} />
+            <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
+
+            {/* Catch-all - redirect to home */}
+            <Route path="*" element={<Home />} />
+          </Routes>
+        </main>
         <Footer />
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 };
 

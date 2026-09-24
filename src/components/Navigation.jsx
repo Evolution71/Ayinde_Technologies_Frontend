@@ -21,6 +21,7 @@ const Navigation = () => {
         </Link>
         <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
           <Link to="/" className="nav-link" onClick={() => setIsOpen(false)}>Home</Link>
+          <Link to="/services" className="nav-link" onClick={() => setIsOpen(false)}>💎 Premium Services</Link>
           <a href={sectionHref('#services')} className="nav-link" onClick={() => setIsOpen(false)}>Services</a>
           <a href={sectionHref('#projects')} className="nav-link" onClick={() => setIsOpen(false)}>Projects</a>
           <a href={sectionHref('#courses')} className="nav-link" onClick={() => setIsOpen(false)}>Courses</a>
