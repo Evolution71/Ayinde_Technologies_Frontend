@@ -1,21 +1,15 @@
 // Backend API URL — HTTPS enforced, with fallback
-// Ensures the URL always starts with https://
 function getApiUrl() {
   const envUrl = process.env.REACT_APP_API_URL;
   
-  // If env var exists, use it
   if (envUrl) {
-    // Ensure it has https:// protocol
     if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
-      // Already has protocol, return as-is
       return envUrl;
     } else {
-      // No protocol, add https://
       return `https://${envUrl}`;
     }
   }
   
-  // Fallback for development
   return 'https://ayindetechnologiesbackend-production.up.railway.app';
 }
 
@@ -29,15 +23,23 @@ export function getToken() {
 
 export function setToken(token) {
   localStorage.setItem(TOKEN_KEY, token);
+  console.log('✅ Token saved to localStorage');
 }
 
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
+  console.log('✅ Token cleared');
 }
 
 function authHeaders() {
   const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  if (token) {
+    return { 
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  }
+  return { 'Content-Type': 'application/json' };
 }
 
 async function parseOrThrow(res) {
@@ -47,7 +49,7 @@ async function parseOrThrow(res) {
     const body = await res.json();
     detail = body.detail || detail;
   } catch (_) {
-    // ignore — use default message
+    // ignore
   }
   throw new Error(detail);
 }
@@ -76,7 +78,12 @@ export const api = {
         captcha_answer: captchaAnswer,
       }),
     });
-    return parseOrThrow(res);
+    const data = await parseOrThrow(res);
+    // SAVE TOKEN AFTER LOGIN
+    if (data.access_token) {
+      setToken(data.access_token);
+    }
+    return data;
   },
 
   async me() {
@@ -122,7 +129,7 @@ export const api = {
   async completeLesson(courseId, lessonId) {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/complete/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() }
+      headers: authHeaders()
     });
     return parseOrThrow(res);
   },
@@ -135,11 +142,10 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // SQUARE PAYMENT - ORIGINAL FLOW
   async createPaymentIntent(courseId) {
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      headers: authHeaders(),
       body: JSON.stringify({ course_id: courseId }),
     });
     return parseOrThrow(res);
@@ -148,7 +154,7 @@ export const api = {
   async initiatePayment(courseId, amount, currency = 'USD') {
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      headers: authHeaders(),
       body: JSON.stringify({ 
         course_id: courseId,
         amount: amount,
@@ -161,7 +167,7 @@ export const api = {
   async verifyPayment(paymentId, token, billingData = {}) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      headers: authHeaders(),
       body: JSON.stringify({
         payment_id: paymentId,
         nonce: token,
@@ -193,11 +199,10 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ✅ NEW: SUBSCRIPTION METHODS (added for 30-day trial auto-charge)
   async savePaymentMethod(courseId, nonce) {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/save-card/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      headers: authHeaders(),
       body: JSON.stringify({ nonce }),
     });
     return parseOrThrow(res);
