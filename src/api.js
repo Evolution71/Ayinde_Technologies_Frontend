@@ -119,8 +119,8 @@ export const api = {
   },
 
   async getCourseDetail(courseId) {
-    // PUBLIC - no auth needed
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/`);
+    // AUTHENTICATED - requires enrollment
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/`, { headers: authHeaders() });
     return parseOrThrow(res);
   },
 
