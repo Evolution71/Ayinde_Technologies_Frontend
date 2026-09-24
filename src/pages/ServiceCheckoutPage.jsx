@@ -41,29 +41,30 @@ const ServiceCheckoutPage = () => {
       return;
     }
 
-    initializeSquareCard();
-  }, [paymentData, user, navigate]);
+    // Initialize Square Card
+    const initializeSquareCard = async () => {
+      try {
+        setLoading(true);
 
-  // Initialize Square Card
-  const initializeSquareCard = async () => {
-    try {
-      setLoading(true);
-
-      // Load Square SDK if not already loaded
-      if (!window.Square) {
-        const script = document.createElement('script');
-        script.src = 'https://web.squarecdn.com/v1/square.js';
-        script.async = true;
-        script.onload = () => setupSquare();
-        document.head.appendChild(script);
-      } else {
-        setupSquare();
+        // Load Square SDK if not already loaded
+        if (!window.Square) {
+          const script = document.createElement('script');
+          script.src = 'https://web.squarecdn.com/v1/square.js';
+          script.async = true;
+          script.onload = () => setupSquare();
+          document.head.appendChild(script);
+        } else {
+          setupSquare();
+        }
+      } catch (err) {
+        setError('Failed to load payment system: ' + err.message);
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Failed to load payment system: ' + err.message);
-      setLoading(false);
-    }
-  };
+    };
+
+    initializeSquareCard();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paymentData, user, navigate]);
 
   const setupSquare = async () => {
     try {

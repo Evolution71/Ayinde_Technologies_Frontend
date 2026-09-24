@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../api';
 
 const PricingPage = () => {
   const navigate = useNavigate();
@@ -496,7 +495,6 @@ const PricingPage = () => {
       <div style={{
         maxWidth: '1200px',
         margin: '60px auto',
-        padding: '0 20px',
         backgroundColor: '#f0f9ff',
         borderRadius: '12px',
         padding: '30px',
