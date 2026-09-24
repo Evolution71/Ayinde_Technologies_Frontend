@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api';
+import api from '../api';  // ✅ FIXED: Default import, not named
 
 const CheckoutPage = () => {
   const { courseId } = useParams();
@@ -132,6 +132,7 @@ const CheckoutPage = () => {
 
     try {
       setProcessing(true);
+      setError(null);
 
       // ✅ CORRECT: Use card.tokenize()
       const tokenResult = await cardRef.current.tokenize();
@@ -143,17 +144,31 @@ const CheckoutPage = () => {
       }
 
       const token = tokenResult.token;
+      console.log('[Checkout] Token created:', token);
 
-      // Verify payment
-      await api.verifyPayment(paymentId, token, {
+      // Verify payment with backend
+      console.log('[Checkout] Verifying payment with backend...');
+      const verifyResult = await api.verifyPayment(paymentId, token, {
         billingPostalCode,
         billingCountry
       });
 
-      alert('✅ Payment successful!');
+      console.log('[Checkout] Payment verification result:', verifyResult);
+
+      // ✅ CHECK if payment actually succeeded
+      if (!verifyResult.success && verifyResult.status !== 'success') {
+        setError(verifyResult.message || 'Payment failed - please check your card and try again');
+        setProcessing(false);
+        return;
+      }
+
+      // ✅ Only navigate if TRULY successful
+      console.log('[Checkout] ✅ Payment successful!');
+      alert('✅ Payment successful! You are now enrolled in the course.');
       navigate('/courses');
     } catch (err) {
-      setError('Payment failed: ' + err.message);
+      console.error('[Checkout] Payment error:', err);
+      setError('Payment failed: ' + (err.message || 'Unknown error'));
       setProcessing(false);
     }
   };
@@ -168,8 +183,8 @@ const CheckoutPage = () => {
         <h1>💳 Checkout</h1>
 
         {error && (
-          <div style={{ padding: '15px', backgroundColor: '#fef3c7', borderRadius: '6px', marginBottom: '20px', color: '#92400e' }}>
-            ⚠️ {error}
+          <div style={{ padding: '15px', backgroundColor: '#fee2e2', borderRadius: '6px', marginBottom: '20px', color: '#991b1b', border: '1px solid #fca5a5' }}>
+            ❌ {error}
           </div>
         )}
 
@@ -234,6 +249,7 @@ const CheckoutPage = () => {
                   onChange={(e) => setBillingPostalCode(e.target.value)}
                   placeholder="12345"
                   style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', boxSizing: 'border-box' }}
+                  required
                 />
               </div>
 
