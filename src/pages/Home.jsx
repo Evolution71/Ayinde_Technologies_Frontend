@@ -10,6 +10,7 @@ const Home = () => {
   const [stats, setStats] = useState({ totalCourses: 0, userEnrollments: 0 });
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
+  const [enrollingCourseId, setEnrollingCourseId] = useState(null);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
@@ -24,17 +25,32 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const coursesData = await api.getCourses();
-        setCourses(coursesData || []);
+        // ✅ Always fetch public courses (no auth needed)
+        let coursesData = await api.getCourses();
+        
+        // Handle different response formats
+        if (coursesData && typeof coursesData === 'object' && !Array.isArray(coursesData)) {
+          // If it's an object with a courses property, extract it
+          coursesData = coursesData.courses || coursesData.data || [];
+        }
+        
+        coursesData = coursesData || [];
+        setCourses(coursesData);
         let enrollmentCount = 0;
         
+        // ✅ Only fetch enrollments if user is logged in
         if (user) {
-          const enrollments = await api.getMyEnrollments();
-          enrollmentCount = enrollments.enrollments.length;
+          try {
+            const enrollments = await api.getMyEnrollments();
+            enrollmentCount = enrollments.enrollments?.length || 0;
+          } catch (err) {
+            // Silently fail - user may not have enrollments
+            enrollmentCount = 0;
+          }
         }
 
         setStats({
-          totalCourses: coursesData.length,
+          totalCourses: Array.isArray(coursesData) ? coursesData.length : 0,
           userEnrollments: enrollmentCount
         });
         setLoading(false);
@@ -46,6 +62,34 @@ const Home = () => {
 
     fetchData();
   }, [user]);
+
+  // ✅ Handle Enroll button click
+  const handleEnrollClick = async (courseId, courseName) => {
+    // If not logged in, redirect to login
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    // If logged in, start trial enrollment
+    try {
+      setEnrollingCourseId(courseId);
+      const response = await api.post(`/courses/${courseId}/enroll/`, {});
+      
+      if (response.status === 'success') {
+        alert(`✅ You've successfully enrolled in ${courseName}! 30-day trial starts now.`);
+        navigate(`/courses/${courseId}`);
+      } else if (response.status === 'already_enrolled') {
+        alert(`You're already enrolled in ${courseName}. Redirecting...`);
+        navigate(`/courses/${courseId}`);
+      }
+    } catch (err) {
+      console.error('Error enrolling:', err);
+      alert('Error enrolling in course. Please try again.');
+    } finally {
+      setEnrollingCourseId(null);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -231,39 +275,45 @@ const Home = () => {
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                onClick={() => navigate(`/checkout/${course.id}`)}
               >
-                {course.icon && (
-                  <img
-                    src={course.icon}
-                    alt={course.title}
-                    style={{ width: '100%', height: '180px', objectFit: 'cover' }}
+              <div style={{ backgroundColor: '#e0e7ff', padding: '20px', textAlign: 'center', height: '200px', overflow: 'hidden' }}>
+                {course.icon ? (
+                  <img 
+                    src={course.icon} 
+                    alt={course.title} 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={(e) => {e.target.style.display = 'none'}}
                   />
+                ) : (
+                  <div style={{ fontSize: '60px' }}>📚</div>
                 )}
+              </div>
                 <div style={{ padding: '20px' }}>
-                  <h3 style={{ margin: '0 0 10px 0' }}>{course.title}</h3>
-                  {course.description && (
-                    <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
-                      {course.description.substring(0, 80)}...
-                    </p>
-                  )}
+                  <h3 style={{ marginBottom: '10px', fontSize: '18px', fontWeight: 'bold' }}>
+                    {course.title}
+                  </h3>
+                  <p style={{ color: '#666', marginBottom: '10px', fontSize: '14px', minHeight: '40px' }}>
+                    {course.description?.substring(0, 80)}...
+                  </p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e40af' }}>
                       ${course.price}
                     </div>
                     <button
+                      onClick={() => handleEnrollClick(course.id, course.title)}
+                      disabled={enrollingCourseId === course.id}
                       style={{
                         padding: '8px 16px',
-                        backgroundColor: '#1e40af',
+                        backgroundColor: enrollingCourseId === course.id ? '#999' : '#1e40af',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px',
-                        cursor: 'pointer',
+                        cursor: enrollingCourseId === course.id ? 'not-allowed' : 'pointer',
                         fontSize: '14px',
                         fontWeight: 'bold'
                       }}
                     >
-                      Enroll Now
+                      {enrollingCourseId === course.id ? 'Enrolling...' : 'Enroll Now'}
                     </button>
                   </div>
                 </div>
