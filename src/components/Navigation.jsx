@@ -31,7 +31,7 @@ const Navigation = () => {
               Hi, {user.name.split(' ')[0]} · <button className="link-btn" onClick={logout}>Log out</button>
             </span>
           ) : (
-            <a href={sectionHref('#projects')} className="nav-link" onClick={() => setIsOpen(false)}>Log in</a>
+            <Link to="/login" className="nav-link" onClick={() => setIsOpen(false)}>Log in</Link>
           )}
         </div>
         <button

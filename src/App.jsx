@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './App.css';
 import { AuthProvider } from './context/AuthContext';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
@@ -10,30 +9,26 @@ import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import CheckoutPage from './pages/CheckoutPage';
 import CourseDetailPage from './pages/CourseDetailPage';
+import Login from './pages/Login';
 
-function AppContent() {
+const App = () => {
   return (
-    <div className="app">
-      <Navigation />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/checkout/:courseId" element={<CheckoutPage />} />
-        <Route path="/course/:courseId" element={<CourseDetailPage />} />
-      </Routes>
-      <Footer />
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/checkout/:courseId" element={<CheckoutPage />} />
+          <Route path="/course/:courseId" element={<CourseDetailPage />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+    </AuthProvider>
   );
-}
+};
 
-export default function App() {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </BrowserRouter>
-  );
-}
+export default App;

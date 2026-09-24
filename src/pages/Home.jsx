@@ -1,18 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api';  // ✅ FIXED: Named import
+import { api } from '../api';
 
 const Home = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [stats, setStats] = useState({ totalCourses: 0, userEnrollments: 0 });
   const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [projects, setProjects] = useState([]);
+
+  // Scroll to hash on mount or when location changes
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const courses = await api.getCourses();
+        const coursesData = await api.getCourses();
+        setCourses(coursesData || []);
         let enrollmentCount = 0;
         
         if (user) {
@@ -21,7 +35,7 @@ const Home = () => {
         }
 
         setStats({
-          totalCourses: courses.length,
+          totalCourses: coursesData.length,
           userEnrollments: enrollmentCount
         });
         setLoading(false);
@@ -36,7 +50,7 @@ const Home = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
-      {/* Hero Section */}
+      {/* ========== HERO SECTION ========== */}
       <div
         style={{
           background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
@@ -70,7 +84,7 @@ const Home = () => {
               Login
             </button>
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login')}
               style={{
                 padding: '14px 32px',
                 fontSize: '16px',
@@ -104,7 +118,7 @@ const Home = () => {
         )}
       </div>
 
-      {/* Stats Section */}
+      {/* ========== STATS SECTION ========== */}
       {!loading && (
         <div
           style={{
@@ -134,9 +148,11 @@ const Home = () => {
         </div>
       )}
 
-      {/* Features Section */}
-      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '40px' }}>Why Choose Us?</h2>
+      {/* ========== SERVICES SECTION ========== */}
+      <div id="services" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
+          Our Services
+        </h2>
 
         <div
           style={{
@@ -146,11 +162,229 @@ const Home = () => {
           }}
         >
           {[
-            { icon: '👨‍🏫', title: 'Expert Instructors', desc: 'Learn from industry professionals' },
-            { icon: '💻', title: 'Hands-On Projects', desc: 'Build real-world applications' },
-            { icon: '🎓', title: 'Certifications', desc: 'Earn recognized credentials' },
-            { icon: '📱', title: 'Lifetime Access', desc: 'Learn at your own pace' }
-          ].map((feature, i) => (
+            { 
+              icon: '💻', 
+              title: 'AI App Development', 
+              desc: 'Build intelligent applications with cutting-edge AI technologies' 
+            },
+            { 
+              icon: '🌐', 
+              title: 'Web Development', 
+              desc: 'Full-stack web solutions from concept to deployment' 
+            },
+            { 
+              icon: '🤝', 
+              title: 'Tech Consulting', 
+              desc: 'Strategic guidance for your digital transformation' 
+            },
+            { 
+              icon: '📚', 
+              title: 'Training & Education', 
+              desc: 'Expert-led courses to upskill your team' 
+            }
+          ].map((service, i) => (
+            <div
+              key={i}
+              style={{
+                backgroundColor: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                textAlign: 'center',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                transition: 'transform 0.3s ease',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon}</div>
+              <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title}</h3>
+              <p style={{ color: '#666' }}>{service.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========== COURSES SECTION ========== */}
+      <div id="courses" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
+          Featured Courses
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '25px'
+          }}
+        >
+          {courses.length > 0 ? (
+            courses.slice(0, 6).map((course) => (
+              <div
+                key={course.id}
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  cursor: 'pointer',
+                  transition: 'transform 0.3s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                onClick={() => navigate(`/checkout/${course.id}`)}
+              >
+                {course.icon && (
+                  <img
+                    src={course.icon}
+                    alt={course.title}
+                    style={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                  />
+                )}
+                <div style={{ padding: '20px' }}>
+                  <h3 style={{ margin: '0 0 10px 0' }}>{course.title}</h3>
+                  {course.description && (
+                    <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+                      {course.description.substring(0, 80)}...
+                    </p>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e40af' }}>
+                      ${course.price}
+                    </div>
+                    <button
+                      style={{
+                        padding: '8px 16px',
+                        backgroundColor: '#1e40af',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      Enroll Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div style={{ textAlign: 'center', padding: '40px', gridColumn: '1 / -1' }}>
+              <p>Loading courses...</p>
+            </div>
+          )}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <button
+            onClick={() => navigate('/courses')}
+            style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              backgroundColor: '#1e40af',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            View All Courses →
+          </button>
+        </div>
+      </div>
+
+      {/* ========== PROJECTS SECTION ========== */}
+      <div id="projects" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
+          Our Projects
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '30px'
+          }}
+        >
+          {[
+            {
+              title: 'AI-Powered Dashboard',
+              description: 'Real-time analytics platform with machine learning predictions',
+              tags: ['Python', 'React', 'TensorFlow']
+            },
+            {
+              title: 'E-Learning Platform',
+              description: 'Comprehensive online education system with subscription management',
+              tags: ['FastAPI', 'React', 'PostgreSQL']
+            },
+            {
+              title: 'Mobile Trading App',
+              description: 'High-performance cryptocurrency trading application',
+              tags: ['React Native', 'WebSocket', 'Python']
+            },
+            {
+              title: 'Enterprise CRM',
+              description: 'Customer relationship management system for businesses',
+              tags: ['React', 'FastAPI', 'MongoDB']
+            }
+          ].map((project, i) => (
+            <div
+              key={i}
+              style={{
+                backgroundColor: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+              }}
+            >
+              <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
+                {project.title}
+              </h3>
+              <p style={{ color: '#666', marginBottom: '20px' }}>{project.description}</p>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {project.tags.map((tag, j) => (
+                  <span
+                    key={j}
+                    style={{
+                      backgroundColor: '#e0e7ff',
+                      color: '#1e40af',
+                      padding: '6px 12px',
+                      borderRadius: '20px',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========== TEAM SECTION ========== */}
+      <div id="team" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
+          Our Team
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '30px'
+          }}
+        >
+          {[
+            { name: 'Ayinde O.', role: 'Founder & CEO', expertise: 'AI Strategy' },
+            { name: 'Tech Lead', role: 'Lead Developer', expertise: 'Full Stack' },
+            { name: 'Data Lead', role: 'ML Engineer', expertise: 'Machine Learning' },
+            { name: 'Design Lead', role: 'UI/UX Designer', expertise: 'Product Design' }
+          ].map((member, i) => (
             <div
               key={i}
               style={{
@@ -161,11 +395,85 @@ const Home = () => {
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
               }}
             >
-              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{feature.icon}</div>
-              <h3 style={{ marginBottom: '10px' }}>{feature.title}</h3>
-              <p style={{ color: '#666' }}>{feature.desc}</p>
+              <div
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  backgroundColor: '#e0e7ff',
+                  borderRadius: '50%',
+                  margin: '0 auto 15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '40px'
+                }}
+              >
+                👤
+              </div>
+              <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
+                {member.name}
+              </h3>
+              <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
+                {member.role}
+              </p>
+              <p style={{ color: '#666', fontSize: '14px' }}>
+                {member.expertise}
+              </p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* ========== CONTACT SECTION ========== */}
+      <div id="contact" style={{ backgroundColor: '#1e40af', color: 'white', padding: '60px 40px', textAlign: 'center', marginTop: '60px', scrollMarginTop: '80px' }}>
+        <h2 style={{ marginBottom: '20px', fontSize: '36px', fontWeight: 'bold' }}>
+          Ready to Get Started?
+        </h2>
+        <p style={{ fontSize: '18px', marginBottom: '40px', opacity: 0.9 }}>
+          Contact us today to discuss your project or enroll in a course
+        </p>
+
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/login')}
+            style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              backgroundColor: 'white',
+              color: '#1e40af',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            Enroll Now
+          </button>
+          <a
+            href="mailto:support@ayindetechnologies.com"
+            style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              backgroundColor: '#fbbf24',
+              color: '#1e40af',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              textDecoration: 'none'
+            }}
+          >
+            Email Us
+          </a>
+        </div>
+
+        <div style={{ marginTop: '40px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.2)' }}>
+          <p style={{ fontSize: '14px' }}>
+            📞 +1 949-520-8178 | 📧 support@ayindetechnologies.com
+          </p>
+          <p style={{ fontSize: '14px', marginTop: '10px' }}>
+            112 S Market St, Suite 1008, Inglewood, CA 90301
+          </p>
         </div>
       </div>
     </div>
