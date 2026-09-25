@@ -87,8 +87,10 @@ const CheckoutPage = () => {
 
         setCourse(foundCourse);
 
-        // Initiate payment
-        const payData = await api.initiatePayment(foundCourse.id, foundCourse.price, 'USD');
+        // ✅ FIXED: Use correct method name - createPaymentIntent not initiatePayment
+        console.log('[Checkout] Creating payment intent for course:', foundCourse.id);
+        const payData = await api.createPaymentIntent(foundCourse.id, foundCourse.price);
+        console.log('[Checkout] Payment intent created:', payData);
         setPaymentId(payData.payment_id);
 
         // Load Square SDK
@@ -100,6 +102,7 @@ const CheckoutPage = () => {
         };
         document.head.appendChild(script);
       } catch (err) {
+        console.error('[Checkout] Init error:', err);
         setError(err.message);
         setLoading(false);
       }
