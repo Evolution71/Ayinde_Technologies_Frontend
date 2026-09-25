@@ -1,13 +1,11 @@
 /**
- * API Client - Frontend API integration
- * 
- * Handles all HTTP requests to backend with auth headers
- * Uses localStorage for token management
+ * API Client for Ayinde Technologies
+ * Updated to include new captcha methods
  * 
  * Usage:
  *   import { api } from '../api'
- *   await api.getCourses()
- *   await api.login(email, password)
+ *   await api.getCaptcha()
+ *   await api.verifyCaptcha(captchaId, userAnswer)
  */
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -43,6 +41,7 @@ const parseOrThrow = async (res) => {
 // ========== MAIN API OBJECT ==========
 
 export const api = {
+  
   // ========== AUTH ENDPOINTS ==========
 
   async login(email, password) {
@@ -52,7 +51,7 @@ export const api = {
       body: JSON.stringify({ email, password })
     });
     const data = await parseOrThrow(res);
-    setToken(data.access_token); // Auto-save token
+    setToken(data.access_token);
     return data;
   },
 
@@ -63,7 +62,7 @@ export const api = {
       body: JSON.stringify({ name, email, password })
     });
     const data = await parseOrThrow(res);
-    setToken(data.access_token); // Auto-save token
+    setToken(data.access_token);
     return data;
   },
 
@@ -78,13 +77,66 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  // ========== CAPTCHA ENDPOINTS (NEW) ==========
+
+  async getCaptcha() {
+    /**
+     * Generate a new captcha challenge
+     * 
+     * Returns: {
+     *   captcha_id: unique ID (needed for verification),
+     *   captcha_image: text to display to user,
+     *   expires_at: when captcha expires
+     * }
+     * 
+     * Frontend should display captcha_image and ask user to enter it
+     */
+    const res = await fetch(`${API_URL}/api/captcha/`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  async verifyCaptcha(captchaId, userAnswer) {
+    /**
+     * Verify user's captcha answer
+     * 
+     * Args:
+     *   captchaId: ID from getCaptcha response
+     *   userAnswer: What user typed
+     * 
+     * Returns: {
+     *   success: true/false,
+     *   message: explanation,
+     *   score: 1.0 if valid, 0.0 if not
+     * }
+     */
+    const res = await fetch(`${API_URL}/api/captcha/verify/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        captcha_id: captchaId,
+        captcha_answer: userAnswer
+      })
+    });
+    return parseOrThrow(res);
+  },
+
+  async deleteCaptcha(captchaId) {
+    /**
+     * Delete a captcha (for form cancellations)
+     */
+    const res = await fetch(`${API_URL}/api/captcha/${captchaId}/`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
   // ========== COURSE ENDPOINTS ==========
 
   async getCourses() {
-    /**
-     * Get list of all courses
-     * PUBLIC endpoint - no auth required
-     */
     const res = await fetch(`${API_URL}/api/courses/`, {
       headers: { 'Content-Type': 'application/json' }
     });
@@ -92,10 +144,6 @@ export const api = {
   },
 
   async getCourseDetail(courseId) {
-    /**
-     * Get detailed course view with lessons
-     * REQUIRES auth - must be enrolled in course
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/`, {
       headers: authHeaders()
     });
@@ -103,25 +151,13 @@ export const api = {
   },
 
   async getMyEnrollments() {
-    /**
-     * Get list of courses user is enrolled in
-     * REQUIRES auth
-     */
     const res = await fetch(`${API_URL}/api/courses/me/enrollments/`, {
       headers: authHeaders()
     });
     return parseOrThrow(res);
   },
 
-  // ========== SUBSCRIPTION ENDPOINTS (NEW) ==========
-
   async enrollInCourse(courseId) {
-    /**
-     * Start a free 30-day trial on a course
-     * REQUIRES auth
-     * 
-     * Returns: enrollment_id, trial_ends_at
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
       method: 'POST',
       headers: authHeaders()
@@ -130,13 +166,6 @@ export const api = {
   },
 
   async getEnrollmentStatus(courseId) {
-    /**
-     * Get trial countdown and subscription status
-     * REQUIRES auth
-     * 
-     * Returns: status (trial/active/expired/cancelled), 
-     *          trial_ends_at, days_remaining
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enrollment-status/`, {
       headers: authHeaders()
     });
@@ -144,16 +173,6 @@ export const api = {
   },
 
   async savePaymentMethod(courseId, nonce) {
-    /**
-     * Save Square payment token for auto-charge after trial
-     * REQUIRES auth
-     * 
-     * Args:
-     *   courseId: Course ID
-     *   nonce: Square payment token (from Web Payments SDK)
-     * 
-     * Returns: success confirmation
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/save-payment-method/`, {
       method: 'POST',
       headers: {
@@ -166,13 +185,6 @@ export const api = {
   },
 
   async cancelSubscription(courseId) {
-    /**
-     * Cancel course subscription
-     * No charge will occur on trial end
-     * REQUIRES auth
-     * 
-     * Returns: success confirmation
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/cancel/`, {
       method: 'POST',
       headers: authHeaders()
@@ -181,12 +193,6 @@ export const api = {
   },
 
   async getCourseProgress(courseId) {
-    /**
-     * Get user's overall progress in a course
-     * REQUIRES auth
-     * 
-     * Returns: overall_progress %, lessons progress array
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/progress/`, {
       headers: authHeaders()
     });
@@ -196,10 +202,6 @@ export const api = {
   // ========== LESSON ENDPOINTS ==========
 
   async getLesson(courseId, lessonId) {
-    /**
-     * Get single lesson content
-     * REQUIRES auth + active enrollment
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/`, {
       headers: authHeaders()
     });
@@ -207,11 +209,6 @@ export const api = {
   },
 
   async completeLesson(courseId, lessonId) {
-    /**
-     * Mark lesson as complete
-     * Updates course progress %
-     * REQUIRES auth
-     */
     const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/complete/`, {
       method: 'POST',
       headers: authHeaders()
@@ -222,10 +219,6 @@ export const api = {
   // ========== SERVICE ENDPOINTS ==========
 
   async getServices() {
-    /**
-     * Get list of premium services
-     * PUBLIC endpoint
-     */
     const res = await fetch(`${API_URL}/api/services/`, {
       headers: { 'Content-Type': 'application/json' }
     });
@@ -233,22 +226,17 @@ export const api = {
   },
 
   async purchaseService(serviceId, package_type, billing_cycle) {
-    /**
-     * Purchase a premium service
-     * REQUIRES auth
-     * 
-     * Args:
-     *   serviceId: Service ID
-     *   package_type: e.g., "Website Pro", "Application Pro", "Supreme VIP"
-     *   billing_cycle: "monthly", "6_months", "annual", "2_year", "3_year"
-     */
     const res = await fetch(`${API_URL}/api/services/purchase/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
-      body: JSON.stringify({ service_id: serviceId, package_type, billing_cycle })
+      body: JSON.stringify({ 
+        service_id: serviceId, 
+        package_type, 
+        billing_cycle 
+      })
     });
     return parseOrThrow(res);
   },
@@ -256,10 +244,6 @@ export const api = {
   // ========== PAYMENT ENDPOINTS ==========
 
   async createPaymentIntent(courseId, amount) {
-    /**
-     * Create Square payment intent
-     * REQUIRES auth
-     */
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: {
@@ -272,10 +256,6 @@ export const api = {
   },
 
   async verifyPayment(paymentId, nonce) {
-    /**
-     * Verify and process payment
-     * REQUIRES auth
-     */
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: {
@@ -288,17 +268,54 @@ export const api = {
   },
 
   async getPaymentStatus(paymentId) {
-    /**
-     * Get payment status
-     * REQUIRES auth
-     */
     const res = await fetch(`${API_URL}/api/payments/${paymentId}/`, {
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  // ========== CONTACT ENDPOINTS ==========
+
+  async submitContactForm(formData) {
+    const res = await fetch(`${API_URL}/api/contact/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    return parseOrThrow(res);
+  },
+
+  // ========== TEAM ENDPOINTS ==========
+
+  async getTeam() {
+    const res = await fetch(`${API_URL}/api/team/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  async getTeamMember(memberId) {
+    const res = await fetch(`${API_URL}/api/team/${memberId}/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  // ========== PROJECTS ENDPOINTS ==========
+
+  async getProjects() {
+    const res = await fetch(`${API_URL}/api/projects/`, {
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  async getProject(projectId) {
+    const res = await fetch(`${API_URL}/api/projects/${projectId}/`, {
       headers: authHeaders()
     });
     return parseOrThrow(res);
   }
 };
-
-// ========== EXPORT FOR USE ==========
 
 export const logout = () => api.logout();
