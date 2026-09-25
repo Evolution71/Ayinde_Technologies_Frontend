@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { api } from '../api';
-import { AlertCircle, RefreshCw, CheckCircle } from 'lucide-react';
 
 /**
- * Updated Captcha Component
+ * Updated Captcha Component - NO lucide-react dependency
  * 
  * Uses database-backed text captchas instead of math challenges
  * Exposes ref methods: getToken(), getAnswer(), refresh()
@@ -100,48 +99,116 @@ const Captcha = forwardRef(function Captcha(_props, ref) {
 
   if (loading) {
     return (
-      <div className="w-full p-4 border border-gray-300 rounded-lg bg-gray-50">
-        <div className="flex items-center justify-center gap-3">
-          <div className="w-5 h-5 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-gray-600">Loading captcha...</span>
+      <div style={{
+        width: '100%',
+        padding: '1rem',
+        border: '1px solid #ddd',
+        borderRadius: '0.5rem',
+        backgroundColor: '#f9f9f9'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem'
+        }}>
+          <div style={{
+            width: '1.25rem',
+            height: '1.25rem',
+            border: '3px solid #2563eb',
+            borderTopColor: 'transparent',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <span style={{ color: '#666' }}>Loading captcha...</span>
         </div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
 
   if (verified) {
     return (
-      <div className="w-full p-4 bg-green-50 border border-green-300 rounded-lg flex gap-3">
-        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+      <div style={{
+        width: '100%',
+        padding: '1rem',
+        backgroundColor: '#f0fdf4',
+        border: '1px solid #86efac',
+        borderRadius: '0.5rem',
+        display: 'flex',
+        gap: '0.75rem'
+      }}>
+        <div style={{ fontSize: '1.25rem' }}>✓</div>
         <div>
-          <p className="font-semibold text-green-900">✓ Captcha Verified!</p>
-          <p className="text-sm text-green-700">You can now submit the form</p>
+          <p style={{ margin: '0 0 0.25rem 0', fontWeight: 'bold', color: '#166534' }}>
+            ✓ Captcha Verified!
+          </p>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: '#15803d' }}>
+            You can now submit the form
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full space-y-4">
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       {/* Challenge Display */}
-      <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-4">
-        <p className="text-xs text-gray-600 mb-2 font-semibold">Enter the text shown below:</p>
-        <div className="bg-white border-2 border-gray-300 rounded px-4 py-3 font-mono text-2xl font-bold text-center tracking-widest select-none">
+      <div style={{
+        background: 'linear-gradient(to right, #eff6ff, #dbeafe)',
+        border: '2px solid #60a5fa',
+        borderRadius: '0.5rem',
+        padding: '1rem'
+      }}>
+        <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.75rem', color: '#666', fontWeight: 'bold' }}>
+          Enter the text shown below:
+        </p>
+        <div style={{
+          backgroundColor: 'white',
+          border: '2px solid #ccc',
+          borderRadius: '0.375rem',
+          padding: '0.75rem',
+          fontFamily: 'monospace',
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          letterSpacing: '0.125rem',
+          userSelect: 'none'
+        }}>
           {challenge || '......'}
         </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-700">{error}</p>
+        <div style={{
+          backgroundColor: '#fef2f2',
+          border: '1px solid #fecaca',
+          borderRadius: '0.5rem',
+          padding: '0.75rem',
+          display: 'flex',
+          gap: '0.75rem'
+        }}>
+          <div style={{ fontSize: '1.25rem', color: '#dc2626' }}>⚠</div>
+          <p style={{ margin: 0, fontSize: '0.875rem', color: '#991b1b' }}>
+            {error}
+          </p>
         </div>
       )}
 
       {/* Input Field */}
       <div>
-        <label htmlFor="captcha-input" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="captcha-input" style={{
+          display: 'block',
+          fontSize: '0.875rem',
+          fontWeight: '500',
+          color: '#374151',
+          marginBottom: '0.5rem'
+        }}>
           Your Answer
         </label>
         <input
@@ -154,25 +221,74 @@ const Captcha = forwardRef(function Captcha(_props, ref) {
           }}
           placeholder="Type the text above"
           disabled={verifying}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+          style={{
+            width: '100%',
+            padding: '0.5rem 1rem',
+            border: '1px solid #ccc',
+            borderRadius: '0.5rem',
+            fontSize: '1rem',
+            fontFamily: 'inherit',
+            boxSizing: 'border-box',
+            cursor: verifying ? 'not-allowed' : 'text',
+            backgroundColor: verifying ? '#f3f4f6' : 'white',
+            opacity: verifying ? 0.6 : 1
+          }}
           autoComplete="off"
           autoFocus
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p style={{
+          margin: '0.25rem 0 0 0',
+          fontSize: '0.75rem',
+          color: '#666'
+        }}>
           Case-insensitive • Expires in 5 minutes
         </p>
       </div>
 
       {/* Buttons */}
-      <div className="flex gap-2">
+      <div style={{
+        display: 'flex',
+        gap: '0.5rem'
+      }}>
         <button
           onClick={handleVerify}
           disabled={verifying || !captchaId}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          style={{
+            flex: 1,
+            backgroundColor: verifying || !captchaId ? '#d1d5db' : '#2563eb',
+            color: 'white',
+            fontWeight: '600',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            border: 'none',
+            cursor: verifying || !captchaId ? 'not-allowed' : 'pointer',
+            transition: 'background-color 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem'
+          }}
+          onMouseEnter={(e) => {
+            if (!verifying && captchaId) {
+              e.target.style.backgroundColor = '#1d4ed8';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!verifying && captchaId) {
+              e.target.style.backgroundColor = '#2563eb';
+            }
+          }}
         >
           {verifying ? (
             <>
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <div style={{
+                width: '1rem',
+                height: '1rem',
+                border: '2px solid white',
+                borderTopColor: 'transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite'
+              }}></div>
               Verifying...
             </>
           ) : (
@@ -184,13 +300,43 @@ const Captcha = forwardRef(function Captcha(_props, ref) {
           type="button"
           onClick={load}
           disabled={loading || verifying}
-          className="bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-800 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: loading || verifying ? '#e5e7eb' : '#e5e7eb',
+            color: '#1f2937',
+            fontWeight: '600',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.5rem',
+            border: 'none',
+            cursor: loading || verifying ? 'not-allowed' : 'pointer',
+            transition: 'background-color 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.5rem',
+            minWidth: '100px'
+          }}
+          onMouseEnter={(e) => {
+            if (!loading && !verifying) {
+              e.target.style.backgroundColor = '#d1d5db';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading && !verifying) {
+              e.target.style.backgroundColor = '#e5e7eb';
+            }
+          }}
           title="Get a new captcha"
         >
-          <RefreshCw className="w-4 h-4" />
-          <span className="hidden sm:inline">Reload</span>
+          <span style={{ fontSize: '1.25rem' }}>↻</span>
+          <span style={{ display: 'none' }}>Reload</span>
         </button>
       </div>
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 });
