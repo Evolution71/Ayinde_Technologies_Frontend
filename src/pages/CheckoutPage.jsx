@@ -33,7 +33,12 @@ const CheckoutPage = () => {
         // Try to get course
         let foundCourse = null;
         try {
-          const courses = await api.getCourses();
+          const coursesResponse = await api.getCourses();
+          // ✅ FIXED: Handle both { courses: [...] } and [...] formats
+          const courses = Array.isArray(coursesResponse) 
+            ? coursesResponse 
+            : (coursesResponse.courses || []);
+          
           foundCourse = courses.find(c => c.id === parseInt(courseId));
         } catch (err) {
           console.log('[Checkout] Could not fetch all courses:', err);
@@ -42,11 +47,21 @@ const CheckoutPage = () => {
         // If not found, get enrolled courses
         if (!foundCourse) {
           try {
-            const enrollmentsData = await api.getMyEnrollments();
-            const enrollmentIds = enrollmentsData.enrollments.map(e => e.course_id);
+            const enrollmentsResponse = await api.getMyEnrollments();
+            // ✅ FIXED: Handle both { enrollments: [...] } and [...] formats
+            const enrollmentsData = Array.isArray(enrollmentsResponse)
+              ? enrollmentsResponse
+              : (enrollmentsResponse.enrollments || []);
+            
+            const enrollmentIds = enrollmentsData.map(e => e.course_id);
             
             // Get all courses and filter by enrollment
-            const allCourses = await api.getCourses();
+            const coursesResponse = await api.getCourses();
+            // ✅ FIXED: Handle both { courses: [...] } and [...] formats
+            const allCourses = Array.isArray(coursesResponse)
+              ? coursesResponse
+              : (coursesResponse.courses || []);
+            
             const enrolled = allCourses.filter(c => enrollmentIds.includes(c.id));
             setEnrolledCourses(enrolled);
 
