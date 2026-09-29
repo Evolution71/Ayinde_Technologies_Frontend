@@ -6,7 +6,6 @@ const ConsultationServicesPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [selectedService, setSelectedService] = useState(null);
-  const [engagementType, setEngagementType] = useState('hourly');
   const [loading, setLoading] = useState(false);
 
   const services = {
@@ -141,10 +140,8 @@ const ConsultationServicesPage = () => {
       const consultationData = {
         serviceKey: serviceKey,
         serviceName: service.name,
-        engagementType: engagementType,
-        rate: engagementType === 'hourly' ? service.hourlyRate :
-              engagementType === 'retainer' ? service.retainerRate :
-              service.projectRate,
+        engagementType: 'hourly',
+        rate: service.hourlyRate,
         bookingTime: new Date().toISOString()
       };
 
