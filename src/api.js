@@ -1,7 +1,7 @@
 /**
  * API Client for Ayinde Technologies
- * Updated to include new captcha methods
- * 
+ * Updated to include new captcha methods and corrected register function
+ *
  * Usage:
  *   import { api } from '../api'
  *   await api.getCaptcha()
@@ -41,7 +41,7 @@ const parseOrThrow = async (res) => {
 // ========== MAIN API OBJECT ==========
 
 export const api = {
-  
+
   // ========== AUTH ENDPOINTS ==========
 
   async login(email, password) {
@@ -55,11 +55,11 @@ export const api = {
     return data;
   },
 
-  async register(name, email, password) {
+  async register(first_name, last_name, email, password) {
     const res = await fetch(`${API_URL}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
+      body: JSON.stringify({ first_name, last_name, email, password })
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
@@ -82,13 +82,13 @@ export const api = {
   async getCaptcha() {
     /**
      * Generate a new captcha challenge
-     * 
+     *
      * Returns: {
      *   captcha_id: unique ID (needed for verification),
      *   captcha_image: text to display to user,
      *   expires_at: when captcha expires
      * }
-     * 
+     *
      * Frontend should display captcha_image and ask user to enter it
      */
     const res = await fetch(`${API_URL}/api/captcha/`, {
@@ -101,11 +101,11 @@ export const api = {
   async verifyCaptcha(captchaId, userAnswer) {
     /**
      * Verify user's captcha answer
-     * 
+     *
      * Args:
      *   captchaId: ID from getCaptcha response
      *   userAnswer: What user typed
-     * 
+     *
      * Returns: {
      *   success: true/false,
      *   message: explanation,
@@ -232,10 +232,10 @@ export const api = {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
-      body: JSON.stringify({ 
-        service_id: serviceId, 
-        package_type, 
-        billing_cycle 
+      body: JSON.stringify({
+        service_id: serviceId,
+        package_type,
+        billing_cycle
       })
     });
     return parseOrThrow(res);

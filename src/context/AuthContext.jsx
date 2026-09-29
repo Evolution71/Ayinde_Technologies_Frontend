@@ -37,9 +37,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, captchaToken, captchaAnswer) => {
+  const register = async (first_name, last_name, email, password, captchaToken, captchaAnswer) => {
     try {
-      const response = await api.register(name, email, password, captchaToken, captchaAnswer);
+      const response = await api.register(first_name, last_name, email, password, captchaToken, captchaAnswer);
       localStorage.setItem('token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
       setUser(response.user);

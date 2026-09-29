@@ -5,7 +5,7 @@ import Captcha from './Captcha';
 export default function AuthForms({ onSuccess }) {
   const { login, register } = useAuth();
   const [mode, setMode] = useState('login'); // 'login' | 'register'
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ first_name: '', last_name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const captchaRef = useRef(null);
@@ -26,7 +26,7 @@ export default function AuthForms({ onSuccess }) {
       if (mode === 'login') {
         await login(form.email, form.password, captchaToken, captchaAnswer);
       } else {
-        await register(form.name, form.email, form.password, captchaToken, captchaAnswer);
+        await register(form.first_name, form.last_name, form.email, form.password, captchaToken, captchaAnswer);
       }
       if (onSuccess) onSuccess();
     } catch (err) {
@@ -60,10 +60,16 @@ export default function AuthForms({ onSuccess }) {
         {error && <div className="alert alert-error">{error}</div>}
 
         {mode === 'register' && (
-          <input
-            type="text" name="name" placeholder="Full name"
-            value={form.name} onChange={handleChange} required
-          />
+          <>
+            <input
+              type="text" name="first_name" placeholder="First name"
+              value={form.first_name} onChange={handleChange} required
+            />
+            <input
+              type="text" name="last_name" placeholder="Last name"
+              value={form.last_name} onChange={handleChange} required
+            />
+          </>
         )}
         <input
           type="email" name="email" placeholder="Email"
