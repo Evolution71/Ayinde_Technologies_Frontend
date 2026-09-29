@@ -17,7 +17,14 @@ const Courses = () => {
         setLoading(true);
         setError(null);
 
-        const coursesData = await api.getCourses();
+        let coursesData = await api.getCourses();
+
+        // Handle different response formats - extract courses array from object
+        if (coursesData && typeof coursesData === 'object' && !Array.isArray(coursesData)) {
+          coursesData = coursesData.courses || coursesData.data || [];
+        }
+
+        coursesData = coursesData || [];
         setCourses(coursesData);
 
         if (user && user.id) {
