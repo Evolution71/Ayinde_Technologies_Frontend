@@ -29,7 +29,7 @@ const Navigation = () => {
           <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>Contact Us</a>
           {user ? (
             <span className="nav-user">
-              Hi, {user.name.split(' ')[0]} · <button className="link-btn" onClick={logout}>Log out</button>
+              Hi, {user.first_name} · <button className="link-btn" onClick={logout}>Log out</button>
             </span>
           ) : (
             <Link to="/login" className="nav-link" onClick={() => setIsOpen(false)}>Log in</Link>
