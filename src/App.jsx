@@ -10,7 +10,7 @@ import About from './pages/About';
 import Login from './pages/login';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
-import Courses from './pages/Courses';
+import Courses from './components/Courses';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 
@@ -39,7 +39,7 @@ const App = () => {
             {/* Authentication */}
             <Route path="/login" element={<Login />} />
 
-            {/* Courses - ADD THIS LINE */}
+            {/* Courses */}
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseId" element={<CourseDetailPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
