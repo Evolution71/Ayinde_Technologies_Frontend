@@ -17,6 +17,9 @@ import CheckoutPage from './pages/CheckoutPage';
 // NEW: Premium Services Pages
 import PricingPage from './pages/PricingPage';
 import ServiceCheckoutPage from './pages/ServiceCheckoutPage';
+import WebsiteServicesPage from './pages/WebsiteServicesPage';
+import ApplicationServicesPage from './pages/ApplicationServicesPage';
+import ConsultationServicesPage from './pages/ConsultationServicesPage';
 
 const App = () => {
   useEffect(() => {
@@ -46,6 +49,9 @@ const App = () => {
 
             {/* NEW: Premium Services */}
             <Route path="/services" element={<PricingPage />} />
+            <Route path="/services/websites" element={<WebsiteServicesPage />} />
+            <Route path="/services/applications" element={<ApplicationServicesPage />} />
+            <Route path="/services/consultation" element={<ConsultationServicesPage />} />
             <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
 
             {/* Catch-all - redirect to home */}
