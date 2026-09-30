@@ -28,6 +28,7 @@ const ServiceCheckoutPage = () => {
 
   const paymentsRef = useRef(null);
   const cardRef = useRef(null);
+  const cardInitializedRef = useRef(false);
 
   // Redirect if no payment data
   useEffect(() => {
@@ -41,7 +42,13 @@ const ServiceCheckoutPage = () => {
       return;
     }
 
-    // Initialize Square Card
+    // Initialize Square Card - only once
+    if (cardInitializedRef.current) {
+      setLoading(false);
+      setCardReady(true);
+      return;
+    }
+
     const initializeSquareCard = async () => {
       try {
         setLoading(true);
@@ -52,6 +59,10 @@ const ServiceCheckoutPage = () => {
           script.src = 'https://web.squarecdn.com/v1/square.js';
           script.async = true;
           script.onload = () => setupSquare();
+          script.onerror = () => {
+            setError('Failed to load Square payment system. Please refresh and try again.');
+            setLoading(false);
+          };
           document.head.appendChild(script);
         } else {
           setupSquare();
@@ -68,6 +79,13 @@ const ServiceCheckoutPage = () => {
 
   const setupSquare = async () => {
     try {
+      // Prevent duplicate initialization
+      if (cardInitializedRef.current) {
+        setCardReady(true);
+        setLoading(false);
+        return;
+      }
+
       const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
       if (!appId) {
         throw new Error('Square App ID not configured');
@@ -80,9 +98,13 @@ const ServiceCheckoutPage = () => {
       cardRef.current = card;
 
       await card.attach('#sq-card-container');
+
+      // Mark as initialized to prevent re-attachment
+      cardInitializedRef.current = true;
       setCardReady(true);
       setLoading(false);
     } catch (err) {
+      console.error('[ServiceCheckout] Card initialization error:', err);
       setError('Card initialization failed: ' + err.message);
       setLoading(false);
     }
@@ -105,8 +127,8 @@ const ServiceCheckoutPage = () => {
       return;
     }
 
-    if (!billingInfo.fullName || !billingInfo.email) {
-      setError('Please fill in all required fields');
+    if (!billingInfo.fullName || !billingInfo.email || !billingInfo.postalCode) {
+      setError('Please fill in all required fields (name, email, postal code)');
       return;
     }
 
@@ -118,7 +140,21 @@ const ServiceCheckoutPage = () => {
       const tokenResult = await cardRef.current.tokenize();
 
       if (tokenResult.status !== 'OK') {
-        setError('Card error: ' + tokenResult.errors?.[0]?.message);
+        // Parse Square card error messages
+        const squareError = tokenResult.errors?.[0];
+        let errorMessage = 'Card error: Unable to process card';
+
+        if (squareError) {
+          if (squareError.code === 'INVALID_CARD_DATA' || squareError.message?.includes('invalid')) {
+            errorMessage = '❌ Invalid card details. Please check your card number, expiry date, and CVV.';
+          } else if (squareError.message?.includes('declined')) {
+            errorMessage = '❌ Card was declined. Please check your card or try a different payment method.';
+          } else {
+            errorMessage = 'Card error: ' + squareError.message;
+          }
+        }
+
+        setError(errorMessage);
         setProcessing(false);
         return;
       }
@@ -155,20 +191,41 @@ const ServiceCheckoutPage = () => {
         localStorage.removeItem('pendingPayment');
 
         alert(`✅ Payment successful! \n\nWelcome to ${paymentData.tierName}!\n\nA confirmation email has been sent to ${billingInfo.email}`);
-        
+
         // Redirect to dashboard or confirmation page
-        navigate('/dashboard', { 
-          state: { 
+        navigate('/dashboard', {
+          state: {
             serviceOrder: response.order,
             message: `You have successfully subscribed to ${paymentData.tierName}`
           }
         });
       } else {
-        setError(response.message || 'Payment processing failed');
+        // Handle backend payment errors
+        const backendError = response.message || 'Payment processing failed';
+
+        if (backendError.includes('insufficient') || backendError.includes('funds')) {
+          setError('❌ Insufficient funds on your card. Please check your account balance or use a different card.');
+        } else if (backendError.includes('declined')) {
+          setError('❌ Your card was declined. Please try a different card.');
+        } else {
+          setError(backendError);
+        }
       }
     } catch (err) {
       console.error('[ServiceCheckout] Error:', err);
-      setError('Payment failed: ' + (err.message || 'Unknown error'));
+
+      // Enhanced error message parsing
+      const errorMsg = err.message || 'Unknown error';
+
+      if (errorMsg.includes('insufficient')) {
+        setError('❌ Insufficient funds. Please check your card balance.');
+      } else if (errorMsg.includes('declined') || errorMsg.includes('invalid')) {
+        setError('❌ Card was declined or invalid. Please check your card details.');
+      } else if (errorMsg.includes('Network')) {
+        setError('❌ Network error. Please check your connection and try again.');
+      } else {
+        setError('❌ Payment failed: ' + errorMsg);
+      }
     } finally {
       setProcessing(false);
     }

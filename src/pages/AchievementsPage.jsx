@@ -1,111 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../api';
 
 const AchievementsPage = () => {
-   const [activeTab] = useState('all');
+  const [activeTab] = useState('all');
+  const [achievements, setAchievements] = useState([]);
+  const [maleTeamMembers, setMaleTeamMembers] = useState([]);
+  const [femaleTeamMembers, setFemaleTeamMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const achievements = [
-    {
-      id: 1,
-      title: '500+ Successful Projects Delivered',
-      description: 'Successfully completed and deployed 500+ projects across various industries and sectors',
-      category: 'general',
-      icon: '🎯'
-    },
-    {
-      id: 2,
-      title: 'Industry Award - Best Tech Innovation 2024',
-      description: 'Recognized by the Global Tech Innovation Awards for groundbreaking solutions',
-      category: 'general',
-      icon: '🏆'
-    },
-    {
-      id: 3,
-      title: 'Trusted by 1000+ Businesses',
-      description: 'Serving clients from startups to Fortune 500 companies worldwide',
-      category: 'general',
-      icon: '🤝'
-    },
-    {
-      id: 4,
-      title: '99.9% Client Satisfaction Rate',
-      description: 'Consistently maintaining exceptional service quality and client satisfaction',
-      category: 'general',
-      icon: '⭐'
-    },
-    {
-      id: 5,
-      title: 'ISO 27001 Certified',
-      description: 'Certified for information security management and data protection standards',
-      category: 'general',
-      icon: '🔒'
-    },
-    {
-      id: 6,
-      title: '$50M+ in Client Revenue Generated',
-      description: 'Helped clients generate over $50 million in additional revenue through digital transformation',
-      category: 'general',
-      icon: '💰'
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  const maleCEOQuotes = [
-    {
-      id: 1,
-      name: 'Ayinde Okafor',
-      title: 'Founder & CEO',
-      quote: 'At Ayinde Technologies, we believe technology should empower businesses, not complicate them. Our mission is to make cutting-edge solutions accessible to everyone.',
-      image: '👨‍💼',
-      achievement: 'Led the company to $10M+ annual revenue in 5 years'
-    },
-    {
-      id: 2,
-      name: 'James Mitchell',
-      title: 'Chief Innovation Officer',
-      quote: 'Innovation is at the heart of everything we do. We invest heavily in research and development to ensure our clients always stay ahead of the curve.',
-      image: '👨‍💻',
-      achievement: 'Spearheaded development of 50+ proprietary technologies'
-    },
-    {
-      id: 3,
-      name: 'David Chen',
-      title: 'Chief Technology Officer',
-      quote: 'Our technical excellence comes from hiring the best talent and creating an environment where they can thrive. Quality is never compromised.',
-      image: '👨‍🔬',
-      achievement: 'Built a team of 200+ world-class engineers'
-    }
-  ];
+        // Fetch achievements
+        const achievementsResponse = await api.getAchievements();
+        setAchievements(achievementsResponse.achievements || []);
 
-  const femaleCEOQuotes = [
-    {
-      id: 1,
-      name: 'Amara Johnson',
-      title: 'Chief Operating Officer',
-      quote: 'Operational excellence is what enables us to deliver consistent, high-quality results. We obsess over details so our clients don\'t have to.',
-      image: '👩‍💼',
-      achievement: 'Streamlined operations to improve delivery time by 40%'
-    },
-    {
-      id: 2,
-      name: 'Sofia Garcia',
-      title: 'Chief Marketing Officer',
-      quote: 'Our clients are the foundation of our success. We listen, we adapt, and we always put their needs first. That\'s what drives us every day.',
-      image: '👩‍💻',
-      achievement: 'Grew client base from 100 to 1000+ in 3 years'
-    },
-    {
-      id: 3,
-      name: 'Michelle Watson',
-      title: 'Chief Financial Officer',
-      quote: 'We believe in transparent, fair pricing and measurable ROI. Every investment our clients make with us should deliver clear business value.',
-      image: '👩‍🔬',
-      achievement: 'Achieved 95% client retention rate through 5 years'
-    }
-  ];
+        // Fetch team members by gender
+        const maleResponse = await api.getTeamMembersByGender('male');
+        setMaleTeamMembers(maleResponse.team_members || []);
+
+        const femaleResponse = await api.getTeamMembersByGender('female');
+        setFemaleTeamMembers(femaleResponse.team_members || []);
+      } catch (err) {
+        console.error('[AchievementsPage] Error fetching data:', err);
+        setError(err.message || 'Failed to load achievements and team data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const filterAchievements = () => {
     if (activeTab === 'all') return achievements;
     return achievements.filter(a => a.category === activeTab);
   };
+
+  if (loading) {
+    return (
+      <div style={{ backgroundColor: '#f9fafb', paddingTop: '40px', paddingBottom: '60px', minHeight: '100vh', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+          <h2 style={{ color: '#666', marginTop: '100px' }}>Loading achievements and team data...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ backgroundColor: '#f9fafb', paddingTop: '40px', paddingBottom: '60px', minHeight: '100vh' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', textAlign: 'center' }}>
+          <h2 style={{ color: '#d32f2f', marginTop: '100px' }}>Error Loading Data</h2>
+          <p style={{ color: '#666', marginBottom: '30px' }}>{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#1e40af',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer'
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: '#f9fafb', paddingTop: '40px', paddingBottom: '60px', minHeight: '100vh' }}>
@@ -170,12 +138,15 @@ const AchievementsPage = () => {
           <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '30px', color: '#1f2937', textAlign: 'center' }}>
             👨‍💼 Male Leadership Team
           </h2>
+          {maleTeamMembers.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#999' }}>No male team members available</p>
+          ) : (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '30px'
           }}>
-            {maleCEOQuotes.map((leader) => (
+            {maleTeamMembers.map((leader) => (
               <div key={leader.id} style={{
                 backgroundColor: 'white',
                 borderRadius: '12px',
@@ -220,6 +191,7 @@ const AchievementsPage = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
 
         {/* Female Leadership Quotes */}
@@ -227,12 +199,15 @@ const AchievementsPage = () => {
           <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '30px', color: '#1f2937', textAlign: 'center' }}>
             👩‍💼 Female Leadership Team
           </h2>
+          {femaleTeamMembers.length === 0 ? (
+            <p style={{ textAlign: 'center', color: '#999' }}>No female team members available</p>
+          ) : (
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: '30px'
           }}>
-            {femaleCEOQuotes.map((leader) => (
+            {femaleTeamMembers.map((leader) => (
               <div key={leader.id} style={{
                 backgroundColor: 'white',
                 borderRadius: '12px',
@@ -277,6 +252,7 @@ const AchievementsPage = () => {
               </div>
             ))}
           </div>
+          )}
         </div>
 
         {/* Statistics Section */}

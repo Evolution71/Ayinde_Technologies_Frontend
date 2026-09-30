@@ -346,6 +346,140 @@ export const api = {
     return parseOrThrow(res);
   },
 
+
+  // ========== ACHIEVEMENT & TEAM ENDPOINTS ==========
+
+  /**
+   * Get all active achievements
+   * @returns {array} List of achievements (title, description, category, icon)
+   */
+  async getAchievements() {
+    const res = await fetch(`${API_URL}/api/achievements/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Get all active team members
+   * @returns {object} Team members grouped by gender and full list
+   */
+  async getTeamMembers() {
+    const res = await fetch(`${API_URL}/api/team-members/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Get team members filtered by gender
+   * @param {string} gender - 'male' | 'female' | 'other'
+   * @returns {array} Filtered team members
+   */
+  async getTeamMembersByGender(gender) {
+    const res = await fetch(`${API_URL}/api/team-members/by-gender/${gender}/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Create achievement (admin only)
+   * @param {object} achievementData - { title, description, category, icon, order }
+   * @returns {object} Created achievement details
+   */
+  async createAchievement(achievementData) {
+    const res = await fetch(`${API_URL}/api/achievements/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(achievementData)
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Update achievement (admin only)
+   * @param {number} achievementId - Achievement ID
+   * @param {object} updateData - Fields to update
+   * @returns {object} Updated achievement details
+   */
+  async updateAchievement(achievementId, updateData) {
+    const res = await fetch(`${API_URL}/api/achievements/${achievementId}/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(updateData)
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Delete achievement (admin only)
+   * @param {number} achievementId - Achievement ID
+   * @returns {object} Deletion confirmation
+   */
+  async deleteAchievement(achievementId) {
+    const res = await fetch(`${API_URL}/api/achievements/${achievementId}/`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Create team member (admin only)
+   * @param {object} memberData - { name, title, quote, achievement, image, gender, category, order }
+   * @returns {object} Created member details
+   */
+  async createTeamMember(memberData) {
+    const res = await fetch(`${API_URL}/api/team-members/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(memberData)
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Update team member (admin only)
+   * @param {number} memberId - Team member ID
+   * @param {object} updateData - Fields to update
+   * @returns {object} Updated member details
+   */
+  async updateTeamMember(memberId, updateData) {
+    const res = await fetch(`${API_URL}/api/team-members/${memberId}/`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(updateData)
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Delete team member (admin only)
+   * @param {number} memberId - Team member ID
+   * @returns {object} Deletion confirmation
+   */
+  async deleteTeamMember(memberId) {
+    const res = await fetch(`${API_URL}/api/team-members/${memberId}/`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+
   // ========== PAYMENT ENDPOINTS ==========
 
   async createPaymentIntent(courseId, amount) {
