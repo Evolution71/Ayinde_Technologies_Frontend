@@ -22,6 +22,7 @@ import ConsultationServicesPage from './pages/ConsultationServicesPage';
 import PremiumServicesPage from './pages/PremiumServicesPage';
 import ServiceCheckoutPage from './pages/ServiceCheckoutPage';
 import AchievementsPage from './pages/AchievementsPage';
+import FamousQuotesPage from './pages/FamousQuotesPage';
 
 const App = () => {
   useEffect(() => {
@@ -59,6 +60,7 @@ const App = () => {
 
             {/* Achievements/Quotes Page */}
             <Route path="/achievements" element={<AchievementsPage />} />
+            <Route path="/quotes" element={<FamousQuotesPage />} />
 
             {/* Catch-all - redirect to home */}
             <Route path="*" element={<Home />} />

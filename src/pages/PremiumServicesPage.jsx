@@ -22,6 +22,7 @@ const PremiumServicesPage = () => {
       color: '#f59e0b',
       icon: '👑',
       features: [
+        'Minimum 10 Hours Expert Consultation',
         'Open Web/App Concept Research & Design from Beginning to End',
         'Latest Website Creation & Development',
         'Latest Application Creation & Development',

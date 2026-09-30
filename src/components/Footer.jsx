@@ -17,7 +17,7 @@ const Footer = () => {
               Inglewood, CA 90301<br />
               United States
             </p>
-            <p className="footer-phone"><a href="tel:+19495208178">+1 949-520-8178</a></p>
+            <p className="footer-phone"><a href="tel:+19496627869">+1 949-662-7869</a></p>
           </div>
           <div className="footer-section">
             <h4>Services</h4>

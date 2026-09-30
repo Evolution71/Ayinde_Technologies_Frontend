@@ -450,7 +450,7 @@ const Home = () => {
           }}
         >
           {[
-            { name: 'Ayinde O.', role: 'Founder & CEO', expertise: 'AI Strategy' },
+            { name: 'Albert A. D. Cabrera', role: 'Founder & CEO', expertise: 'AI Strategy' },
             { name: 'Tech Lead', role: 'Lead Developer', expertise: 'Full Stack' },
             { name: 'Data Lead', role: 'ML Engineer', expertise: 'Machine Learning' },
             { name: 'Design Lead', role: 'UI/UX Designer', expertise: 'Product Design' }
@@ -539,7 +539,7 @@ const Home = () => {
 
         <div style={{ marginTop: '40px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.2)' }}>
           <p style={{ fontSize: '14px' }}>
-            📞 +1 949-520-8178 | 📧 support@ayindetechnologies.com
+            📞 +1 949-662-7869 | 📧 support@ayindetechnologies.com
           </p>
           <p style={{ fontSize: '14px', marginTop: '10px' }}>
             112 S Market St, Suite 1008, Inglewood, CA 90301

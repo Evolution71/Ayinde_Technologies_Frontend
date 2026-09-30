@@ -87,7 +87,7 @@ export default function About() {
               Inglewood, CA 90301<br />
               United States
             </address>
-            <p><a href="tel:+19495208178">+1 949-520-8178</a></p>
+            <p><a href="tel:+19496627869">+1 949-662-7869</a></p>
             <p><a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a></p>
           </div>
           <div className="about-cta-card">

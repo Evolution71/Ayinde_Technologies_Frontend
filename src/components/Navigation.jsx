@@ -28,6 +28,7 @@ const Navigation = () => {
           <Link to="/services/premium" className="nav-link" onClick={() => setIsOpen(false)}>👑 Premium</Link>
           <Link to="/courses" className="nav-link" onClick={() => setIsOpen(false)}>Courses</Link>
           <Link to="/achievements" className="nav-link" onClick={() => setIsOpen(false)}>🏆 Achievements</Link>
+          <Link to="/quotes" className="nav-link" onClick={() => setIsOpen(false)}>💬 Quotes</Link>
           <Link to="/about" className="nav-link" onClick={() => setIsOpen(false)}>About Us</Link>
           <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>Contact Us</a>
           {user ? (
