@@ -13,6 +13,7 @@ import Terms from './pages/Terms';
 import Courses from './components/Courses';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
+import Dashboard from './pages/Dashboard';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';
@@ -44,6 +45,9 @@ const App = () => {
 
             {/* Authentication */}
             <Route path="/login" element={<Login />} />
+
+            {/* Dashboard */}
+            <Route path="/dashboard" element={<Dashboard />} />
 
             {/* Courses */}
             <Route path="/courses" element={<Courses />} />

@@ -59,6 +59,11 @@ const Courses = () => {
     navigate(`/checkout/${courseId}`);
   };
 
+  const handleViewEnrolled = (courseId) => {
+    // Navigate to course detail page when clicked on enrolled course
+    navigate(`/courses/${courseId}`);
+  };
+
   if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>;
   if (error) return <div style={{ padding: '40px', textAlign: 'center', color: 'red' }}>Error: {error}</div>;
 
@@ -74,24 +79,23 @@ const Courses = () => {
             return (
               <div key={course.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '20px', backgroundColor: '#fff' }}>
                 {course.icon && <img src={course.icon} alt={course.title} style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '4px', marginBottom: '15px' }} />}
-                
+
                 <h3 style={{ margin: '0 0 10px 0' }}>{course.title}</h3>
-                
+
                 {course.description && <p style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>{course.description}</p>}
-                
+
                 <div style={{ fontSize: '12px', color: '#999', marginBottom: '15px' }}>
                   {course.instructor && <div>👨‍🏫 {course.instructor}</div>}
                   {course.duration && <div>⏱️ {course.duration}</div>}
                   {course.level && <div>📊 {course.level}</div>}
                 </div>
-                
+
                 <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '15px', color: '#1e40af' }}>
                   {course.currency || 'USD'} {course.price?.toFixed(2) || '0.00'}
                 </div>
-                
+
                 <button
-                  onClick={() => !isEnrolled && handleEnroll(course.id)}
-                  disabled={isEnrolled}
+                  onClick={() => isEnrolled ? handleViewEnrolled(course.id) : handleEnroll(course.id)}
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -99,12 +103,19 @@ const Courses = () => {
                     border: 'none',
                     fontSize: '16px',
                     fontWeight: 'bold',
-                    cursor: isEnrolled ? 'default' : 'pointer',
+                    cursor: 'pointer',
                     backgroundColor: isEnrolled ? '#4ade80' : '#1e40af',
-                    color: 'white'
+                    color: 'white',
+                    transition: 'opacity 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '0.9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '1';
                   }}
                 >
-                  {isEnrolled ? '✅ Enrolled' : 'Enroll Now'}
+                  {isEnrolled ? '✅ Enrolled - View Course' : 'Enroll Now'}
                 </button>
               </div>
             );
