@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const AchievementsPage = () => {
-  const [activeTab, setActiveTab] = useState('all');
+   const [activeTab] = useState('all');
 
   const achievements = [
     {

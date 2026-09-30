@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const PremiumServicesPage = () => {
   const navigate = useNavigate();
-  const [selectedTier, setSelectedTier] = useState('supreme');
+  const [selectedTier] = useState('supreme');
   const [paymentOption, setPaymentOption] = useState('monthly');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [showBreakdown, setShowBreakdown] = useState(null);
