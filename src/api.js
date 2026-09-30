@@ -1,11 +1,12 @@
 /**
  * API Client for Ayinde Technologies
- * Updated to include new captcha methods and corrected register function
+ * Updated with new Service endpoints for 12-page website structure
  *
  * Usage:
  *   import { api } from '../api'
- *   await api.getCaptcha()
- *   await api.verifyCaptcha(captchaId, userAnswer)
+ *   await api.getServiceTiers(serviceType)
+ *   await api.createServiceCheckout(serviceData)
+ *   await api.applyPromoCode(code)
  */
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -77,7 +78,7 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== CAPTCHA ENDPOINTS (NEW) ==========
+  // ========== CAPTCHA ENDPOINTS ==========
 
   async getCaptcha() {
     /**
@@ -216,26 +217,130 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== SERVICE ENDPOINTS ==========
+  // ========== SERVICE ENDPOINTS (NEW - 12-Page Website Services) ==========
 
-  async getServices() {
-    const res = await fetch(`${API_URL}/api/services/`, {
+  /**
+   * Get all service tiers for a specific service type
+   * @param {string} serviceType - 'website' | 'applications' | 'consultation' | 'premium'
+   * @returns {object} Service tiers with pricing and features
+   */
+  async getServiceTiers(serviceType) {
+    const res = await fetch(`${API_URL}/api/services/tiers/${serviceType}/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
-  async purchaseService(serviceId, package_type, billing_cycle) {
-    const res = await fetch(`${API_URL}/api/services/purchase/`, {
+  /**
+   * Get all available service packages
+   * @returns {array} List of all service packages across all service types
+   */
+  async getServicePackages() {
+    const res = await fetch(`${API_URL}/api/services/packages/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Get user's current service subscriptions
+   * @returns {array} User's active service subscriptions
+   */
+  async getServiceSubscriptions() {
+    const res = await fetch(`${API_URL}/api/services/my-subscriptions/`, {
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Verify and apply promotional code
+   * @param {string} promoCode - Promotional code to apply
+   * @param {number} amount - Original amount before discount
+   * @returns {object} { valid: bool, discount_percentage: number, discount_amount: number, final_amount: number, message: string }
+   */
+  async applyPromoCode(promoCode, amount) {
+    const res = await fetch(`${API_URL}/api/services/promo-code/verify/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
       body: JSON.stringify({
-        service_id: serviceId,
-        package_type,
-        billing_cycle
+        promo_code: promoCode,
+        amount
+      })
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Create service checkout (initiate purchase)
+   * @param {object} checkoutData - {
+   *   service_type: 'website' | 'applications' | 'consultation' | 'premium',
+   *   tier: 'starter' | 'professional' | 'advanced' | 'premium',
+   *   payment_option: 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down',
+   *   hours: number (for consultation only),
+   *   promo_code: string (optional),
+   *   amount: number,
+   *   payment_method_nonce: string (from Square)
+   * }
+   * @returns {object} Checkout response with session ID and confirmation details
+   */
+  async createServiceCheckout(checkoutData) {
+    const res = await fetch(`${API_URL}/api/services/checkout/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(checkoutData)
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Get checkout status
+   * @param {string} checkoutId - ID from createServiceCheckout response
+   * @returns {object} Checkout status and details
+   */
+  async getCheckoutStatus(checkoutId) {
+    const res = await fetch(`${API_URL}/api/services/checkout/${checkoutId}/`, {
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Cancel a service subscription
+   * @param {string} subscriptionId - Service subscription ID
+   * @returns {object} Cancellation confirmation
+   */
+  async cancelServiceSubscription(subscriptionId) {
+    const res = await fetch(`${API_URL}/api/services/subscriptions/${subscriptionId}/cancel/`, {
+      method: 'POST',
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Upgrade or downgrade service tier
+   * @param {string} subscriptionId - Current subscription ID
+   * @param {string} newTier - 'starter' | 'professional' | 'advanced' | 'premium'
+   * @param {string} paymentOption - 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down'
+   * @returns {object} Updated subscription details
+   */
+  async upgradeServiceTier(subscriptionId, newTier, paymentOption) {
+    const res = await fetch(`${API_URL}/api/services/subscriptions/${subscriptionId}/upgrade/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify({
+        new_tier: newTier,
+        payment_option: paymentOption
       })
     });
     return parseOrThrow(res);

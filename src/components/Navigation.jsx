@@ -21,10 +21,13 @@ const Navigation = () => {
         </Link>
         <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
           <Link to="/" className="nav-link" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link to="/services" className="nav-link" onClick={() => setIsOpen(false)}>💎 Premium Services</Link>
-          <a href={sectionHref('#services')} className="nav-link" onClick={() => setIsOpen(false)}>Services</a>
-          <a href={sectionHref('#projects')} className="nav-link" onClick={() => setIsOpen(false)}>Projects</a>
-          <a href={sectionHref('#courses')} className="nav-link" onClick={() => setIsOpen(false)}>Courses</a>
+          <Link to="/services" className="nav-link" onClick={() => setIsOpen(false)}>Services</Link>
+          <Link to="/services/website" className="nav-link" onClick={() => setIsOpen(false)}>🌐 Websites</Link>
+          <Link to="/services/applications" className="nav-link" onClick={() => setIsOpen(false)}>📱 Applications</Link>
+          <Link to="/services/consultation" className="nav-link" onClick={() => setIsOpen(false)}>💡 Consultation</Link>
+          <Link to="/services/premium" className="nav-link" onClick={() => setIsOpen(false)}>👑 Premium</Link>
+          <Link to="/courses" className="nav-link" onClick={() => setIsOpen(false)}>Courses</Link>
+          <Link to="/achievements" className="nav-link" onClick={() => setIsOpen(false)}>🏆 Achievements</Link>
           <Link to="/about" className="nav-link" onClick={() => setIsOpen(false)}>About Us</Link>
           <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>Contact Us</a>
           {user ? (

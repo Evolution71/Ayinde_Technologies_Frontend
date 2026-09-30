@@ -14,12 +14,14 @@ import Courses from './components/Courses';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 
-// NEW: Premium Services Pages
-import PricingPage from './pages/PricingPage';
-import ServiceCheckoutPage from './pages/ServiceCheckoutPage';
+// Service Pages
+import ServicesOverviewPage from './pages/ServicesOverviewPage';
 import WebsiteServicesPage from './pages/WebsiteServicesPage';
 import ApplicationServicesPage from './pages/ApplicationServicesPage';
 import ConsultationServicesPage from './pages/ConsultationServicesPage';
+import PremiumServicesPage from './pages/PremiumServicesPage';
+import ServiceCheckoutPage from './pages/ServiceCheckoutPage';
+import AchievementsPage from './pages/AchievementsPage';
 
 const App = () => {
   useEffect(() => {
@@ -47,12 +49,16 @@ const App = () => {
             <Route path="/courses/:courseId" element={<CourseDetailPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
 
-            {/* NEW: Premium Services */}
-            <Route path="/services" element={<PricingPage />} />
-            <Route path="/services/websites" element={<WebsiteServicesPage />} />
+            {/* Services Routes - 12-Page Structure */}
+            <Route path="/services" element={<ServicesOverviewPage />} />
+            <Route path="/services/website" element={<WebsiteServicesPage />} />
             <Route path="/services/applications" element={<ApplicationServicesPage />} />
             <Route path="/services/consultation" element={<ConsultationServicesPage />} />
+            <Route path="/services/premium" element={<PremiumServicesPage />} />
             <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
+
+            {/* Achievements/Quotes Page */}
+            <Route path="/achievements" element={<AchievementsPage />} />
 
             {/* Catch-all - redirect to home */}
             <Route path="*" element={<Home />} />

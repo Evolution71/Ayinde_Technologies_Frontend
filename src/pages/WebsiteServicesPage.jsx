@@ -1,109 +1,121 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 const WebsiteServicesPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [selectedTier, setSelectedTier] = useState(null);
+  const [selectedTier, setSelectedTier] = useState('starter');
   const [paymentOption, setPaymentOption] = useState('monthly');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [showBreakdown, setShowBreakdown] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Website Pricing Tiers
   const tiers = {
-    basic: {
-      name: 'Basic',
+    starter: {
+      name: 'Website Starter',
       basePrice: 297,
       period: '/month',
-      description: 'Professional Web Presence',
+      description: 'Perfect for Small Businesses',
       color: '#3b82f6',
-      badge: null,
+      icon: '🚀',
       features: [
-        'Custom Website Design & Development',
-        'Basic AI-Powered Functions',
-        'Google Business Profile Optimization',
-        'Website Management & Hosting',
-        'Monthly Security Updates',
-        'Technical Support (Business Hours)',
-        'Basic Performance Monitoring',
-        'SSL Certificate Included'
+        'Professional Website Design & Development',
+        'Up to 5 Pages',
+        'Mobile Responsive Design',
+        'Basic SEO Setup',
+        'Contact Form Integration',
+        'Social Media Links',
+        'Monthly Updates (8 hours)',
+        'Email Support',
+        'SSL Certificate'
       ]
     },
-    plus: {
-      name: 'Plus',
+    professional: {
+      name: 'Website Professional',
       basePrice: 497,
       period: '/month',
-      description: 'Growth-Focused Solution',
+      description: 'For Growing Businesses',
       color: '#8b5cf6',
-      badge: null,
+      icon: '⭐',
       features: [
-        'Custom Website Design & Development',
-        'Advanced AI-Powered Capabilities',
-        'SEO Optimization & Strategy',
-        'Google Business Profile Management',
-        'Website Performance Analytics',
-        'Bi-weekly Updates & Maintenance',
-        'Priority Support (Extended Hours)',
-        'Conversion Rate Optimization',
-        'Mobile Optimization',
-        'Email Integration & Forms'
+        'All Starter Features',
+        'Up to 10 Pages',
+        'Advanced SEO Optimization',
+        'Google Analytics Integration',
+        'E-Commerce Ready (Up to 50 products)',
+        'Email Marketing Integration',
+        'Blog Setup',
+        'Weekly Updates (16 hours)',
+        'Phone & Email Support',
+        'Performance Monitoring'
+      ]
+    },
+    advanced: {
+      name: 'Website Advanced',
+      basePrice: 697,
+      period: '/month',
+      description: 'For Established Businesses',
+      color: '#f59e0b',
+      icon: '💎',
+      features: [
+        'All Professional Features',
+        'Unlimited Pages',
+        'AI-Powered Chatbot',
+        'Advanced E-Commerce (Unlimited products)',
+        'Custom Integrations',
+        'CRM Integration',
+        'API Development',
+        'Bi-weekly Updates (24 hours)',
+        '24/7 Priority Support',
+        'Advanced Analytics & Reporting'
       ]
     },
     premium: {
-      name: 'Premium',
-      basePrice: 697,
+      name: 'Website Premium',
+      basePrice: 897,
       period: '/month',
-      description: 'Complete Digital Ecosystem',
-      color: '#f59e0b',
-      badge: 'MOST POPULAR',
+      description: 'Enterprise-Grade Solutions',
+      color: '#10b981',
+      icon: '👑',
       features: [
-        'Custom Website Design & Development',
-        'Advanced AI Functions & Chatbot',
-        'Comprehensive SEO & Technical SEO',
-        'AI-Enhanced Search Optimization',
-        'Google Business Profile Mastery',
-        'Weekly Updates & Optimization',
-        'Advanced Analytics & Reporting',
-        '24/7 Priority Support & Rapid Issue Resolution',
-        'Custom Integrations (Payment, CRM, Email)',
-        'Social Media Integration',
-        'Blog/Content Management System',
-        'Monthly Strategy Review & Recommendations'
+        'All Advanced Features',
+        'Dedicated Account Manager',
+        'Custom AI Solutions',
+        'Enterprise E-Commerce Setup',
+        'Advanced Security Features',
+        'White Label Options',
+        'Weekly Updates (32 hours)',
+        'Custom Development',
+        '24/7 Dedicated Support',
+        'Quarterly Strategy Reviews',
+        'Priority Feature Development'
       ]
     }
   };
 
-  // Calculate price based on tier and options
   const calculatePrice = (tier) => {
     if (!tier) return 0;
 
-    let basePrice = tier.basePrice;
-    let period = 'monthly';
+    let basePrice = 0;
 
-    if (paymentOption === 'quarterly') {
-      basePrice = tier.basePrice * 3 * 0.95; // 5% discount for quarterly
-      period = 'quarterly';
+    if (paymentOption === 'monthly') {
+      basePrice = tier.basePrice;
+    } else if (paymentOption === 'quarterly') {
+      basePrice = tier.basePrice * 3 * 0.95; // 5% discount
     } else if (paymentOption === 'annual') {
-      basePrice = tier.basePrice * 12 * 0.9; // 10% discount for annual
-      period = 'annual';
+      basePrice = tier.basePrice * 12 * 0.9; // 10% discount
     } else if (paymentOption === 'halfdown') {
-      basePrice = (tier.basePrice * 6) / 2; // 50% down for 6 months
-      period = '50% down + 6 months';
+      basePrice = (tier.basePrice * 6) / 2;
     }
 
     const discount = (basePrice * discountPercent) / 100;
     const finalPrice = basePrice - discount;
 
-    return { price: finalPrice, discount, period, basePrice };
+    return { price: finalPrice, discount, period: paymentOption, basePrice };
   };
 
-  // Handle checkout
   const handleCheckout = async (tierKey) => {
-    if (!user) {
-      alert('Please login to continue');
-      navigate('/login');
+    if (!selectedTier) {
+      alert('Please select a tier first');
       return;
     }
 
@@ -114,6 +126,7 @@ const WebsiteServicesPage = () => {
       const priceInfo = calculatePrice(tier);
 
       const paymentData = {
+        service: 'website',
         tier: tierKey,
         tierName: tier.name,
         amount: Math.round(priceInfo.price * 100),
@@ -123,13 +136,11 @@ const WebsiteServicesPage = () => {
         discountAmount: Math.round(priceInfo.discount * 100),
         originalPrice: Math.round(priceInfo.basePrice * 100),
         finalPrice: Math.round(priceInfo.price * 100),
-        period: priceInfo.period,
-        serviceType: 'website',
         features: tier.features
       };
 
       localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
-      navigate('/checkout', { state: { paymentData } });
+      navigate('/services/checkout', { state: { paymentData } });
     } catch (err) {
       console.error('Error preparing checkout:', err);
       alert('Error preparing payment. Please try again.');
@@ -138,8 +149,78 @@ const WebsiteServicesPage = () => {
     }
   };
 
-  // Feature Breakdown Modal
+  const PricingCard = ({ tierKey, tier }) => (
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      padding: '30px',
+      border: selectedTier === tierKey ? `3px solid ${tier.color}` : '2px solid #e5e7eb',
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      boxShadow: selectedTier === tierKey ? `0 10px 30px ${tier.color}40` : '0 2px 8px rgba(0,0,0,0.1)',
+      transform: selectedTier === tierKey ? 'translateY(-5px)' : 'translateY(0)'
+    }}
+    onClick={() => setSelectedTier(tierKey)}>
+      <div style={{ fontSize: '32px', marginBottom: '10px' }}>{tier.icon}</div>
+      <h3 style={{ color: tier.color, marginBottom: '8px' }}>{tier.name}</h3>
+      <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>{tier.description}</p>
+
+      <div style={{
+        backgroundColor: tier.color + '10',
+        padding: '20px',
+        borderRadius: '8px',
+        marginBottom: '20px',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '32px', fontWeight: 'bold', color: tier.color }}>
+          ${tier.basePrice}
+        </div>
+        <div style={{ color: '#666', fontSize: '14px' }}>per month</div>
+      </div>
+
+      <button
+        onClick={() => setShowBreakdown(tierKey)}
+        style={{
+          width: '100%',
+          padding: '12px',
+          marginBottom: '15px',
+          backgroundColor: tier.color,
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          fontSize: '14px'
+        }}
+      >
+        View Details
+      </button>
+
+      {selectedTier === tierKey && (
+        <button
+          onClick={() => handleCheckout(tierKey)}
+          disabled={loading}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: '#16a34a',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontWeight: 'bold',
+            opacity: loading ? 0.6 : 1
+          }}
+        >
+          {loading ? 'Processing...' : 'Select This Plan'}
+        </button>
+      )}
+    </div>
+  );
+
   const FeatureBreakdown = ({ tierKey }) => {
+    if (!showBreakdown) return null;
+
     const tier = tiers[tierKey];
     const priceInfo = calculatePrice(tier);
 
@@ -166,49 +247,47 @@ const WebsiteServicesPage = () => {
           overflowY: 'auto',
           boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
         }}>
-          <div style={{ marginBottom: '30px' }}>
-            <h2 style={{ color: tier.color, marginBottom: '10px' }}>
-              {tier.name} - Website Services
-            </h2>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              {tier.description}
-            </p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ color: tier.color, margin: 0 }}>{tier.name}</h2>
+            <button
+              onClick={() => setShowBreakdown(null)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#999'
+              }}
+            >
+              ✕
+            </button>
           </div>
 
+          <h3 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold' }}>What's Included:</h3>
           <div style={{ marginBottom: '30px' }}>
-            <h3 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold' }}>
-              What's Included:
-            </h3>
-            <div>
-              {tier.features.map((feature, i) => (
-                <div key={i} style={{
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  marginBottom: '12px',
-                  paddingBottom: '12px',
-                  borderBottom: '1px solid #eee'
-                }}>
-                  <span style={{ color: tier.color, marginRight: '12px', fontWeight: 'bold' }}>✓</span>
-                  <span style={{ color: '#333', lineHeight: '1.5' }}>{feature}</span>
-                </div>
-              ))}
-            </div>
+            {tier.features.map((feature, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                marginBottom: '12px',
+                paddingBottom: '12px',
+                borderBottom: '1px solid #eee'
+              }}>
+                <span style={{ color: tier.color, marginRight: '12px', fontWeight: 'bold' }}>✓</span>
+                <span style={{ color: '#333' }}>{feature}</span>
+              </div>
+            ))}
           </div>
 
           <div style={{
             backgroundColor: '#f8f9fa',
             padding: '20px',
             borderRadius: '8px',
-            marginBottom: '30px'
+            marginBottom: '20px'
           }}>
-            <h3 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold' }}>
-              Pricing Options:
-            </h3>
+            <h3 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold' }}>Pricing Options:</h3>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '500' }}>
-                Payment Term:
-              </label>
+            <div style={{ marginBottom: '15px' }}>
               <select
                 value={paymentOption}
                 onChange={(e) => setPaymentOption(e.target.value)}
@@ -221,30 +300,30 @@ const WebsiteServicesPage = () => {
                 }}
               >
                 <option value="monthly">Monthly - ${tier.basePrice}/month</option>
-                <option value="quarterly">Quarterly - ${(tier.basePrice * 3 * 0.95).toFixed(2)} (5% off)</option>
-                <option value="annual">Annual - ${(tier.basePrice * 12 * 0.9).toFixed(2)} (10% off)</option>
+                <option value="quarterly">Quarterly - ${(tier.basePrice * 3 * 0.95).toFixed(0)} (5% savings)</option>
+                <option value="annual">Annual - ${(tier.basePrice * 12 * 0.9).toFixed(0)} (10% savings)</option>
                 <option value="halfdown">50% Down + 6 Months</option>
               </select>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '10px', fontWeight: '500' }}>
-                Limited Time Offer (30 days):
+                Special Offer (30 days):
               </label>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                 {[0, 5, 10, 20].map((discount) => (
                   <button
                     key={discount}
                     onClick={() => setDiscountPercent(discount)}
                     style={{
-                      padding: '10px 15px',
+                      padding: '8px 12px',
                       borderRadius: '6px',
-                      border: discountPercent === discount ? '2px solid ' + tier.color : '1px solid #ddd',
+                      border: discountPercent === discount ? `2px solid ${tier.color}` : '1px solid #ddd',
                       backgroundColor: discountPercent === discount ? tier.color + '20' : 'white',
                       color: discountPercent === discount ? tier.color : '#333',
                       cursor: 'pointer',
                       fontWeight: '500',
-                      fontSize: '14px'
+                      fontSize: '12px'
                     }}
                   >
                     {discount === 0 ? 'No Discount' : `${discount}% OFF`}
@@ -261,7 +340,7 @@ const WebsiteServicesPage = () => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span>Original Price:</span>
-                <span>${priceInfo.basePrice.toFixed(2)}</span>
+                <span style={{ fontWeight: 'bold' }}>${priceInfo.basePrice.toFixed(2)}</span>
               </div>
               {priceInfo.discount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', color: '#16a34a' }}>
@@ -273,239 +352,114 @@ const WebsiteServicesPage = () => {
                 display: 'flex',
                 justifyContent: 'space-between',
                 paddingTop: '8px',
-                borderTop: '2px solid #eee',
+                borderTop: '2px solid #ddd',
                 fontSize: '18px',
                 fontWeight: 'bold',
                 color: tier.color
               }}>
-                <span>Final Price ({priceInfo.period}):</span>
+                <span>Final Price:</span>
                 <span>${priceInfo.price.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <button
-              onClick={() => setShowBreakdown(null)}
-              style={{
-                flex: 1,
-                padding: '12px',
-                borderRadius: '6px',
-                border: '1px solid #ddd',
-                backgroundColor: 'white',
-                color: '#333',
-                cursor: 'pointer',
-                fontWeight: '500',
-                fontSize: '14px'
-              }}
-            >
-              Back
-            </button>
-            <button
-              onClick={() => {
-                setSelectedTier(tierKey);
-                handleCheckout(tierKey);
-              }}
-              disabled={loading}
-              style={{
-                flex: 1,
-                padding: '12px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: tier.color,
-                color: 'white',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontWeight: '500',
-                fontSize: '14px',
-                opacity: loading ? 0.7 : 1
-              }}
-            >
-              {loading ? 'Processing...' : 'Proceed to Checkout →'}
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              handleCheckout(tierKey);
+              setShowBreakdown(null);
+            }}
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '14px',
+              backgroundColor: tier.color,
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontWeight: 'bold',
+              fontSize: '16px',
+              opacity: loading ? 0.6 : 1
+            }}
+          >
+            {loading ? 'Processing...' : 'Proceed to Checkout'}
+          </button>
         </div>
       </div>
     );
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', paddingTop: '60px' }}>
-      {/* Header */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 20px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '42px', fontWeight: 'bold', marginBottom: '20px', color: '#1e40af' }}>
-          🌐 Website Services
-        </h1>
-        <p style={{ fontSize: '18px', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-          Custom website design, AI-powered functionality, and managed support. Pick the tier that fits your growth.
-        </p>
-      </div>
+    <div style={{ backgroundColor: '#f9fafb', paddingTop: '40px', paddingBottom: '60px', minHeight: '100vh' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+        {/* Header */}
+        <div style={{ marginBottom: '60px', textAlign: 'center' }}>
+          <h1 style={{ fontSize: '42px', fontWeight: 'bold', marginBottom: '15px', color: '#1f2937' }}>
+            🌐 Website Services
+          </h1>
+          <p style={{ fontSize: '18px', color: '#666', marginBottom: '20px' }}>
+            Professional website solutions for every business size
+          </p>
+          <p style={{ fontSize: '14px', color: '#999' }}>
+            ✅ Includes 24/7 Support | ✅ Regular Updates | ✅ Security Included
+          </p>
+        </div>
 
-      {/* Pricing Cards */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '0 auto',
-        padding: '40px 20px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-        gap: '30px'
-      }}>
-        {Object.entries(tiers).map(([tierKey, tier]) => (
-          <div
-            key={tierKey}
-            style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              padding: '30px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-              border: selectedTier === tierKey ? '3px solid ' + tier.color : '1px solid #e5e7eb',
-              transition: 'all 0.3s ease',
-              position: 'relative',
-              transform: 'scale(1)'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          >
-            {tier.badge && (
-              <div style={{
-                position: 'absolute',
-                top: '-15px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                backgroundColor: tier.color,
-                color: 'white',
-                padding: '6px 16px',
-                borderRadius: '20px',
-                fontSize: '12px',
-                fontWeight: 'bold'
-              }}>
-                {tier.badge}
-              </div>
-            )}
+        {/* Pricing Cards Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '30px',
+          marginBottom: '60px'
+        }}>
+          {Object.entries(tiers).map(([key, tier]) => (
+            <PricingCard key={key} tierKey={key} tier={tier} />
+          ))}
+        </div>
 
-            <h2 style={{ color: tier.color, marginBottom: '10px', fontSize: '24px', fontWeight: 'bold' }}>
-              {tier.name}
-            </h2>
-            <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
-              {tier.description}
-            </p>
-
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: tier.color, marginBottom: '5px' }}>
-                ${tier.basePrice}
-                <span style={{ fontSize: '16px', fontWeight: 'normal', color: '#666' }}>
-                  {tier.period}
-                </span>
-              </div>
+        {/* Info Section */}
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '40px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
+          <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>
+            Why Choose Our Website Services?
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '20px'
+          }}>
+            <div>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px' }}>🎨 Custom Design</h3>
+              <p style={{ color: '#666', lineHeight: '1.6' }}>Tailored designs that match your brand identity and goals</p>
             </div>
-
-            <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: '1px solid #eee' }}>
-              {tier.features.slice(0, 5).map((feature, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ color: tier.color, marginRight: '8px' }}>✓</span>
-                  <span style={{ fontSize: '13px', color: '#666' }}>{feature}</span>
-                </div>
-              ))}
-              {tier.features.length > 5 && (
-                <div style={{ color: '#999', fontSize: '12px', marginTop: '8px', fontStyle: 'italic' }}>
-                  +{tier.features.length - 5} more features
-                </div>
-              )}
+            <div>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px' }}>📱 Responsive</h3>
+              <p style={{ color: '#666', lineHeight: '1.6' }}>Perfect on all devices - desktop, tablet, and mobile</p>
             </div>
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={() => setShowBreakdown(tierKey)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  borderRadius: '6px',
-                  border: '2px solid ' + tier.color,
-                  backgroundColor: 'white',
-                  color: tier.color,
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '14px'
-                }}
-              >
-                View Details
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedTier(tierKey);
-                  setShowBreakdown(tierKey);
-                }}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: tier.color,
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '14px'
-                }}
-              >
-                Get Started →
-              </button>
+            <div>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px' }}>⚡ Fast Performance</h3>
+              <p style={{ color: '#666', lineHeight: '1.6' }}>Optimized for speed and search engine rankings</p>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Info Section */}
-      <div style={{
-        maxWidth: '1200px',
-        margin: '60px auto',
-        backgroundColor: '#f0f9ff',
-        borderRadius: '12px',
-        padding: '30px',
-        marginBottom: '60px'
-      }}>
-        <h3 style={{ color: '#1e40af', marginBottom: '20px', fontSize: '20px', fontWeight: 'bold' }}>
-          ℹ️ Website Services Include
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-          <div>
-            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>🎨 Custom Design</h4>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              Professional, responsive design tailored to your brand. Mobile-optimized and conversion-focused.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>🤖 AI Integration</h4>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              AI chatbots, smart forms, and automation features included based on your tier.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>🔍 SEO Optimization</h4>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              Search engine optimization and monthly performance monitoring included.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>🛡️ Security & Hosting</h4>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              SSL certificates, automatic backups, and 99.9% uptime guarantee included.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>📞 24/7 Support</h4>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              Premium tiers include 24/7 support, rapid bug fixes, and regular updates.
-            </p>
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 'bold', marginBottom: '8px' }}>💳 Flexible Payments</h4>
-            <p style={{ color: '#666', fontSize: '14px' }}>
-              Monthly, quarterly, annual, or 50% down payment plans available.
-            </p>
+            <div>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px' }}>🔒 Security</h3>
+              <p style={{ color: '#666', lineHeight: '1.6' }}>SSL certificates and regular security updates included</p>
+            </div>
+            <div>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px' }}>📊 Analytics</h3>
+              <p style={{ color: '#666', lineHeight: '1.6' }}>Track performance and visitor behavior in real-time</p>
+            </div>
+            <div>
+              <h3 style={{ color: '#3b82f6', marginBottom: '8px' }}>24/7 Support</h3>
+              <p style={{ color: '#666', lineHeight: '1.6' }}>Always here when you need help or have questions</p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Feature Breakdown Modal */}
       {showBreakdown && <FeatureBreakdown tierKey={showBreakdown} />}
     </div>
   );
