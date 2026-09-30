@@ -38,7 +38,7 @@ const Dashboard = () => {
         coursesData = coursesData.courses || coursesData.data || [];
       }
 
-      // Separate active and expired courses
+      // Separate and TRACK EVERYTHING: active and expired courses
       const active = [];
       const expired = [];
 
@@ -49,25 +49,29 @@ const Dashboard = () => {
           const trialEndsAt = new Date(enrollment.trial_ends_at);
 
           if (trialEndsAt > now) {
+            // ACTIVE: Trial still valid
             active.push({
               ...course,
               enrollment: enrollment,
               daysRemaining: Math.ceil((trialEndsAt - now) / (1000 * 60 * 60 * 24))
             });
           } else {
+            // EXPIRED: Trial has ended - TRACK IT
             expired.push({
               ...course,
               enrollment: enrollment,
-              expiredDate: trialEndsAt
+              expiredDate: trialEndsAt,
+              daysExpired: Math.ceil((now - trialEndsAt) / (1000 * 60 * 60 * 24))
             });
           }
         }
       });
 
+      // TRACK EVERYTHING: Store both active and expired
       setEnrolledCourses(active);
       setExpiredCourses(expired);
 
-      console.log('[Dashboard] Active:', active.length, 'Expired:', expired.length);
+      console.log('[Dashboard] Active:', active.length, 'Expired:', expired.length, 'Total Tracked:', active.length + expired.length);
     } catch (err) {
       console.error('[Dashboard] Error:', err);
       setError(err.message || 'Failed to load dashboard data');
@@ -103,7 +107,7 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - TRACK EVERYTHING */}
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
@@ -175,7 +179,7 @@ const Dashboard = () => {
                 border: '1px solid #e5e7eb'
               }}>
                 <p style={{ fontSize: '18px', color: '#666', marginBottom: '20px' }}>
-                  You haven't enrolled in any courses yet.
+                  You haven't enrolled in any active courses yet.
                 </p>
                 <button
                   onClick={() => navigate('/courses')}
@@ -329,7 +333,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Expired Courses Tab */}
+        {/* Expired Courses Tab - TRACKING EVERYTHING */}
         {activeTab === 'expired' && (
           <div>
             {expiredCourses.length === 0 ? (
@@ -389,7 +393,7 @@ const Dashboard = () => {
                       }}>
                         <span style={{ fontSize: '16px' }}>❌</span>
                         <span style={{ fontSize: '12px', color: '#991b1b', fontWeight: 'bold' }}>
-                          Trial Expired
+                          Trial Expired ({course.daysExpired} days ago)
                         </span>
                       </div>
 
