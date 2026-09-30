@@ -8,10 +8,10 @@ const ServiceCheckoutPage = () => {
   const location = useLocation();
   const { user } = useAuth();
 
-  // Payment data from PricingPage
-  const paymentData = location.state?.paymentData || localStorage.getItem('pendingPayment') 
-    ? JSON.parse(localStorage.getItem('pendingPayment')) 
-    : null;
+  // Payment data from PremiumServicesPage
+  const paymentData = location.state?.paymentData || (localStorage.getItem('pendingPayment')
+    ? JSON.parse(localStorage.getItem('pendingPayment'))
+    : null);
 
   const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -29,8 +29,10 @@ const ServiceCheckoutPage = () => {
   const paymentsRef = useRef(null);
   const cardRef = useRef(null);
   const cardInitializedRef = useRef(false);
+  const cardAttachedRef = useRef(false);
+  const squareScriptLoadedRef = useRef(false);
 
-  // Redirect if no payment data
+  // Redirect if no payment data or no user
   useEffect(() => {
     if (!paymentData) {
       navigate('/services');
@@ -41,11 +43,14 @@ const ServiceCheckoutPage = () => {
       navigate('/login');
       return;
     }
+  }, [paymentData, user, navigate]);
 
-    // Initialize Square Card - only once
+  // Initialize Square Card - only once
+  useEffect(() => {
+    if (!paymentData || !user) return;
+
+    // If already initialized, don't do it again
     if (cardInitializedRef.current) {
-      setLoading(false);
-      setCardReady(true);
       return;
     }
 
@@ -54,30 +59,53 @@ const ServiceCheckoutPage = () => {
         setLoading(true);
 
         // Load Square SDK if not already loaded
-        if (!window.Square) {
+        if (!window.Square && !squareScriptLoadedRef.current) {
+          squareScriptLoadedRef.current = true;
+
           const script = document.createElement('script');
           script.src = 'https://web.squarecdn.com/v1/square.js';
           script.async = true;
-          script.onload = () => setupSquare();
+
+          script.onload = () => {
+            setupSquareCard();
+          };
+
           script.onerror = () => {
             setError('Failed to load Square payment system. Please refresh and try again.');
             setLoading(false);
+            squareScriptLoadedRef.current = false;
           };
+
           document.head.appendChild(script);
-        } else {
-          setupSquare();
+        } else if (window.Square) {
+          setupSquareCard();
         }
       } catch (err) {
+        console.error('[ServiceCheckout] Initialization error:', err);
         setError('Failed to load payment system: ' + err.message);
         setLoading(false);
       }
     };
 
     initializeSquareCard();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paymentData, user, navigate]);
 
-  const setupSquare = async () => {
+    // Cleanup function
+    return () => {
+      if (cardRef.current && cardAttachedRef.current) {
+        try {
+          cardRef.current.detach?.();
+          cardAttachedRef.current = false;
+        } catch (err) {
+          console.error('[ServiceCheckout] Detach error:', err);
+        }
+      }
+    };
+
+    // Only run once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setupSquareCard = async () => {
     try {
       // Prevent duplicate initialization
       if (cardInitializedRef.current) {
@@ -97,16 +125,25 @@ const ServiceCheckoutPage = () => {
       const card = await payments.card();
       cardRef.current = card;
 
+      // Clear container before attaching
+      const container = document.getElementById('sq-card-container');
+      if (container) {
+        container.innerHTML = '';
+      }
+
       await card.attach('#sq-card-container');
 
       // Mark as initialized to prevent re-attachment
       cardInitializedRef.current = true;
+      cardAttachedRef.current = true;
       setCardReady(true);
       setLoading(false);
     } catch (err) {
-      console.error('[ServiceCheckout] Card initialization error:', err);
+      console.error('[ServiceCheckout] Card setup error:', err);
       setError('Card initialization failed: ' + err.message);
       setLoading(false);
+      cardInitializedRef.current = false;
+      cardAttachedRef.current = false;
     }
   };
 
@@ -161,63 +198,57 @@ const ServiceCheckoutPage = () => {
 
       const token = tokenResult.token;
 
-      // Create service order via backend
-      const orderData = {
+      // Transform payment data to match API format
+      const checkoutData = {
+        service_type: paymentData.service || 'premium',  // Maps to service_type
         tier: paymentData.tier,
-        tierName: paymentData.tierName,
-        amount: paymentData.finalPrice / 100, // Convert back from cents
-        currency: paymentData.currency,
-        paymentOption: paymentData.paymentOption,
-        discountPercent: paymentData.discountPercent,
-        period: paymentData.period,
-        // Billing info
-        fullName: billingInfo.fullName,
-        email: billingInfo.email,
-        phone: billingInfo.phone,
-        company: billingInfo.company,
-        postalCode: billingInfo.postalCode,
-        country: billingInfo.country,
-        // Square token
-        sourceId: token
+        payment_option: paymentData.paymentOption,
+        hours: paymentData.hours || null,  // For consultation services
+        promo_code: paymentData.promoCode || null,
+        amount: Math.round(paymentData.finalPrice) / 100,  // Convert from cents to dollars
+        payment_method_nonce: token,
+        // Additional billing info
+        billing_email: billingInfo.email,
+        billing_name: billingInfo.fullName,
+        billing_phone: billingInfo.phone,
+        billing_company: billingInfo.company,
+        billing_postal_code: billingInfo.postalCode,
+        billing_country: billingInfo.country
       };
 
-      console.log('[ServiceCheckout] Submitting order:', orderData);
+      console.log('[ServiceCheckout] Submitting checkout:', checkoutData);
 
-      // Call backend to process payment
-      const response = await api.post('/services/purchase/', orderData);
+      // Call backend API to create checkout - CORRECT API METHOD
+      const response = await api.createServiceCheckout(checkoutData);
 
-      if (response.success) {
+      if (response.success || response.checkout_id) {
         // Clear pending payment
         localStorage.removeItem('pendingPayment');
 
-        alert(`✅ Payment successful! \n\nWelcome to ${paymentData.tierName}!\n\nA confirmation email has been sent to ${billingInfo.email}`);
+        const message = `✅ Payment successful! \n\nWelcome to ${paymentData.tierName}!\n\nA confirmation email has been sent to ${billingInfo.email}`;
+        alert(message);
 
         // Redirect to dashboard or confirmation page
         navigate('/dashboard', {
           state: {
-            serviceOrder: response.order,
+            checkout_id: response.checkout_id || response.id,
             message: `You have successfully subscribed to ${paymentData.tierName}`
           }
         });
       } else {
-        // Handle backend payment errors
-        const backendError = response.message || 'Payment processing failed';
-
-        if (backendError.includes('insufficient') || backendError.includes('funds')) {
-          setError('❌ Insufficient funds on your card. Please check your account balance or use a different card.');
-        } else if (backendError.includes('declined')) {
-          setError('❌ Your card was declined. Please try a different card.');
-        } else {
-          setError(backendError);
-        }
+        // Handle backend response errors
+        const backendError = response.message || response.detail || 'Payment processing failed';
+        setError('❌ ' + backendError);
       }
     } catch (err) {
-      console.error('[ServiceCheckout] Error:', err);
+      console.error('[ServiceCheckout] Payment error:', err);
 
       // Enhanced error message parsing
       const errorMsg = err.message || 'Unknown error';
 
-      if (errorMsg.includes('insufficient')) {
+      if (errorMsg.includes('not a function')) {
+        setError('❌ API configuration error. Please contact support.');
+      } else if (errorMsg.includes('insufficient')) {
         setError('❌ Insufficient funds. Please check your card balance.');
       } else if (errorMsg.includes('declined') || errorMsg.includes('invalid')) {
         setError('❌ Card was declined or invalid. Please check your card details.');
@@ -235,7 +266,20 @@ const ServiceCheckoutPage = () => {
     return (
       <div style={{ padding: '40px', textAlign: 'center' }}>
         <h2>Invalid checkout session</h2>
-        <button onClick={() => navigate('/services')}>← Back to Services</button>
+        <button
+          onClick={() => navigate('/services')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#1e40af',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontSize: '14px'
+          }}
+        >
+          ← Back to Services
+        </button>
       </div>
     );
   }
@@ -356,6 +400,19 @@ const ServiceCheckoutPage = () => {
           }}>
             <h2 style={{ marginTop: 0, marginBottom: '30px' }}>Complete Your Purchase</h2>
 
+            {loading && (
+              <div style={{
+                padding: '15px',
+                backgroundColor: '#dbeafe',
+                borderRadius: '8px',
+                marginBottom: '20px',
+                color: '#1e40af',
+                border: '1px solid #93c5fd'
+              }}>
+                🔄 Loading payment system...
+              </div>
+            )}
+
             {error && (
               <div style={{
                 padding: '15px',
@@ -365,7 +422,7 @@ const ServiceCheckoutPage = () => {
                 color: '#991b1b',
                 border: '1px solid #fca5a5'
               }}>
-                ❌ {error}
+                {error}
               </div>
             )}
 
@@ -500,18 +557,24 @@ const ServiceCheckoutPage = () => {
                 </div>
               </div>
 
-              {/* Card Payment */}
+              {/* Card Payment Section - ONLY ONE CARD FORM */}
               <div style={{ marginBottom: '30px' }}>
                 <h3 style={{ fontSize: '16px', marginBottom: '15px', color: '#333' }}>
                   Card Details
                 </h3>
+                {!cardReady && !loading && (
+                  <div style={{ color: '#999', fontSize: '13px', marginBottom: '10px' }}>
+                    Initializing payment form...
+                  </div>
+                )}
                 <div
                   id="sq-card-container"
                   style={{
                     border: '1px solid #ddd',
                     padding: '12px',
                     borderRadius: '6px',
-                    minHeight: '50px'
+                    minHeight: '55px',
+                    backgroundColor: cardReady ? '#fff' : '#f9fafb'
                   }}
                 />
               </div>
@@ -530,15 +593,17 @@ const ServiceCheckoutPage = () => {
                   fontSize: '16px',
                   fontWeight: 'bold',
                   cursor: processing || !cardReady || loading ? 'not-allowed' : 'pointer',
-                  marginBottom: '10px'
+                  marginBottom: '10px',
+                  transition: 'background-color 0.3s'
                 }}
               >
-                {processing ? '🔄 Processing Payment...' : `💳 Pay $${finalPrice.toFixed(2)}`}
+                {processing ? '🔄 Processing Payment...' : cardReady ? `💳 Pay $${finalPrice.toFixed(2)}` : '⏳ Preparing...'}
               </button>
 
               <button
                 type="button"
                 onClick={() => navigate('/services')}
+                disabled={processing}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -546,8 +611,9 @@ const ServiceCheckoutPage = () => {
                   color: '#333',
                   border: 'none',
                   borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
+                  cursor: processing ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  opacity: processing ? 0.6 : 1
                 }}
               >
                 ← Cancel

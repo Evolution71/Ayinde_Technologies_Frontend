@@ -1,6 +1,6 @@
 /**
  * API Client for Ayinde Technologies
- * Updated with new Service endpoints for 12-page website structure
+ * Updated with Service endpoints for 12-page website structure
  *
  * Usage:
  *   import { api } from '../api'
@@ -276,6 +276,8 @@ export const api = {
 
   /**
    * Create service checkout (initiate purchase)
+   * IMPORTANT: This is the CORRECT method to use for service payments
+   *
    * @param {object} checkoutData - {
    *   service_type: 'website' | 'applications' | 'consultation' | 'premium',
    *   tier: 'starter' | 'professional' | 'advanced' | 'premium',
@@ -283,7 +285,13 @@ export const api = {
    *   hours: number (for consultation only),
    *   promo_code: string (optional),
    *   amount: number,
-   *   payment_method_nonce: string (from Square)
+   *   payment_method_nonce: string (from Square tokenization),
+   *   billing_email: string,
+   *   billing_name: string,
+   *   billing_phone: string,
+   *   billing_company: string,
+   *   billing_postal_code: string,
+   *   billing_country: string
    * }
    * @returns {object} Checkout response with session ID and confirmation details
    */
@@ -346,6 +354,24 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Save payment method for service (alternative to full checkout)
+   * @param {string} paymentMethodNonce - From Square tokenization
+   * @returns {object} Saved payment method details
+   */
+  async saveServicePaymentMethod(paymentMethodNonce) {
+    const res = await fetch(`${API_URL}/api/services/payment-method/save/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify({
+        payment_method_nonce: paymentMethodNonce
+      })
+    });
+    return parseOrThrow(res);
+  },
 
   // ========== ACHIEVEMENT & TEAM ENDPOINTS ==========
 
