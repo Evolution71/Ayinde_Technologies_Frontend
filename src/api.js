@@ -4,6 +4,7 @@
  *
  * Usage:
  *   import { api } from '../api'
+ *   await api.getServices()
  *   await api.getServiceTiers(serviceType)
  *   await api.createServiceCheckout(serviceData)
  *   await api.applyPromoCode(code)
@@ -220,6 +221,18 @@ export const api = {
   // ========== SERVICE ENDPOINTS (NEW - 12-Page Website Services) ==========
 
   /**
+   * Get all services overview (for home page display)
+   * Returns all available services with basic info
+   * @returns {array} List of all services with tiers and basic details
+   */
+  async getServices() {
+    const res = await fetch(`${API_URL}/api/services/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
    * Get all service tiers for a specific service type
    * @param {string} serviceType - 'website' | 'applications' | 'consultation' | 'premium'
    * @returns {object} Service tiers with pricing and features
@@ -369,6 +382,23 @@ export const api = {
       body: JSON.stringify({
         payment_method_nonce: paymentMethodNonce
       })
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Create a service order/purchase with Square payment token
+   * @param {object} purchaseData - { tier, tierName, amount, currency, paymentOption, discountPercent, period, fullName, email, phone, company, postalCode, country, sourceId }
+   * @returns {object} Service order confirmation with order_id
+   */
+  async createServicePurchase(purchaseData) {
+    const res = await fetch(`${API_URL}/api/services/purchase/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(purchaseData)
     });
     return parseOrThrow(res);
   },
