@@ -8,7 +8,6 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [expiredCourses, setExpiredCourses] = useState([]);
-  const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'expired'
@@ -30,7 +29,6 @@ const Dashboard = () => {
       // Fetch enrollments
       const enrollmentsData = await api.getMyEnrollments();
       const enrollmentList = enrollmentsData.enrollments || [];
-      setEnrollments(enrollmentList);
 
       // Fetch all courses
       let coursesData = await api.getCourses();
