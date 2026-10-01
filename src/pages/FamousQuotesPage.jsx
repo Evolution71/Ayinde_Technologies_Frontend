@@ -1,344 +1,226 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../api';
 
-const FamousQuotesPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('innovation');
+export function QuotesPage() {
+  const [quotes, setQuotes] = useState([]);
+  const [filteredQuotes, setFilteredQuotes] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
 
-  const quotes = [
-    {
-      id: 1,
-      text: "Innovation distinguishes between a leader and a follower.",
-      author: "Steve Jobs",
-      title: "Apple Co-founder",
-      category: "innovation",
-      icon: "💡"
-    },
-    {
-      id: 2,
-      text: "The only way to do great work is to love what you do.",
-      author: "Steve Jobs",
-      title: "Apple Co-founder",
-      category: "passion",
-      icon: "❤️"
-    },
-    {
-      id: 3,
-      text: "Life is what happens when you're busy making other plans.",
-      author: "John Lennon",
-      title: "Musician & Visionary",
-      category: "wisdom",
-      icon: "🎵"
-    },
-    {
-      id: 4,
-      text: "The future belongs to those who believe in the beauty of their dreams.",
-      author: "Eleanor Roosevelt",
-      title: "Political Figure & Activist",
-      category: "vision",
-      icon: "✨"
-    },
-    {
-      id: 5,
-      text: "It's better to be a pirate than to join the Navy.",
-      author: "Steve Jobs",
-      title: "Apple Co-founder",
-      category: "courage",
-      icon: "⚓"
-    },
-    {
-      id: 6,
-      text: "Don't watch the clock; do what it does. Keep going.",
-      author: "Sam Levenson",
-      title: "Humorist & Writer",
-      category: "perseverance",
-      icon: "⏰"
-    },
-    {
-      id: 7,
-      text: "The only thing we have to fear is fear itself.",
-      author: "Franklin D. Roosevelt",
-      title: "U.S. President",
-      category: "courage",
-      icon: "💪"
-    },
-    {
-      id: 8,
-      text: "Success is not final, failure is not fatal.",
-      author: "Winston Churchill",
-      title: "British Prime Minister",
-      category: "perseverance",
-      icon: "🏆"
-    },
-    {
-      id: 9,
-      text: "The way to get started is to quit talking and begin doing.",
-      author: "Walt Disney",
-      title: "Disney Founder",
-      category: "action",
-      icon: "🎬"
-    },
-    {
-      id: 10,
-      text: "You miss 100% of the shots you don't take.",
-      author: "Wayne Gretzky",
-      title: "Hockey Legend",
-      category: "courage",
-      icon: "🎯"
-    },
-    {
-      id: 11,
-      text: "Ideas are nothing. Execution is everything.",
-      author: "Mark Zuckerberg",
-      title: "Facebook Founder",
-      category: "execution",
-      icon: "⚙️"
-    },
-    {
-      id: 12,
-      text: "Your work is going to fill a large part of your life.",
-      author: "Steve Jobs",
-      title: "Apple Co-founder",
-      category: "passion",
-      icon: "💼"
-    },
-    {
-      id: 13,
-      text: "Do something you love, and you'll never work a day in your life.",
-      author: "Marc Anthony",
-      title: "Entrepreneur & Speaker",
-      category: "passion",
-      icon: "😊"
-    },
-    {
-      id: 14,
-      text: "The only impossible journey is the one you never begin.",
-      author: "Tony Robbins",
-      title: "Motivational Speaker",
-      category: "vision",
-      icon: "🚀"
-    },
-    {
-      id: 15,
-      text: "Great things never come from comfort zones.",
-      author: "Unknown",
-      title: "Universal Truth",
-      category: "courage",
-      icon: "🌟"
+  useEffect(() => {
+    loadAllQuotes();
+  }, []);
+
+  useEffect(() => {
+    filterQuotes();
+  }, [selectedCategory, quotes]);
+
+  async function loadAllQuotes() {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await api.getQuotes();
+      const quotesList = data.quotes || [];
+      setQuotes(quotesList);
+
+      if (quotesList.length > 0) {
+        const uniqueCategories = [...new Set(quotesList.map(q => q.category))];
+        setCategories(uniqueCategories.sort());
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to load quotes');
+      console.error('Error loading quotes:', err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  }
 
-  const categories = [
-    { id: 'innovation', label: '💡 Innovation', count: quotes.filter(q => q.category === 'innovation').length },
-    { id: 'passion', label: '❤️ Passion', count: quotes.filter(q => q.category === 'passion').length },
-    { id: 'wisdom', label: '🧠 Wisdom', count: quotes.filter(q => q.category === 'wisdom').length },
-    { id: 'vision', label: '🎯 Vision', count: quotes.filter(q => q.category === 'vision').length },
-    { id: 'courage', label: '💪 Courage', count: quotes.filter(q => q.category === 'courage').length },
-    { id: 'perseverance', label: '🏆 Perseverance', count: quotes.filter(q => q.category === 'perseverance').length },
-    { id: 'action', label: '⚡ Action', count: quotes.filter(q => q.category === 'action').length },
-    { id: 'execution', label: '⚙️ Execution', count: quotes.filter(q => q.category === 'execution').length }
-  ];
+  async function filterQuotes() {
+    if (selectedCategory === 'all') {
+      setFilteredQuotes(quotes);
+    } else {
+      try {
+        const data = await api.getQuotesByCategory(selectedCategory);
+        setFilteredQuotes(data.quotes || []);
+      } catch (err) {
+        console.error('Error filtering quotes:', err);
+        setFilteredQuotes([]);
+      }
+    }
+  }
 
-  const filteredQuotes = selectedCategory === 'all'
-    ? quotes
-    : quotes.filter(q => q.category === selectedCategory);
+  if (loading) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <p>Loading quotes...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '2rem', color: 'red' }}>
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ backgroundColor: '#f9fafb', paddingTop: '40px', paddingBottom: '60px', minHeight: '100vh' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '60px', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '42px', fontWeight: 'bold', marginBottom: '15px', color: '#1f2937' }}>
-            💬 Famous Tech CEOs Quotes
-          </h1>
-          <p style={{ fontSize: '18px', color: '#666', marginBottom: '20px' }}>
-            Inspiration and wisdom from industry leaders and visionaries
-          </p>
-        </div>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '0.5rem' }}>
+          Inspirational Quotes
+        </h1>
+        <p style={{ fontSize: '1.2rem', color: '#666' }}>
+          Words of wisdom to inspire your journey
+        </p>
+      </div>
 
-        {/* Category Filter */}
-        <div style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '12px',
-          justifyContent: 'center',
-          marginBottom: '50px'
-        }}>
+      {/* Category Filter */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '0.75rem',
+        justifyContent: 'center',
+        marginBottom: '3rem'
+      }}>
+        <button
+          onClick={() => setSelectedCategory('all')}
+          style={{
+            padding: '0.5rem 1.25rem',
+            background: selectedCategory === 'all' ? '#6366f1' : '#f3f4f6',
+            color: selectedCategory === 'all' ? 'white' : '#1f2937',
+            border: 'none',
+            borderRadius: '1rem',
+            cursor: 'pointer',
+            fontWeight: '500',
+            fontSize: '0.95rem',
+            transition: 'all 0.3s'
+          }}
+        >
+          All ({quotes.length})
+        </button>
+        {categories.map(category => (
           <button
-            onClick={() => setSelectedCategory('all')}
+            key={category}
+            onClick={() => setSelectedCategory(category)}
             style={{
-              padding: '10px 20px',
-              backgroundColor: selectedCategory === 'all' ? '#3b82f6' : '#e5e7eb',
-              color: selectedCategory === 'all' ? 'white' : '#1f2937',
+              padding: '0.5rem 1.25rem',
+              background: selectedCategory === category ? '#6366f1' : '#f3f4f6',
+              color: selectedCategory === category ? 'white' : '#1f2937',
               border: 'none',
-              borderRadius: '20px',
+              borderRadius: '1rem',
               cursor: 'pointer',
               fontWeight: '500',
-              transition: 'all 0.3s ease'
+              fontSize: '0.95rem',
+              transition: 'all 0.3s'
             }}
           >
-            All Quotes ({quotes.length})
+            {category.charAt(0).toUpperCase() + category.slice(1)}
           </button>
-          {categories.map(cat => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: selectedCategory === cat.id ? '#3b82f6' : '#e5e7eb',
-                color: selectedCategory === cat.id ? 'white' : '#1f2937',
-                border: 'none',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontWeight: '500',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              {cat.label} ({cat.count})
-            </button>
-          ))}
-        </div>
+        ))}
+      </div>
 
-        {/* Quotes Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-          gap: '30px',
-          marginBottom: '60px'
-        }}>
-          {filteredQuotes.map((quote) => (
+      {/* Quotes Grid */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        gap: '2rem',
+        marginBottom: '3rem'
+      }}>
+        {filteredQuotes.length > 0 ? (
+          filteredQuotes.map(quote => (
             <div
               key={quote.id}
               style={{
-                backgroundColor: 'white',
-                borderRadius: '12px',
-                padding: '30px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                borderLeft: '5px solid #3b82f6',
-                transition: 'all 0.3s ease',
+                background: '#f9fafb',
+                border: '1px solid #e5e7eb',
+                borderRadius: '1rem',
+                padding: '2rem',
+                transition: 'all 0.3s',
                 cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-5px)';
-                e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+                e.currentTarget.style.transform = 'translateY(-8px)';
+                e.currentTarget.style.boxShadow = '0 10px 15px rgba(0,0,0,0.1)';
+                e.currentTarget.style.borderColor = '#6366f1';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.borderColor = '#e5e7eb';
               }}
             >
-              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{quote.icon}</div>
-              <blockquote style={{
+              <div style={{ fontSize: '3rem', color: '#6366f1', opacity: '0.2', marginBottom: '1rem' }}>
+                "
+              </div>
+              <p style={{
+                fontSize: '1.1rem',
                 fontStyle: 'italic',
-                color: '#374151',
-                marginBottom: '20px',
-                fontSize: '16px',
-                lineHeight: '1.6',
-                fontWeight: '500'
+                marginBottom: '1.5rem',
+                lineHeight: '1.8'
               }}>
-                "{quote.text}"
-              </blockquote>
-              <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '15px' }}>
-                <p style={{ margin: '0 0 5px 0', color: '#1f2937', fontWeight: 'bold', fontSize: '15px' }}>
-                  — {quote.author}
-                </p>
-                <p style={{ margin: 0, color: '#6b7280', fontSize: '13px' }}>
-                  {quote.title}
-                </p>
+                {quote.text}
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  background: 'linear-gradient(135deg, #6366f1, #ec4899)',
+                  color: 'white',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  fontSize: '0.9rem'
+                }}>
+                  {quote.author
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2)}
+                </div>
+                <div>
+                  <p style={{ fontWeight: '600', margin: '0' }}>{quote.author}</p>
+                  <p style={{ fontSize: '0.85rem', color: '#666', margin: '0', textTransform: 'capitalize' }}>
+                    {quote.category}
+                  </p>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Statistics */}
-        <div style={{
-          backgroundColor: 'white',
-          borderRadius: '12px',
-          padding: '40px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          marginBottom: '60px'
-        }}>
-          <h2 style={{ marginBottom: '30px', fontSize: '24px', fontWeight: 'bold', color: '#1f2937', textAlign: 'center' }}>
-            Quote Statistics
-          </h2>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '30px',
-            textAlign: 'center'
-          }}>
-            <div>
-              <div style={{ fontSize: '42px', fontWeight: 'bold', color: '#3b82f6', marginBottom: '10px' }}>
-                {quotes.length}
-              </div>
-              <p style={{ color: '#666' }}>Total Quotes</p>
-            </div>
-            <div>
-              <div style={{ fontSize: '42px', fontWeight: 'bold', color: '#8b5cf6', marginBottom: '10px' }}>
-                {new Set(quotes.map(q => q.author)).size}
-              </div>
-              <p style={{ color: '#666' }}>Unique Authors</p>
-            </div>
-            <div>
-              <div style={{ fontSize: '42px', fontWeight: 'bold', color: '#f59e0b', marginBottom: '10px' }}>
-                {categories.length}
-              </div>
-              <p style={{ color: '#666' }}>Categories</p>
-            </div>
-            <div>
-              <div style={{ fontSize: '42px', fontWeight: 'bold', color: '#10b981', marginBottom: '10px' }}>
-                ∞
-              </div>
-              <p style={{ color: '#666' }}>Unlimited Inspiration</p>
-            </div>
+          ))
+        ) : (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: '#999' }}>
+            No quotes found for this category
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Call to Action */}
-        <div style={{
-          backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-          borderRadius: '12px',
-          padding: '40px',
-          textAlign: 'center',
-          color: 'white'
-        }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '15px' }}>
-            Ready to Transform Your Vision into Reality?
-          </h2>
-          <p style={{ fontSize: '16px', marginBottom: '25px', opacity: 0.9 }}>
-            Let the wisdom of industry leaders inspire your journey. Partner with Ayinde Technologies to turn inspiration into innovation.
-          </p>
-          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="/services" style={{
-              display: 'inline-block',
-              padding: '14px 32px',
-              backgroundColor: 'white',
-              color: '#3b82f6',
-              textDecoration: 'none',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}>
-              Explore Our Services
-            </a>
-            <a href="/#contact" style={{
-              display: 'inline-block',
-              padding: '14px 32px',
-              backgroundColor: 'rgba(255,255,255,0.2)',
-              color: 'white',
-              textDecoration: 'none',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              border: '2px solid white',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}>
-              Get In Touch
-            </a>
-          </div>
+      {/* Stats */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+        gap: '1rem'
+      }}>
+        <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '1rem', padding: '1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', fontWeight: '800', color: '#6366f1' }}>{quotes.length}</div>
+          <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>Total Quotes</div>
+        </div>
+        <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '1rem', padding: '1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', fontWeight: '800', color: '#6366f1' }}>{categories.length}</div>
+          <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>Categories</div>
+        </div>
+        <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '1rem', padding: '1.5rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '2rem', fontWeight: '800', color: '#6366f1' }}>{filteredQuotes.length}</div>
+          <div style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>Showing</div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default FamousQuotesPage;
+export default QuotesPage;

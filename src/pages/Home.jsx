@@ -13,6 +13,11 @@ const Home = () => {
   const [services, setServices] = useState([]);
   const [enrollingCourseId, setEnrollingCourseId] = useState(null);
   const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
+  
+  // ✅ NEW: Team members state
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [loadingTeam, setLoadingTeam] = useState(true);
+  const [teamError, setTeamError] = useState(null);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
@@ -82,6 +87,26 @@ const Home = () => {
 
     fetchData();
   }, [user]);
+
+  // ✅ NEW: Fetch team members from API
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        setLoadingTeam(true);
+        const data = await api.getTeamMembers();
+        setTeamMembers(data || []);
+        setTeamError(null);
+      } catch (err) {
+        console.error('Failed to fetch team members:', err);
+        setTeamError('Failed to load team members');
+        setTeamMembers([]);
+      } finally {
+        setLoadingTeam(false);
+      }
+    };
+
+    fetchTeamMembers();
+  }, []);
 
   // ✅ Handle Enroll button click
   const handleEnrollClick = async (courseId, courseName) => {
@@ -442,56 +467,90 @@ const Home = () => {
           Our Team
         </h2>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '30px'
-          }}
-        >
-          {[
-            { name: 'Albert A. D. Cabrera', role: 'Founder & CEO', expertise: 'AI Strategy' },
-            { name: 'Tech Lead', role: 'Lead Developer', expertise: 'Full Stack' },
-            { name: 'Data Lead', role: 'ML Engineer', expertise: 'Machine Learning' },
-            { name: 'Design Lead', role: 'UI/UX Designer', expertise: 'Product Design' }
-          ].map((member, i) => (
-            <div
-              key={i}
-              style={{
-                backgroundColor: 'white',
-                padding: '30px',
-                borderRadius: '8px',
-                textAlign: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-              }}
-            >
+        {loadingTeam ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <p style={{ color: '#666', fontSize: '16px' }}>Loading team members...</p>
+          </div>
+        ) : teamError ? (
+          <div style={{
+            backgroundColor: '#fee2e2',
+            padding: '20px',
+            borderRadius: '8px',
+            color: '#991b1b',
+            textAlign: 'center',
+            marginBottom: '40px'
+          }}>
+            <p>{teamError}</p>
+          </div>
+        ) : teamMembers && teamMembers.length > 0 ? (
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '30px'
+            }}
+          >
+            {teamMembers.map((member, i) => (
               <div
+                key={i}
                 style={{
-                  width: '100px',
-                  height: '100px',
-                  backgroundColor: '#e0e7ff',
-                  borderRadius: '50%',
-                  margin: '0 auto 15px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '40px'
+                  backgroundColor: 'white',
+                  padding: '30px',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                 }}
               >
-                👤
+                <div
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    backgroundColor: '#e0e7ff',
+                    borderRadius: '50%',
+                    margin: '0 auto 15px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '40px'
+                  }}
+                >
+                  {member.image || member.avatar || '👤'}
+                </div>
+                <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
+                  {member.name}
+                </h3>
+                <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
+                  {member.title || member.role}
+                </p>
+                {member.expertise && (
+                  <p style={{ color: '#666', fontSize: '14px' }}>
+                    {member.expertise}
+                  </p>
+                )}
+                {member.quote && (
+                  <p style={{
+                    color: '#999',
+                    fontSize: '12px',
+                    fontStyle: 'italic',
+                    marginTop: '10px',
+                    borderTop: '1px solid #e5e7eb',
+                    paddingTop: '10px'
+                  }}>
+                    "{member.quote}"
+                  </p>
+                )}
               </div>
-              <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
-                {member.name}
-              </h3>
-              <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
-                {member.role}
-              </p>
-              <p style={{ color: '#666', fontSize: '14px' }}>
-                {member.expertise}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: '#666'
+          }}>
+            <p>No team members available at the moment</p>
+          </div>
+        )}
       </div>
 
       {/* ========== CONTACT SECTION ========== */}
