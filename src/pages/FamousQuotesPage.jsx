@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../api';
 
 export function QuotesPage() {
@@ -13,9 +13,23 @@ export function QuotesPage() {
     loadAllQuotes();
   }, []);
 
+  const filterQuotes = useCallback(() => {
+    if (selectedCategory === 'all') {
+      setFilteredQuotes(quotes);
+    } else {
+      try {
+        const data = api.getQuotesByCategory(selectedCategory);
+        setFilteredQuotes(data.quotes || []);
+      } catch (err) {
+        console.error('Error filtering quotes:', err);
+        setFilteredQuotes([]);
+      }
+    }
+  }, [selectedCategory, quotes]);
+
   useEffect(() => {
     filterQuotes();
-  }, [selectedCategory, quotes]);
+  }, [filterQuotes]);
 
   async function loadAllQuotes() {
     try {
@@ -34,20 +48,6 @@ export function QuotesPage() {
       console.error('Error loading quotes:', err);
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function filterQuotes() {
-    if (selectedCategory === 'all') {
-      setFilteredQuotes(quotes);
-    } else {
-      try {
-        const data = await api.getQuotesByCategory(selectedCategory);
-        setFilteredQuotes(data.quotes || []);
-      } catch (err) {
-        console.error('Error filtering quotes:', err);
-        setFilteredQuotes([]);
-      }
     }
   }
 
