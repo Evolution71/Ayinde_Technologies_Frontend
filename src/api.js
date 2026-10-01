@@ -421,7 +421,7 @@ export const api = {
    * @returns {object} Team members grouped by gender and full list
    */
   async getTeamMembers() {
-    const res = await fetch(`${API_URL}/api/team-members/`, {
+    const res = await fetch(`${API_URL}/api/team/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
@@ -434,6 +434,29 @@ export const api = {
    */
   async getTeamMembersByGender(gender) {
     const res = await fetch(`${API_URL}/api/team-members/by-gender/${gender}/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Get all active quotes
+   * @returns {object} { success: bool, quotes: array }
+   */
+  async getQuotes() {
+    const res = await fetch(`${API_URL}/api/quotes/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
+  /**
+   * Get quotes by category
+   * @param {string} category - Quote category
+   * @returns {object} { success: bool, quotes: array }
+   */
+  async getQuotesByCategory(category) {
+    const res = await fetch(`${API_URL}/api/quotes/?category=${category}`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
@@ -493,7 +516,7 @@ export const api = {
    * @returns {object} Created member details
    */
   async createTeamMember(memberData) {
-    const res = await fetch(`${API_URL}/api/team-members/`, {
+    const res = await fetch(`${API_URL}/api/team/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -511,7 +534,7 @@ export const api = {
    * @returns {object} Updated member details
    */
   async updateTeamMember(memberId, updateData) {
-    const res = await fetch(`${API_URL}/api/team-members/${memberId}/`, {
+    const res = await fetch(`${API_URL}/api/team/${memberId}/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -528,13 +551,12 @@ export const api = {
    * @returns {object} Deletion confirmation
    */
   async deleteTeamMember(memberId) {
-    const res = await fetch(`${API_URL}/api/team-members/${memberId}/`, {
+    const res = await fetch(`${API_URL}/api/team/${memberId}/`, {
       method: 'DELETE',
       headers: authHeaders()
     });
     return parseOrThrow(res);
   },
-
 
   // ========== PAYMENT ENDPOINTS ==========
 
