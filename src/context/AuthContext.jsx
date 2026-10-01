@@ -1,68 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../api';  // ✅ NAMED import
+import { api } from '../api';
 
 const AuthContext = createContext();
-
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-
-    if (token && userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (err) {
-        console.error('Failed to parse user data:', err);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-    }
-
-    setLoading(false);
-  }, []);
-
-  const login = async (email, password, captchaToken, captchaAnswer) => {
-    try {
-      const response = await api.login(email, password, captchaToken, captchaAnswer);
-      localStorage.setItem('token', response.access_token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
-  };
-
-  const register = async (first_name, last_name, email, password, captchaToken, captchaAnswer) => {
-    try {
-      const response = await api.register(first_name, last_name, email, password, captchaToken, captchaAnswer);
-      localStorage.setItem('token', response.access_token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    api.logout?.();
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -72,4 +11,42 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthProvider;
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Check if user is logged in on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem('ayinde_token');
+      if (token) {
+        try {
+          const userData = await api.getCurrentUser();
+          setUser(userData);
+        } catch (err) {
+          console.error('Auth check failed:', err);
+          localStorage.removeItem('ayinde_token');
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  const login = (userData) => {
+    setUser(userData);
+  };
+
+  const logout = () => {
+    setUser(null);
+    api.logout();
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
