@@ -13,12 +13,12 @@ export function QuotesPage() {
     loadAllQuotes();
   }, []);
 
-  const filterQuotes = useCallback(() => {
+  const filterQuotes = useCallback(async () => {
     if (selectedCategory === 'all') {
       setFilteredQuotes(quotes);
     } else {
       try {
-        const data = api.getQuotesByCategory(selectedCategory);
+        const data = await api.getQuotesByCategory(selectedCategory);
         setFilteredQuotes(data.quotes || []);
       } catch (err) {
         console.error('Error filtering quotes:', err);
