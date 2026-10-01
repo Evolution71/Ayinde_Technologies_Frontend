@@ -94,7 +94,9 @@ const Home = () => {
       try {
         setLoadingTeam(true);
         const data = await api.getTeamMembers();
-        setTeamMembers(data || []);
+        // Extract team_members array from response object
+        const members = data.team_members || data.members || data || [];
+        setTeamMembers(Array.isArray(members) ? members : []);
         setTeamError(null);
       } catch (err) {
         console.error('Failed to fetch team members:', err);
