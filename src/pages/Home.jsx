@@ -26,19 +26,37 @@ const Home = () => {
         setLoading(true);
         setError(null);
 
-        // ✅ FIXED: Use getTeam() which returns a list directly
+        // ✅ FIXED: Use getTeam() and handle multiple response formats
         const response = await api.getTeam();
 
         console.log('[Home] Team response:', response);
+        console.log('[Home] Response type:', typeof response);
+        console.log('[Home] Is array:', Array.isArray(response));
 
-        // ✅ FIXED: Handle response correctly - backend returns array directly
+        // ✅ FIXED: Handle flexible response formats
         let teamData = [];
+        
+        // Check if direct array
         if (Array.isArray(response)) {
           teamData = response;
-        } else if (response.all_members && Array.isArray(response.all_members)) {
-          teamData = response.all_members;
+        } 
+        // Check common wrapper keys
+        else if (response && typeof response === 'object') {
+          // Try multiple possible keys where team data might be nested
+          if (Array.isArray(response.team)) {
+            teamData = response.team;
+          } else if (Array.isArray(response.all_members)) {
+            teamData = response.all_members;
+          } else if (Array.isArray(response.members)) {
+            teamData = response.members;
+          } else if (Array.isArray(response.data)) {
+            teamData = response.data;
+          } else if (Array.isArray(response.results)) {
+            teamData = response.results;
+          }
         }
 
+        console.log('[Home] Extracted team data:', teamData);
         console.log('[Home] Team count:', teamData.length);
         setTeamMembers(teamData);
 
