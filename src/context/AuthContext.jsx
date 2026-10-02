@@ -1,69 +1,75 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../api';  // ✅ NAMED import
 
 const AuthContext = createContext();
 
-export const useAuth = () => useContext(AuthContext);
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is already logged in on mount
   useEffect(() => {
-    const token = localStorage.getItem('ayinde_token'); // ← FIXED: Changed from 'token' to 'ayinde_token'
-    if (token) {
-      setIsAuthenticated(true);
-      // Optionally fetch user details from backend
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    if (token && userData) {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (err) {
+        console.error('Failed to parse user data:', err);
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
+
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-
-    if (!response.ok) {
-      throw new Error('Login failed');
+  const login = async (email, password, captchaToken, captchaAnswer) => {
+    try {
+      const response = await api.login(email, password, captchaToken, captchaAnswer);
+      localStorage.setItem('token', response.access_token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
     }
-
-    const data = await response.json();
-    localStorage.setItem('ayinde_token', data.access_token); // ← FIXED: Changed from 'token' to 'ayinde_token'
-    setUser(data.user);
-    setIsAuthenticated(true);
-    return data;
   };
 
-  const register = async (firstName, lastName, email, password) => {
-    const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ first_name: firstName, last_name: lastName, email, password })
-    });
-
-    if (!response.ok) {
-      throw new Error('Registration failed');
+  const register = async (first_name, last_name, email, password, captchaToken, captchaAnswer) => {
+    try {
+      const response = await api.register(first_name, last_name, email, password, captchaToken, captchaAnswer);
+      localStorage.setItem('token', response.access_token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
     }
-
-    const data = await response.json();
-    localStorage.setItem('ayinde_token', data.access_token); // ← FIXED: Changed from 'token' to 'ayinde_token'
-    setUser(data.user);
-    setIsAuthenticated(true);
-    return data;
   };
 
   const logout = () => {
-    localStorage.removeItem('ayinde_token'); // ← FIXED: Changed from 'token' to 'ayinde_token'
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
-    setIsAuthenticated(false);
+    api.logout?.();
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+};
+
+export default AuthProvider;
