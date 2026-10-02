@@ -1,0 +1,47 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="data_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow2">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="200" height="200" fill="url(#data_grad)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="25" cy="175" r="35" fill="white" opacity="0.08"/>
+  <circle cx="175" cy="25" r="45" fill="white" opacity="0.08"/>
+
+  <!-- Chart container -->
+  <rect x="35" y="50" width="130" height="95" rx="8" fill="white" opacity="0.95" filter="url(#shadow2)"/>
+
+  <!-- Chart title -->
+  <text x="100" y="70" font-size="12" font-weight="bold" fill="#333" text-anchor="middle" font-family="Arial">Data Analysis</text>
+
+  <!-- Grid lines -->
+  <line x1="45" y1="78" x2="155" y2="78" stroke="#e0e0e0" stroke-width="1"/>
+  <line x1="45" y1="90" x2="155" y2="90" stroke="#e0e0e0" stroke-width="1"/>
+  <line x1="45" y1="102" x2="155" y2="102" stroke="#e0e0e0" stroke-width="1"/>
+  <line x1="45" y1="114" x2="155" y2="114" stroke="#e0e0e0" stroke-width="1"/>
+
+  <!-- Axes -->
+  <line x1="45" y1="128" x2="155" y2="128" stroke="#333" stroke-width="2"/>
+  <line x1="45" y1="80" x2="45" y2="128" stroke="#333" stroke-width="2"/>
+
+  <!-- Bars with gradient -->
+  <defs>
+    <linearGradient id="bar_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f093fb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f5576c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <rect x="55" y="102" width="14" height="26" rx="2" fill="url(#bar_grad)" opacity="0.9"/>
+  <rect x="75" y="85" width="14" height="43" rx="2" fill="url(#bar_grad)" opacity="0.85"/>
+  <rect x="95" y="95" width="14" height="33" rx="2" fill="url(#bar_grad)" opacity="0.9"/>
+  <rect x="115" y="78" width="14" height="50" rx="2" fill="url(#bar_grad)" opacity="0.85"/>
+  <rect x="135" y="90" width="14" height="38" rx="2" fill="url(#bar_grad)" opacity="0.9"/>
+</svg>

@@ -1,0 +1,37 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="prog_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <rect width="200" height="200" fill="url(#prog_grad)"/>
+
+  <!-- Decorative circles background -->
+  <circle cx="30" cy="30" r="40" fill="white" opacity="0.08"/>
+  <circle cx="170" cy="170" r="50" fill="white" opacity="0.08"/>
+
+  <!-- Main code editor window -->
+  <rect x="35" y="45" width="130" height="110" rx="8" fill="white" opacity="0.95" filter="url(#shadow)"/>
+
+  <!-- Window header -->
+  <rect x="35" y="45" width="130" height="28" rx="8" fill="#2d3748" opacity="0.9"/>
+  <circle cx="48" cy="59" r="3" fill="#ff5f56"/>
+  <circle cx="60" cy="59" r="3" fill="#febc2e"/>
+  <circle cx="72" cy="59" r="3" fill="#28c940"/>
+  <text x="140" y="62" font-size="10" fill="#999" text-anchor="end" font-family="monospace">script.js</text>
+
+  <!-- Code lines -->
+  <line x1="45" y1="80" x2="115" y2="80" stroke="#667eea" stroke-width="2.5" opacity="0.8" stroke-linecap="round"/>
+  <line x1="45" y1="92" x2="140" y2="92" stroke="#764ba2" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <line x1="45" y1="104" x2="125" y2="104" stroke="#667eea" stroke-width="2" opacity="0.7" stroke-linecap="round"/>
+  <line x1="45" y1="116" x2="135" y2="116" stroke="#764ba2" stroke-width="2" opacity="0.6" stroke-linecap="round"/>
+  <line x1="45" y1="128" x2="120" y2="128" stroke="#667eea" stroke-width="2" opacity="0.7" stroke-linecap="round"/>
+
+  <!-- Cursor blinking -->
+  <rect x="143" y="127" width="2" height="10" fill="#667eea" opacity="0.9"/>
+</svg>

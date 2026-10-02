@@ -1,0 +1,61 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ai_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+    <filter id="glow_effect">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="200" height="200" fill="url(#ai_grad)"/>
+
+  <!-- Background circles -->
+  <circle cx="50" cy="50" r="50" fill="white" opacity="0.08"/>
+  <circle cx="150" cy="150" r="60" fill="white" opacity="0.08"/>
+
+  <!-- Central neural network node -->
+  <circle cx="100" cy="90" r="18" fill="white" opacity="0.95" filter="url(#glow_effect)"/>
+  <circle cx="100" cy="90" r="18" fill="url(#glow)" opacity="0.4"/>
+
+  <!-- Connecting lines with gradient -->
+  <defs>
+    <linearGradient id="line_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+
+  <!-- Upper nodes -->
+  <circle cx="60" cy="50" r="6" fill="white" opacity="0.9"/>
+  <circle cx="100" cy="35" r="6" fill="white" opacity="0.9"/>
+  <circle cx="140" cy="50" r="6" fill="white" opacity="0.9"/>
+
+  <!-- Middle nodes -->
+  <circle cx="75" cy="130" r="6" fill="white" opacity="0.85"/>
+  <circle cx="125" cy="130" r="6" fill="white" opacity="0.85"/>
+
+  <!-- Connecting lines -->
+  <line x1="60" y1="50" x2="95" y2="78" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="100" y1="35" x2="100" y2="72" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="140" y1="50" x2="105" y2="78" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="95" y1="108" x2="75" y2="130" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="105" y1="108" x2="125" y2="130" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Bottom node (output) -->
+  <circle cx="100" cy="155" r="8" fill="white" opacity="0.95" filter="url(#glow_effect)"/>
+  <line x1="75" y1="130" x2="95" y2="150" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+  <line x1="125" y1="130" x2="105" y2="150" stroke="url(#line_grad)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Inner core details -->
+  <circle cx="100" cy="90" r="8" fill="#4facfe" opacity="0.4"/>
+</svg>
