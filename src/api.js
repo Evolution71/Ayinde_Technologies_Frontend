@@ -1,11 +1,12 @@
 /**
- * API Client for Ayinde Technologies - FIXED
- * ✅ Fixed verifyPayment to accept billing info as 3rd parameter
- * ✅ Fixed token key to use 'ayinde_token' consistently
+ * API Client for Ayinde Technologies
+ * Updated with new Service endpoints for 12-page website structure
  *
  * Usage:
  *   import { api } from '../api'
- *   await api.verifyPayment(paymentId, nonce, { billingPostalCode, billingCountry })
+ *   await api.getServiceTiers(serviceType)
+ *   await api.createServiceCheckout(serviceData)
+ *   await api.applyPromoCode(code)
  */
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -80,6 +81,17 @@ export const api = {
   // ========== CAPTCHA ENDPOINTS ==========
 
   async getCaptcha() {
+    /**
+     * Generate a new captcha challenge
+     *
+     * Returns: {
+     *   captcha_id: unique ID (needed for verification),
+     *   captcha_image: text to display to user,
+     *   expires_at: when captcha expires
+     * }
+     *
+     * Frontend should display captcha_image and ask user to enter it
+     */
     const res = await fetch(`${API_URL}/api/captcha/`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -88,6 +100,19 @@ export const api = {
   },
 
   async verifyCaptcha(captchaId, userAnswer) {
+    /**
+     * Verify user's captcha answer
+     *
+     * Args:
+     *   captchaId: ID from getCaptcha response
+     *   userAnswer: What user typed
+     *
+     * Returns: {
+     *   success: true/false,
+     *   message: explanation,
+     *   score: 1.0 if valid, 0.0 if not
+     * }
+     */
     const res = await fetch(`${API_URL}/api/captcha/verify/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -100,6 +125,9 @@ export const api = {
   },
 
   async deleteCaptcha(captchaId) {
+    /**
+     * Delete a captcha (for form cancellations)
+     */
     const res = await fetch(`${API_URL}/api/captcha/${captchaId}/`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
@@ -189,8 +217,13 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== SERVICE ENDPOINTS ==========
+  // ========== SERVICE ENDPOINTS (NEW - 12-Page Website Services) ==========
 
+  /**
+   * Get all service tiers for a specific service type
+   * @param {string} serviceType - 'website' | 'applications' | 'consultation' | 'premium'
+   * @returns {object} Service tiers with pricing and features
+   */
   async getServiceTiers(serviceType) {
     const res = await fetch(`${API_URL}/api/services/tiers/${serviceType}/`, {
       headers: { 'Content-Type': 'application/json' }
@@ -198,6 +231,10 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Get all available service packages
+   * @returns {array} List of all service packages across all service types
+   */
   async getServicePackages() {
     const res = await fetch(`${API_URL}/api/services/packages/`, {
       headers: { 'Content-Type': 'application/json' }
@@ -205,6 +242,10 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Get user's current service subscriptions
+   * @returns {array} User's active service subscriptions
+   */
   async getServiceSubscriptions() {
     const res = await fetch(`${API_URL}/api/services/my-subscriptions/`, {
       headers: authHeaders()
@@ -212,6 +253,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Verify and apply promotional code
+   * @param {string} promoCode - Promotional code to apply
+   * @param {number} amount - Original amount before discount
+   * @returns {object} { valid: bool, discount_percentage: number, discount_amount: number, final_amount: number, message: string }
+   */
   async applyPromoCode(promoCode, amount) {
     const res = await fetch(`${API_URL}/api/services/promo-code/verify/`, {
       method: 'POST',
@@ -227,6 +274,19 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create service checkout (initiate purchase)
+   * @param {object} checkoutData - {
+   *   service_type: 'website' | 'applications' | 'consultation' | 'premium',
+   *   tier: 'starter' | 'professional' | 'advanced' | 'premium',
+   *   payment_option: 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down',
+   *   hours: number (for consultation only),
+   *   promo_code: string (optional),
+   *   amount: number,
+   *   payment_method_nonce: string (from Square)
+   * }
+   * @returns {object} Checkout response with session ID and confirmation details
+   */
   async createServiceCheckout(checkoutData) {
     const res = await fetch(`${API_URL}/api/services/checkout/`, {
       method: 'POST',
@@ -239,6 +299,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Get checkout status
+   * @param {string} checkoutId - ID from createServiceCheckout response
+   * @returns {object} Checkout status and details
+   */
   async getCheckoutStatus(checkoutId) {
     const res = await fetch(`${API_URL}/api/services/checkout/${checkoutId}/`, {
       headers: authHeaders()
@@ -246,6 +311,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Cancel a service subscription
+   * @param {string} subscriptionId - Service subscription ID
+   * @returns {object} Cancellation confirmation
+   */
   async cancelServiceSubscription(subscriptionId) {
     const res = await fetch(`${API_URL}/api/services/subscriptions/${subscriptionId}/cancel/`, {
       method: 'POST',
@@ -254,6 +324,13 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Upgrade or downgrade service tier
+   * @param {string} subscriptionId - Current subscription ID
+   * @param {string} newTier - 'starter' | 'professional' | 'advanced' | 'premium'
+   * @param {string} paymentOption - 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down'
+   * @returns {object} Updated subscription details
+   */
   async upgradeServiceTier(subscriptionId, newTier, paymentOption) {
     const res = await fetch(`${API_URL}/api/services/subscriptions/${subscriptionId}/upgrade/`, {
       method: 'POST',
@@ -269,8 +346,33 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create service purchase order (direct service order endpoint)
+   * @param {object} orderData - {
+   *   tier, tierName, amount, currency, paymentOption, discountPercent, period,
+   *   fullName, email, phone, company, postalCode, country,
+   *   sourceId (Square payment token)
+   * }
+   * @returns {object} { success, order_id, message, order }
+   */
+  async createServicePurchase(orderData) {
+    const res = await fetch(`${API_URL}/api/services/purchase/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(orderData)
+    });
+    return parseOrThrow(res);
+  },
+
   // ========== ACHIEVEMENT & TEAM ENDPOINTS ==========
 
+  /**
+   * Get all active achievements
+   * @returns {array} List of achievements (title, description, category, icon)
+   */
   async getAchievements() {
     const res = await fetch(`${API_URL}/api/achievements/`, {
       headers: { 'Content-Type': 'application/json' }
@@ -278,6 +380,10 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Get all active team members
+   * @returns {object} Team members grouped by gender and full list
+   */
   async getTeamMembers() {
     const res = await fetch(`${API_URL}/api/team-members/`, {
       headers: { 'Content-Type': 'application/json' }
@@ -285,6 +391,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Get team members filtered by gender
+   * @param {string} gender - 'male' | 'female' | 'other'
+   * @returns {array} Filtered team members
+   */
   async getTeamMembersByGender(gender) {
     const res = await fetch(`${API_URL}/api/team-members/by-gender/${gender}/`, {
       headers: { 'Content-Type': 'application/json' }
@@ -292,6 +403,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create achievement (admin only)
+   * @param {object} achievementData - { title, description, category, icon, order }
+   * @returns {object} Created achievement details
+   */
   async createAchievement(achievementData) {
     const res = await fetch(`${API_URL}/api/achievements/`, {
       method: 'POST',
@@ -304,6 +420,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Update achievement (admin only)
+   * @param {number} achievementId - Achievement ID
+   * @param {object} updateData - Fields to update
+   * @returns {object} Updated achievement details
+   */
   async updateAchievement(achievementId, updateData) {
     const res = await fetch(`${API_URL}/api/achievements/${achievementId}/`, {
       method: 'PUT',
@@ -316,6 +438,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Delete achievement (admin only)
+   * @param {number} achievementId - Achievement ID
+   * @returns {object} Deletion confirmation
+   */
   async deleteAchievement(achievementId) {
     const res = await fetch(`${API_URL}/api/achievements/${achievementId}/`, {
       method: 'DELETE',
@@ -324,6 +451,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create team member (admin only)
+   * @param {object} memberData - { name, title, quote, achievement, image, gender, category, order }
+   * @returns {object} Created member details
+   */
   async createTeamMember(memberData) {
     const res = await fetch(`${API_URL}/api/team-members/`, {
       method: 'POST',
@@ -336,6 +468,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Update team member (admin only)
+   * @param {number} memberId - Team member ID
+   * @param {object} updateData - Fields to update
+   * @returns {object} Updated member details
+   */
   async updateTeamMember(memberId, updateData) {
     const res = await fetch(`${API_URL}/api/team-members/${memberId}/`, {
       method: 'PUT',
@@ -348,6 +486,11 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Delete team member (admin only)
+   * @param {number} memberId - Team member ID
+   * @returns {object} Deletion confirmation
+   */
   async deleteTeamMember(memberId) {
     const res = await fetch(`${API_URL}/api/team-members/${memberId}/`, {
       method: 'DELETE',
@@ -359,7 +502,6 @@ export const api = {
   // ========== PAYMENT ENDPOINTS ==========
 
   async createPaymentIntent(courseId, amount) {
-    console.log(`[API] Creating payment intent for course ${courseId}, amount: ${amount}`);
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: {
@@ -368,30 +510,19 @@ export const api = {
       },
       body: JSON.stringify({ course_id: courseId, amount })
     });
-    const data = await parseOrThrow(res);
-    console.log('[API] Payment intent created:', data);
-    return data;
+    return parseOrThrow(res);
   },
 
-  // ✅ FIXED: Accept 3rd parameter with billing info
-  async verifyPayment(paymentId, nonce, billingInfo = {}) {
-    console.log(`[API] Verifying payment ${paymentId}`);
+  async verifyPayment(paymentId, nonce) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
-      body: JSON.stringify({
-        payment_id: paymentId,
-        nonce: nonce,
-        billing_postal_code: billingInfo.billingPostalCode || '',
-        billing_country: billingInfo.billingCountry || 'NG'
-      })
+      body: JSON.stringify({ payment_id: paymentId, nonce })
     });
-    const data = await parseOrThrow(res);
-    console.log('[API] Payment verified:', data);
-    return data;
+    return parseOrThrow(res);
   },
 
   async getPaymentStatus(paymentId) {

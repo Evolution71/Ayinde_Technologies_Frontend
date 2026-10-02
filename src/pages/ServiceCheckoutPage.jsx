@@ -183,7 +183,7 @@ const ServiceCheckoutPage = () => {
 
       console.log('[ServiceCheckout] Submitting order:', orderData);
 
-      // Call backend to process payment - FIXED: Use correct API method
+      // Call backend to process payment
       const response = await api.createServicePurchase(orderData);
 
       if (response.success) {
