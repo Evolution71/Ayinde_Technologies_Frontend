@@ -15,13 +15,13 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const setToken = (token) => {
   if (token) {
-    localStorage.setItem('ayinde_token', token);
+    localStorage.setItem('token', token);
   } else {
-    localStorage.removeItem('ayinde_token');
+    localStorage.removeItem('token');
   }
 };
 
-const getToken = () => localStorage.getItem('ayinde_token');
+const getToken = () => localStorage.getItem('token');
 
 // ========== HELPER FUNCTIONS ==========
 
