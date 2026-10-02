@@ -7,17 +7,8 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const [stats, setStats] = useState({ totalCourses: 0, userEnrollments: 0 });
   const [loading, setLoading] = useState(true);
-  const [courses, setCourses] = useState([]);
-  const [services, setServices] = useState([]);
-  const [enrollingCourseId, setEnrollingCourseId] = useState(null);
-  const [enrolledCourseIds, setEnrolledCourseIds] = useState([]);
-  
-  // ✅ NEW: Team members state
   const [teamMembers, setTeamMembers] = useState([]);
-  const [loadingTeam, setLoadingTeam] = useState(true);
-  const [teamError, setTeamError] = useState(null);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
@@ -29,109 +20,22 @@ const Home = () => {
     }
   }, [location]);
 
+  // Fetch team members from backend
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTeam = async () => {
       try {
-        // ✅ Always fetch public courses (no auth needed)
-        let coursesData = await api.getCourses();
-        
-        // Handle different response formats
-        if (coursesData && typeof coursesData === 'object' && !Array.isArray(coursesData)) {
-          // If it's an object with a courses property, extract it
-          coursesData = coursesData.courses || coursesData.data || [];
-        }
-        
-        coursesData = coursesData || [];
-        setCourses(coursesData);
-
-        // ✅ Fetch services (public endpoint)
-        try {
-          let servicesData = await api.getServices();
-          if (servicesData && typeof servicesData === 'object' && !Array.isArray(servicesData)) {
-            servicesData = servicesData.services || servicesData.data || [];
-          }
-          servicesData = servicesData || [];
-          setServices(servicesData);
-        } catch (err) {
-          console.error('Error fetching services:', err);
-          setServices([]);
-        }
-        let enrollmentCount = 0;
-        let enrolledIds = [];
-        
-        // ✅ Only fetch enrollments if user is logged in
-        if (user) {
-          try {
-            const enrollments = await api.getMyEnrollments();
-            enrollmentCount = enrollments.enrollments?.length || 0;
-            // Extract course IDs from enrollments
-            enrolledIds = enrollments.enrollments?.map(e => e.course_id) || [];
-          } catch (err) {
-            // Silently fail - user may not have enrollments
-            enrollmentCount = 0;
-            enrolledIds = [];
-          }
-        }
-
-        setEnrolledCourseIds(enrolledIds);
-        setStats({
-          totalCourses: Array.isArray(coursesData) ? coursesData.length : 0,
-          userEnrollments: enrollmentCount
-        });
-        setLoading(false);
+        const team = await api.get('/api/team/');
+        setTeamMembers(Array.isArray(team) ? team : team.team || []);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [user]);
-
-  // ✅ NEW: Fetch team members from API
-  useEffect(() => {
-    const fetchTeamMembers = async () => {
-      try {
-        setLoadingTeam(true);
-        const data = await api.getTeamMembers();
-        // Extract team_members array from response object
-        const members = data.team_members || data.members || data || [];
-        setTeamMembers(Array.isArray(members) ? members : []);
-        setTeamError(null);
-      } catch (err) {
-        console.error('Failed to fetch team members:', err);
-        setTeamError('Failed to load team members');
+        console.error('Error fetching team:', err);
         setTeamMembers([]);
       } finally {
-        setLoadingTeam(false);
+        setLoading(false);
       }
     };
 
-    fetchTeamMembers();
+    fetchTeam();
   }, []);
-
-  // ✅ Handle Enroll button click
-  const handleEnrollClick = async (courseId, courseName) => {
-    // If not logged in, redirect to login
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    // If logged in, start trial enrollment
-    try {
-      setEnrollingCourseId(courseId);
-      await api.enrollInCourse(courseId);
-      
-      alert(`✅ You've successfully enrolled in ${courseName}! 30-day trial starts now.`);
-      navigate(`/courses/${courseId}`);
-    } catch (err) {
-      console.error('Error enrolling:', err);
-      alert('Error enrolling in course. Please try again.');
-    } finally {
-      setEnrollingCourseId(null);
-    }
-  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
@@ -145,428 +49,15 @@ const Home = () => {
         }}
       >
         <h1 style={{ fontSize: '48px', marginBottom: '20px', fontWeight: 'bold' }}>
-          🚀 Welcome to Ayinde Technologies
+          Technology That Helps Your Business Grow
         </h1>
-        <p style={{ fontSize: '20px', marginBottom: '40px', opacity: 0.9 }}>
-          Master cutting-edge skills with expert instructors
-        </p>
-
-        {!user ? (
-          <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => navigate('/login')}
-              style={{
-                padding: '14px 32px',
-                fontSize: '16px',
-                backgroundColor: 'white',
-                color: '#1e40af',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              style={{
-                padding: '14px 32px',
-                fontSize: '16px',
-                backgroundColor: '#fbbf24',
-                color: '#1e40af',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              Start Learning
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => navigate('/courses')}
-            style={{
-              padding: '14px 32px',
-              fontSize: '16px',
-              backgroundColor: '#fbbf24',
-              color: '#1e40af',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            Browse Courses
-          </button>
-        )}
-      </div>
-
-      {/* ========== STATS SECTION ========== */}
-      {!loading && (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '20px',
-            maxWidth: '1200px',
-            margin: '40px auto',
-            padding: '0 20px'
-          }}
-        >
-          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', textAlign: 'center' }}>
-            <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e40af' }}>
-              {stats.totalCourses}
-            </div>
-            <div style={{ color: '#666', marginTop: '10px' }}>Courses Available</div>
-          </div>
-
-          {user && (
-            <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', textAlign: 'center' }}>
-              <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#16a34a' }}>
-                {stats.userEnrollments}
-              </div>
-              <div style={{ color: '#666', marginTop: '10px' }}>Your Enrollments</div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ========== SERVICES SECTION ========== */}
-      <div id="services" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
-          Our Services
-        </h2>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '30px'
-          }}
-        >
-          {(services && services.length > 0 ? services : [
-            { 
-              icon: '💻', 
-              title: 'AI App Development', 
-              desc: 'Build intelligent applications with cutting-edge AI technologies' 
-            },
-            { 
-              icon: '🌐', 
-              title: 'Web Development', 
-              desc: 'Full-stack web solutions from concept to deployment' 
-            },
-            { 
-              icon: '🤝', 
-              title: 'Tech Consulting', 
-              desc: 'Strategic guidance for your digital transformation' 
-            },
-            { 
-              icon: '📚', 
-              title: 'Training & Education', 
-              desc: 'Expert-led courses to upskill your team' 
-            }
-          ]).map((service, i) => (
-            <div
-              key={i}
-              style={{
-                backgroundColor: 'white',
-                padding: '30px',
-                borderRadius: '8px',
-                textAlign: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                transition: 'transform 0.3s ease',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon || '🚀'}</div>
-              <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title || service.name}</h3>
-              <p style={{ color: '#666' }}>{service.desc || service.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ========== COURSES SECTION ========== */}
-      <div id="courses" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
-          Featured Courses
-        </h2>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '25px'
-          }}
-        >
-          {courses.length > 0 ? (
-            courses.slice(0, 6).map((course) => (
-              <div
-                key={course.id}
-                style={{
-                  backgroundColor: 'white',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  cursor: 'pointer',
-                  transition: 'transform 0.3s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-              >
-              <div style={{ backgroundColor: '#e0e7ff', padding: '20px', textAlign: 'center', height: '200px', overflow: 'hidden' }}>
-                {course.icon ? (
-                  <img 
-                    src={course.icon} 
-                    alt={course.title} 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => {e.target.style.display = 'none'}}
-                  />
-                ) : (
-                  <div style={{ fontSize: '60px' }}>📚</div>
-                )}
-              </div>
-                <div style={{ padding: '20px' }}>
-                  <h3 style={{ marginBottom: '10px', fontSize: '18px', fontWeight: 'bold' }}>
-                    {course.title}
-                  </h3>
-                  <p style={{ color: '#666', marginBottom: '10px', fontSize: '14px', minHeight: '40px' }}>
-                    {course.description?.substring(0, 80)}...
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e40af' }}>
-                      ${course.price}
-                    </div>
-                    <button
-                      onClick={() => {
-                        if (enrolledCourseIds.includes(course.id)) {
-                          navigate(`/courses/${course.id}`);
-                        } else {
-                          handleEnrollClick(course.id, course.title);
-                        }
-                      }}
-                      disabled={enrollingCourseId === course.id}
-                      style={{
-                        padding: '8px 16px',
-                        backgroundColor: enrolledCourseIds.includes(course.id) ? '#10b981' : (enrollingCourseId === course.id ? '#999' : '#1e40af'),
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: enrollingCourseId === course.id ? 'not-allowed' : 'pointer',
-                        fontSize: '14px',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {enrollingCourseId === course.id ? 'Enrolling...' : (enrolledCourseIds.includes(course.id) ? '✅ Dashboard' : 'Enroll Now')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div style={{ textAlign: 'center', padding: '40px', gridColumn: '1 / -1' }}>
-              <p>Loading courses...</p>
-            </div>
-          )}
-        </div>
-
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <button
-            onClick={() => navigate('/courses')}
-            style={{
-              padding: '14px 32px',
-              fontSize: '16px',
-              backgroundColor: '#1e40af',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
-            View All Courses →
-          </button>
-        </div>
-      </div>
-
-      {/* ========== PROJECTS SECTION ========== */}
-      <div id="projects" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
-          Our Projects
-        </h2>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '30px'
-          }}
-        >
-          {[
-            {
-              title: 'AI-Powered Dashboard',
-              description: 'Real-time analytics platform with machine learning predictions',
-              tags: ['Python', 'React', 'TensorFlow']
-            },
-            {
-              title: 'E-Learning Platform',
-              description: 'Comprehensive online education system with subscription management',
-              tags: ['FastAPI', 'React', 'PostgreSQL']
-            },
-            {
-              title: 'Mobile Trading App',
-              description: 'High-performance cryptocurrency trading application',
-              tags: ['React Native', 'WebSocket', 'Python']
-            },
-            {
-              title: 'Enterprise CRM',
-              description: 'Customer relationship management system for businesses',
-              tags: ['React', 'FastAPI', 'MongoDB']
-            }
-          ].map((project, i) => (
-            <div
-              key={i}
-              style={{
-                backgroundColor: 'white',
-                padding: '30px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-              }}
-            >
-              <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
-                {project.title}
-              </h3>
-              <p style={{ color: '#666', marginBottom: '20px' }}>{project.description}</p>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                {project.tags.map((tag, j) => (
-                  <span
-                    key={j}
-                    style={{
-                      backgroundColor: '#e0e7ff',
-                      color: '#1e40af',
-                      padding: '6px 12px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ========== TEAM SECTION ========== */}
-      <div id="team" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
-          Our Team
-        </h2>
-
-        {loadingTeam ? (
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <p style={{ color: '#666', fontSize: '16px' }}>Loading team members...</p>
-          </div>
-        ) : teamError ? (
-          <div style={{
-            backgroundColor: '#fee2e2',
-            padding: '20px',
-            borderRadius: '8px',
-            color: '#991b1b',
-            textAlign: 'center',
-            marginBottom: '40px'
-          }}>
-            <p>{teamError}</p>
-          </div>
-        ) : teamMembers && teamMembers.length > 0 ? (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-              gap: '30px'
-            }}
-          >
-            {teamMembers.map((member, i) => (
-              <div
-                key={i}
-                style={{
-                  backgroundColor: 'white',
-                  padding: '30px',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-                }}
-              >
-                <div
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    backgroundColor: '#e0e7ff',
-                    borderRadius: '50%',
-                    margin: '0 auto 15px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '40px'
-                  }}
-                >
-                  {member.image || member.avatar || '👤'}
-                </div>
-                <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
-                  {member.name}
-                </h3>
-                <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
-                  {member.title || member.role}
-                </p>
-                {member.expertise && (
-                  <p style={{ color: '#666', fontSize: '14px' }}>
-                    {member.expertise}
-                  </p>
-                )}
-                {member.quote && (
-                  <p style={{
-                    color: '#999',
-                    fontSize: '12px',
-                    fontStyle: 'italic',
-                    marginTop: '10px',
-                    borderTop: '1px solid #e5e7eb',
-                    paddingTop: '10px'
-                  }}>
-                    "{member.quote}"
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{
-            textAlign: 'center',
-            padding: '40px',
-            color: '#666'
-          }}>
-            <p>No team members available at the moment</p>
-          </div>
-        )}
-      </div>
-
-      {/* ========== CONTACT SECTION ========== */}
-      <div id="contact" style={{ backgroundColor: '#1e40af', color: 'white', padding: '60px 40px', textAlign: 'center', marginTop: '60px', scrollMarginTop: '80px' }}>
-        <h2 style={{ marginBottom: '20px', fontSize: '36px', fontWeight: 'bold' }}>
-          Ready to Get Started?
-        </h2>
-        <p style={{ fontSize: '18px', marginBottom: '40px', opacity: 0.9 }}>
-          Contact us today to discuss your project or enroll in a course
+        <p style={{ fontSize: '18px', marginBottom: '20px', opacity: 0.9, maxWidth: '800px', margin: '0 auto 20px' }}>
+          We build websites, software and digital solutions that solve real business problems.
         </p>
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/services')}
             style={{
               padding: '14px 32px',
               fontSize: '16px',
@@ -578,10 +69,10 @@ const Home = () => {
               fontWeight: 'bold'
             }}
           >
-            Enroll Now
+            Book a Free Consultation
           </button>
-          <a
-            href="mailto:support@ayindetechnologies.com"
+          <button
+            onClick={() => navigate('/courses')}
             style={{
               padding: '14px 32px',
               fontSize: '16px',
@@ -590,22 +81,303 @@ const Home = () => {
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            View Our Courses
+          </button>
+        </div>
+      </div>
+
+      {/* ========== VALUE PROPOSITION ========== */}
+      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '50px', fontSize: '36px', fontWeight: 'bold' }}>
+          Your Business Deserves Technology That Works for You
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '30px'
+          }}
+        >
+          {[
+            {
+              icon: '👥',
+              title: 'Attract more customers',
+              desc: 'Build a professional digital presence that turns visitors into enquiries and customers.'
+            },
+            {
+              icon: '⏱️',
+              title: 'Save time and reduce manual work',
+              desc: 'Replace repetitive processes with smarter digital systems and automation.'
+            },
+            {
+              icon: '😊',
+              title: 'Deliver better customer experiences',
+              desc: 'Give your customers faster, easier and more convenient ways to interact with your business.'
+            },
+            {
+              icon: '📈',
+              title: 'Scale with confidence',
+              desc: 'Build technology that can grow alongside your business instead of holding it back.'
+            }
+          ].map((value, i) => (
+            <div key={i}
+              style={{
+                backgroundColor: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                textAlign: 'center',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+              }}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '15px' }}>{value.icon}</div>
+              <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{value.title}</h3>
+              <p style={{ color: '#666' }}>{value.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========== SERVICES SECTION ========== */}
+      <div id="services" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '50px', fontSize: '36px', fontWeight: 'bold' }}>
+          What We Build
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: '30px'
+          }}
+        >
+          {[
+            {
+              icon: '🌐',
+              title: 'Websites That Do More Than Look Good',
+              shortDesc: 'Your website is often the first interaction a potential customer has with your business.',
+              services: ['Corporate websites', 'Business websites', 'Landing pages', 'E-commerce websites', 'Web portals'],
+              buttonText: 'Build My Website →'
+            },
+            {
+              icon: '💻',
+              title: 'Custom Software & Web Applications',
+              shortDesc: 'Off-the-shelf software doesn\'t always fit the way your business operates.',
+              services: ['Business management systems', 'Customer portals', 'Booking systems', 'CRM solutions', 'Custom web applications'],
+              buttonText: 'Discuss My Software Project →'
+            },
+            {
+              icon: '📱',
+              title: 'Mobile Applications',
+              shortDesc: 'Transform your ideas into intuitive, reliable mobile experiences.',
+              services: ['iOS & Android Apps', 'React Native Development', 'MVP Development', 'App Strategy'],
+              buttonText: 'Build My App →'
+            }
+          ].map((service, i) => (
+            <div key={i}
+              style={{
+                backgroundColor: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                transition: 'transform 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon}</div>
+              <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title}</h3>
+              <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>{service.shortDesc}</p>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: '#666' }}>
+                  {service.services.map((s, j) => (
+                    <li key={j}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <button
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#1e40af',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px'
+                }}
+              >
+                {service.buttonText}
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========== PROCESS SECTION ========== */}
+      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '50px', fontSize: '36px', fontWeight: 'bold' }}>
+          From Challenge to Working Solution
+        </h2>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '20px'
+          }}
+        >
+          {[
+            { number: '01', title: 'Discover', desc: 'Understand your business and goals' },
+            { number: '02', title: 'Plan', desc: 'Define scope and roadmap' },
+            { number: '03', title: 'Design', desc: 'Create UX and visual direction' },
+            { number: '04', title: 'Build', desc: 'Develop with regular communication' },
+            { number: '05', title: 'Launch', desc: 'Deploy and verify' },
+            { number: '06', title: 'Support', desc: 'Maintenance and improvements' }
+          ].map((step, i) => (
+            <div key={i}
+              style={{
+                backgroundColor: 'white',
+                padding: '25px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                textAlign: 'center'
+              }}
+            >
+              <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
+                {step.number}
+              </div>
+              <h3 style={{ marginBottom: '10px', fontSize: '16px', fontWeight: 'bold' }}>{step.title}</h3>
+              <p style={{ color: '#666', fontSize: '13px' }}>{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========== WHY US ========== */}
+      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '50px', fontSize: '36px', fontWeight: 'bold' }}>
+          Why Work With Ayinde Technologies?
+        </h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
+          {[
+            { title: 'We Listen Before We Build', desc: 'We understand the problem before recommending solutions.' },
+            { title: 'We Build for Your Needs', desc: 'Your business is different. Your technology should be too.' },
+            { title: 'We Communicate Clearly', desc: 'You don\'t need to be a developer to understand progress.' },
+            { title: 'We Focus on Results', desc: 'We create solutions that deliver real value to your business.' },
+            { title: 'We Think Beyond Launch', desc: 'We provide ongoing support, maintenance and improvements.' }
+          ].map((reason, i) => (
+            <div key={i}
+              style={{
+                backgroundColor: 'white',
+                padding: '30px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+              }}
+            >
+              <h3 style={{ marginBottom: '10px', fontSize: '18px', fontWeight: 'bold' }}>{reason.title}</h3>
+              <p style={{ color: '#666' }}>{reason.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ========== TEAM ========== */}
+      <div id="team" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
+          Our Team
+        </h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
+          {!loading && teamMembers.length > 0 ? (
+            teamMembers.map((member, i) => (
+              <div key={i}
+                style={{
+                  backgroundColor: 'white',
+                  padding: '30px',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                }}
+              >
+                <div style={{ fontSize: '50px', marginBottom: '15px' }}>👤</div>
+                <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
+                  {member.name}
+                </h3>
+                <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
+                  {member.role}
+                </p>
+              </div>
+            ))
+          ) : (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+              <p>Loading team members...</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ========== CTA ========== */}
+      <div style={{ maxWidth: '1000px', margin: '60px auto', padding: '40px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center' }}>
+        <h2 style={{ marginBottom: '20px', fontSize: '32px', fontWeight: 'bold' }}>
+          Have a Business Challenge We Can Solve?
+        </h2>
+        <p style={{ color: '#666', marginBottom: '30px', fontSize: '16px' }}>
+          Let's turn your idea into technology that works.
+        </p>
+
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => navigate('/services')}
+            style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              backgroundColor: '#1e40af',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            Book a Free Consultation
+          </button>
+          <a
+            href="https://wa.me/yourwhatsappnumber"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              padding: '14px 32px',
+              fontSize: '16px',
+              backgroundColor: '#25d366',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
               fontWeight: 'bold',
               textDecoration: 'none'
             }}
           >
-            Email Us
+            💬 Chat on WhatsApp
           </a>
         </div>
+      </div>
 
-        <div style={{ marginTop: '40px', paddingTop: '30px', borderTop: '1px solid rgba(255,255,255,0.2)' }}>
-          <p style={{ fontSize: '14px' }}>
-            📞 +1 949-662-7869 | 📧 support@ayindetechnologies.com
-          </p>
-          <p style={{ fontSize: '14px', marginTop: '10px' }}>
-            112 S Market St, Suite 1008, Inglewood, CA 90301
-          </p>
-        </div>
+      {/* ========== FOOTER ========== */}
+      <div style={{ backgroundColor: '#1e40af', color: 'white', padding: '40px', textAlign: 'center', marginTop: '60px' }}>
+        <h3 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
+          Ayinde Technologies
+        </h3>
+        <p style={{ marginBottom: '10px' }}>
+          Building practical digital solutions for businesses ready to grow.
+        </p>
       </div>
     </div>
   );
