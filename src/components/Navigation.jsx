@@ -13,6 +13,42 @@ const Navigation = () => {
 
   const sectionHref = (hash) => (onHome ? hash : `/${hash}`);
 
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.nav-dropdown')) {
+        setServicesDropdown(false);
+        setCoursesDropdown(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // Close dropdowns when navigating
+  React.useEffect(() => {
+    setServicesDropdown(false);
+    setCoursesDropdown(false);
+  }, [location]);
+
+  const handleDropdownToggle = (e, dropdownType) => {
+    e.preventDefault();
+    if (dropdownType === 'services') {
+      setServicesDropdown(!servicesDropdown);
+      setCoursesDropdown(false);
+    } else if (dropdownType === 'courses') {
+      setCoursesDropdown(!coursesDropdown);
+      setServicesDropdown(false);
+    }
+  };
+
+  const handleDropdownSelect = (callback) => {
+    callback();
+    setServicesDropdown(false);
+    setCoursesDropdown(false);
+    setIsOpen(false);
+  };
+
   return (
     <nav className="navbar">
       <div className="nav-container">
@@ -25,24 +61,28 @@ const Navigation = () => {
           </Link>
 
           {/* Services Dropdown */}
-          <div className="nav-dropdown"
+          <div className={`nav-dropdown ${servicesDropdown ? 'active' : ''}`}
             onMouseEnter={() => setServicesDropdown(true)}
             onMouseLeave={() => setServicesDropdown(false)}>
-            <Link to="/services" className="nav-link">
+            <button
+              className="nav-link dropdown-toggle"
+              onClick={(e) => handleDropdownToggle(e, 'services')}
+              aria-expanded={servicesDropdown}
+              aria-label="Services submenu">
               Services ▼
-            </Link>
+            </button>
             {servicesDropdown && (
               <div className="dropdown-menu">
-                <Link to="/services/website" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                <Link to="/services/website" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   🌐 Website Development
                 </Link>
-                <Link to="/services/applications" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                <Link to="/services/applications" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   📱 App Development
                 </Link>
-                <Link to="/services/consultation" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                <Link to="/services/consultation" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   💡 Tech Consultation
                 </Link>
-                <Link to="/services/premium" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                <Link to="/services/premium" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   👑 Premium Services
                 </Link>
               </div>
@@ -50,18 +90,22 @@ const Navigation = () => {
           </div>
 
           {/* Courses Dropdown */}
-          <div className="nav-dropdown"
+          <div className={`nav-dropdown ${coursesDropdown ? 'active' : ''}`}
             onMouseEnter={() => setCoursesDropdown(true)}
             onMouseLeave={() => setCoursesDropdown(false)}>
-            <Link to="/courses" className="nav-link">
+            <button
+              className="nav-link dropdown-toggle"
+              onClick={(e) => handleDropdownToggle(e, 'courses')}
+              aria-expanded={coursesDropdown}
+              aria-label="Courses submenu">
               📚 Courses ▼
-            </Link>
+            </button>
             {coursesDropdown && (
               <div className="dropdown-menu">
-                <Link to="/courses" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                <Link to="/courses" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   Browse All Courses
                 </Link>
-                <Link to="/achievements" className="dropdown-item" onClick={() => setIsOpen(false)}>
+                <Link to="/achievements" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   🏆 Achievements
                 </Link>
               </div>
@@ -106,6 +150,17 @@ const Navigation = () => {
           display: inline-block;
         }
 
+        .dropdown-toggle {
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          font-size: inherit;
+          font-family: inherit;
+          color: inherit;
+          margin: 0;
+        }
+
         .dropdown-menu {
           position: absolute;
           top: 100%;
@@ -117,6 +172,19 @@ const Navigation = () => {
           box-shadow: 0 4px 12px rgba(0,0,0,0.1);
           z-index: 1000;
           padding: 5px 0;
+          margin-top: 5px;
+          animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .dropdown-item {
@@ -137,12 +205,23 @@ const Navigation = () => {
             position: static;
             display: none;
             box-shadow: none;
-            border: none;
+            border-top: 1px solid #ddd;
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
             background: #f9f9f9;
+            margin-top: 0;
+            animation: none;
           }
 
           .nav-dropdown.active .dropdown-menu {
             display: block;
+          }
+
+          .dropdown-item {
+            padding: 15px 20px;
+            font-size: 15px;
           }
         }
       `}</style>
