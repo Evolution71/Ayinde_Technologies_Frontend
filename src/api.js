@@ -10,7 +10,7 @@
  *   await api.applyPromoCode(code)
  */
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'https://ayindetechnologiesbackend-production.up.railway.app';
 
 // ========== TOKEN MANAGEMENT ==========
 
