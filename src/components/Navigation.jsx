@@ -23,9 +23,9 @@ const Navigation = () => {
           <Link to="/" className="nav-link" onClick={() => setIsOpen(false)}>
             Home
           </Link>
-          
+
           {/* Services Dropdown */}
-          <div className="nav-dropdown" 
+          <div className="nav-dropdown"
             onMouseEnter={() => setServicesDropdown(true)}
             onMouseLeave={() => setServicesDropdown(false)}>
             <Link to="/services" className="nav-link">
@@ -71,7 +71,7 @@ const Navigation = () => {
           <Link to="/about" className="nav-link" onClick={() => setIsOpen(false)}>
             About Us
           </Link>
-          
+
           <a href={sectionHref('#team')} className="nav-link" onClick={() => setIsOpen(false)}>
             Team
           </a>
@@ -90,7 +90,7 @@ const Navigation = () => {
             </Link>
           )}
         </div>
-        
+
         <button
           className="hamburger"
           onClick={() => setIsOpen(!isOpen)}

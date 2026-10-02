@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState([]);
 
@@ -191,7 +189,7 @@ const Home = () => {
               <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon}</div>
               <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title}</h3>
               <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>{service.shortDesc}</p>
-              
+
               <div style={{ marginBottom: '20px' }}>
                 <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: '#666' }}>
                   {service.services.map((s, j) => (
