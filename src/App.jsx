@@ -8,13 +8,11 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Login from './pages/login';
-import Register from './pages/Register';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Courses from './components/Courses';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
-import Dashboard from './pages/Dashboard';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';
@@ -28,6 +26,7 @@ import FamousQuotesPage from './pages/FamousQuotesPage';
 
 const App = () => {
   useEffect(() => {
+    // Set page title
     document.title = 'Ayinde Technologies - Premium Tech Solutions';
   }, []);
 
@@ -45,17 +44,13 @@ const App = () => {
 
             {/* Authentication */}
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-
-            {/* Dashboard */}
-            <Route path="/dashboard" element={<Dashboard />} />
 
             {/* Courses */}
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/checkout/:courseId" element={<CheckoutPage />} />
 
-            {/* Services Routes */}
+            {/* Services Routes - 12-Page Structure */}
             <Route path="/services" element={<ServicesOverviewPage />} />
             <Route path="/services/website" element={<WebsiteServicesPage />} />
             <Route path="/services/applications" element={<ApplicationServicesPage />} />
@@ -67,7 +62,7 @@ const App = () => {
             <Route path="/achievements" element={<AchievementsPage />} />
             <Route path="/quotes" element={<FamousQuotesPage />} />
 
-            {/* Catch-all */}
+            {/* Catch-all - redirect to home */}
             <Route path="*" element={<Home />} />
           </Routes>
         </main>
