@@ -7,6 +7,7 @@ const Home = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [error, setError] = useState(null);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
@@ -22,10 +23,19 @@ const Home = () => {
   useEffect(() => {
     const fetchTeam = async () => {
       try {
-        const team = await api.get('/api/team/');
-        setTeamMembers(Array.isArray(team) ? team : team.team || []);
+        setLoading(true);
+        setError(null);
+
+        // Use the api client method
+        const response = await api.getTeamMembers();
+
+        // Extract all_members array from response
+        const teamData = response.all_members || [];
+        setTeamMembers(Array.isArray(teamData) ? teamData : []);
+
       } catch (err) {
         console.error('Error fetching team:', err);
+        setError(err.message);
         setTeamMembers([]);
       } finally {
         setLoading(false);
@@ -158,21 +168,24 @@ const Home = () => {
               title: 'Websites That Do More Than Look Good',
               shortDesc: 'Your website is often the first interaction a potential customer has with your business.',
               services: ['Corporate websites', 'Business websites', 'Landing pages', 'E-commerce websites', 'Web portals'],
-              buttonText: 'Build My Website →'
+              buttonText: 'Build My Website →',
+              link: '/services/website'
             },
             {
               icon: '💻',
               title: 'Custom Software & Web Applications',
               shortDesc: 'Off-the-shelf software doesn\'t always fit the way your business operates.',
               services: ['Business management systems', 'Customer portals', 'Booking systems', 'CRM solutions', 'Custom web applications'],
-              buttonText: 'Discuss My Software Project →'
+              buttonText: 'Discuss My Software Project →',
+              link: '/services/applications'
             },
             {
               icon: '📱',
               title: 'Mobile Applications',
               shortDesc: 'Transform your ideas into intuitive, reliable mobile experiences.',
               services: ['iOS & Android Apps', 'React Native Development', 'MVP Development', 'App Strategy'],
-              buttonText: 'Build My App →'
+              buttonText: 'Build My App →',
+              link: '/services/applications'
             }
           ].map((service, i) => (
             <div key={i}
@@ -189,7 +202,7 @@ const Home = () => {
               <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon}</div>
               <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title}</h3>
               <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>{service.shortDesc}</p>
-              
+
               <div style={{ marginBottom: '20px' }}>
                 <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '14px', color: '#666' }}>
                   {service.services.map((s, j) => (
@@ -199,6 +212,7 @@ const Home = () => {
               </div>
 
               <button
+                onClick={() => navigate(service.link)}
                 style={{
                   width: '100%',
                   padding: '10px',
@@ -305,18 +319,31 @@ const Home = () => {
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                 }}
               >
-                <div style={{ fontSize: '50px', marginBottom: '15px' }}>👤</div>
+                <div style={{ fontSize: '50px', marginBottom: '15px' }}>{member.image || '👤'}</div>
                 <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
                   {member.name}
                 </h3>
                 <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
-                  {member.role}
+                  {member.title}
                 </p>
+                {member.quote && (
+                  <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', marginTop: '10px' }}>
+                    "{member.quote}"
+                  </p>
+                )}
               </div>
             ))
+          ) : loading ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+              <p style={{ color: '#999' }}>Loading team members...</p>
+            </div>
+          ) : error ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
+              <p style={{ color: '#d32f2f' }}>Error loading team: {error}</p>
+            </div>
           ) : (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-              <p>Loading team members...</p>
+              <p style={{ color: '#999' }}>Team members will appear here once added to the backend.</p>
             </div>
           )}
         </div>
