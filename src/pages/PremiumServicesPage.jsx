@@ -84,7 +84,7 @@ const PremiumServicesPage = () => {
       const priceInfo = calculatePrice(tier);
 
       const paymentData = {
-        service: 'premium',
+        serviceType: 'premium',
         tier: tierKey,
         tierName: tier.name,
         amount: Math.round(priceInfo.price * 100),

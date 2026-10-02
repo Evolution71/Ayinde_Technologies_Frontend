@@ -163,6 +163,7 @@ const ServiceCheckoutPage = () => {
 
       // Create service order via backend
       const orderData = {
+        serviceType: paymentData.serviceType || 'website', // Include service type
         tier: paymentData.tier,
         tierName: paymentData.tierName,
         amount: paymentData.finalPrice / 100, // Convert back from cents
