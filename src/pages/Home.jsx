@@ -320,6 +320,119 @@ const Home = () => {
         </div>
       </div>
 
+      {/* ========== QUOTES SECTION ========== */}
+      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '15px', fontSize: '36px', fontWeight: 'bold' }}>
+          💬 Inspiration from Industry Leaders
+        </h2>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: '50px', fontSize: '16px' }}>
+          Wisdom and insights from tech visionaries to inspire your journey
+        </p>
+
+        <div style={{
+          backgroundColor: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+          borderRadius: '12px',
+          padding: '40px',
+          textAlign: 'center',
+          marginBottom: '40px',
+          borderLeft: '5px solid #3b82f6'
+        }}>
+          <div style={{ fontSize: '48px', marginBottom: '20px' }}>💡</div>
+          <blockquote style={{
+            fontSize: '22px',
+            fontStyle: 'italic',
+            color: '#1f2937',
+            marginBottom: '20px',
+            maxWidth: '800px',
+            margin: '0 auto 20px',
+            fontWeight: '500',
+            lineHeight: '1.6'
+          }}>
+            "Innovation distinguishes between a leader and a follower."
+          </blockquote>
+          <p style={{ color: '#374151', fontWeight: 'bold', marginBottom: '5px' }}>
+            — Steve Jobs
+          </p>
+          <p style={{ color: '#666', fontSize: '14px' }}>
+            Apple Co-founder
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px', marginBottom: '40px' }}>
+          {[
+            {
+              icon: '❤️',
+              quote: 'The only way to do great work is to love what you do.',
+              author: 'Steve Jobs',
+              title: 'Apple Co-founder'
+            },
+            {
+              icon: '🚀',
+              quote: 'The only impossible journey is the one you never begin.',
+              author: 'Tony Robbins',
+              title: 'Motivational Speaker'
+            },
+            {
+              icon: '⚙️',
+              quote: 'Ideas are nothing. Execution is everything.',
+              author: 'Mark Zuckerberg',
+              title: 'Facebook Founder'
+            }
+          ].map((item, i) => (
+            <div key={i} style={{
+              backgroundColor: 'white',
+              padding: '25px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              borderLeft: '5px solid #3b82f6',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+              <div style={{ fontSize: '32px', marginBottom: '15px' }}>{item.icon}</div>
+              <p style={{
+                fontSize: '15px',
+                fontStyle: 'italic',
+                color: '#374151',
+                marginBottom: '15px',
+                lineHeight: '1.5'
+              }}>
+                "{item.quote}"
+              </p>
+              <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+                <p style={{ margin: '0 0 3px 0', color: '#1f2937', fontWeight: 'bold', fontSize: '14px' }}>
+                  — {item.author}
+                </p>
+                <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>
+                  {item.title}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <button
+            onClick={() => navigate('/quotes')}
+            style={{
+              padding: '14px 40px',
+              fontSize: '16px',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e40af'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+          >
+            View All Quotes & Categories →
+          </button>
+        </div>
+      </div>
+
       {/* ========== TEAM ========== */}
       <div id="team" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>

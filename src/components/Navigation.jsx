@@ -116,6 +116,10 @@ const Navigation = () => {
             About Us
           </Link>
 
+          <Link to="/quotes" className="nav-link" onClick={() => setIsOpen(false)}>
+            💬 Quotes
+          </Link>
+
           <a href={sectionHref('#team')} className="nav-link" onClick={() => setIsOpen(false)}>
             Team
           </a>
