@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../api';  // ✅ FIXED: Named import
+import { api } from '../api';
 
 const CheckoutPage = () => {
   const { courseId } = useParams();
@@ -14,8 +14,9 @@ const CheckoutPage = () => {
   const [paymentId, setPaymentId] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [billingPostalCode, setBillingPostalCode] = useState('');
-  const [billingCountry, setBillingCountry] = useState('US');
+  const [billingCountry, setBillingCountry] = useState('NG');
   const [enrolledCourses, setEnrolledCourses] = useState([]);
+  const [enrollmentStep, setEnrollmentStep] = useState(null);
 
   const paymentsRef = useRef(null);
   const cardRef = useRef(null);
@@ -34,11 +35,11 @@ const CheckoutPage = () => {
         let foundCourse = null;
         try {
           const coursesResponse = await api.getCourses();
-          // ✅ FIXED: Handle both { courses: [...] } and [...] formats
-          const courses = Array.isArray(coursesResponse) 
-            ? coursesResponse 
+          // Handle both { courses: [...] } and [...] formats
+          const courses = Array.isArray(coursesResponse)
+            ? coursesResponse
             : (coursesResponse.courses || []);
-          
+
           foundCourse = courses.find(c => c.id === parseInt(courseId));
         } catch (err) {
           console.log('[Checkout] Could not fetch all courses:', err);
@@ -48,20 +49,19 @@ const CheckoutPage = () => {
         if (!foundCourse) {
           try {
             const enrollmentsResponse = await api.getMyEnrollments();
-            // ✅ FIXED: Handle both { enrollments: [...] } and [...] formats
+            // Handle both { enrollments: [...] } and [...] formats
             const enrollmentsData = Array.isArray(enrollmentsResponse)
               ? enrollmentsResponse
               : (enrollmentsResponse.enrollments || []);
-            
+
             const enrollmentIds = enrollmentsData.map(e => e.course_id);
-            
+
             // Get all courses and filter by enrollment
             const coursesResponse = await api.getCourses();
-            // ✅ FIXED: Handle both { courses: [...] } and [...] formats
             const allCourses = Array.isArray(coursesResponse)
               ? coursesResponse
               : (coursesResponse.courses || []);
-            
+
             const enrolled = allCourses.filter(c => enrollmentIds.includes(c.id));
             setEnrolledCourses(enrolled);
 
@@ -87,7 +87,6 @@ const CheckoutPage = () => {
 
         setCourse(foundCourse);
 
-        // ✅ FIXED: Use correct method name - createPaymentIntent not initiatePayment
         console.log('[Checkout] Creating payment intent for course:', foundCourse.id);
         const payData = await api.createPaymentIntent(foundCourse.id, foundCourse.price);
         console.log('[Checkout] Payment intent created:', payData);
@@ -139,7 +138,7 @@ const CheckoutPage = () => {
     initCard();
   }, [paymentId, cardReady]);
 
-  // Step 3: Handle payment
+  // ✅ FIXED: Handle payment with proper enrollment flow
   const handlePayment = async (e) => {
     e.preventDefault();
 
@@ -152,7 +151,36 @@ const CheckoutPage = () => {
       setProcessing(true);
       setError(null);
 
-      // ✅ CORRECT: Use card.tokenize()
+      // STEP 1: Ensure user is enrolled in trial first
+      console.log('[Checkout] Step 1: Checking trial enrollment...');
+      setEnrollmentStep('Checking trial enrollment...');
+
+      try {
+        const enrollmentStatus = await api.getEnrollmentStatus(course.id);
+        console.log('[Checkout] Existing enrollment:', enrollmentStatus);
+      } catch (enrollErr) {
+        // 403 means not enrolled - try to enroll
+        if (enrollErr.message.includes('403') || enrollErr.message.includes('Not enrolled')) {
+          console.log('[Checkout] Step 1a: Not enrolled, attempting trial enrollment...');
+          setEnrollmentStep('Enrolling you in trial...');
+
+          try {
+            await api.enrollInCourse(course.id);
+            console.log('[Checkout] ✅ Trial enrollment successful');
+            setEnrollmentStep('Trial enrollment complete');
+          } catch (innerErr) {
+            console.error('[Checkout] Trial enrollment failed:', innerErr);
+            setError(`Trial enrollment failed: ${innerErr.message}`);
+            setProcessing(false);
+            return;
+          }
+        }
+      }
+
+      // STEP 2: Tokenize card
+      console.log('[Checkout] Step 2: Tokenizing card...');
+      setEnrollmentStep('Processing card...');
+
       const tokenResult = await cardRef.current.tokenize();
 
       if (tokenResult.status !== 'OK') {
@@ -162,10 +190,13 @@ const CheckoutPage = () => {
       }
 
       const token = tokenResult.token;
-      console.log('[Checkout] Token created:', token);
+      console.log('[Checkout] ✅ Token created');
 
-      // Verify payment with backend
-      console.log('[Checkout] Verifying payment with backend...');
+      // STEP 3: Verify payment with backend
+      console.log('[Checkout] Step 3: Verifying payment with backend...');
+      setEnrollmentStep('Verifying payment...');
+
+      // ✅ FIXED: Call verifyPayment with 3 parameters including billing info
       const verifyResult = await api.verifyPayment(paymentId, token, {
         billingPostalCode,
         billingCountry
@@ -173,15 +204,16 @@ const CheckoutPage = () => {
 
       console.log('[Checkout] Payment verification result:', verifyResult);
 
-      // ✅ CHECK if payment actually succeeded
+      // Check if payment actually succeeded
       if (!verifyResult.success && verifyResult.status !== 'success') {
         setError(verifyResult.message || 'Payment failed - please check your card and try again');
         setProcessing(false);
         return;
       }
 
-      // ✅ Only navigate if TRULY successful
+      // Only navigate if TRULY successful
       console.log('[Checkout] ✅ Payment successful!');
+      setEnrollmentStep('Payment successful!');
       alert('✅ Payment successful! You are now enrolled in the course.');
       navigate('/courses');
     } catch (err) {
@@ -203,6 +235,12 @@ const CheckoutPage = () => {
         {error && (
           <div style={{ padding: '15px', backgroundColor: '#fee2e2', borderRadius: '6px', marginBottom: '20px', color: '#991b1b', border: '1px solid #fca5a5' }}>
             ❌ {error}
+          </div>
+        )}
+
+        {enrollmentStep && (
+          <div style={{ padding: '15px', backgroundColor: '#dbeafe', borderRadius: '6px', marginBottom: '20px', color: '#1e40af', border: '1px solid #93c5fd' }}>
+            ℹ️ {enrollmentStep}
           </div>
         )}
 

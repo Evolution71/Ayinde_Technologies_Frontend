@@ -26,24 +26,25 @@ const Home = () => {
         setLoading(true);
         setError(null);
 
-        console.log('[Home] Fetching team members...');
+        // ✅ FIXED: Use getTeam() which returns a list directly
         const response = await api.getTeam();
 
-        console.log('[Home] Full response:', response);
-        console.log('[Home] Response type:', typeof response);
-        console.log('[Home] Is array?', Array.isArray(response));
+        console.log('[Home] Team response:', response);
 
-        // Backend returns a plain array, not an object with all_members
-        const teamData = Array.isArray(response) ? response : (response.all_members || []);
+        // ✅ FIXED: Handle response correctly - backend returns array directly
+        let teamData = [];
+        if (Array.isArray(response)) {
+          teamData = response;
+        } else if (response.all_members && Array.isArray(response.all_members)) {
+          teamData = response.all_members;
+        }
 
-        console.log('[Home] Team data:', teamData);
         console.log('[Home] Team count:', teamData.length);
-
-        setTeamMembers(Array.isArray(teamData) ? teamData : []);
+        setTeamMembers(teamData);
 
       } catch (err) {
         console.error('[Home] Error fetching team:', err);
-        setError(err.message || 'Failed to load team members');
+        setError(err.message);
         setTeamMembers([]);
       } finally {
         setLoading(false);
@@ -332,7 +333,7 @@ const Home = () => {
                   {member.name}
                 </h3>
                 <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
-                  {member.title}
+                  {member.role || member.title}
                 </p>
                 {member.quote && (
                   <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', marginTop: '10px' }}>
@@ -348,11 +349,10 @@ const Home = () => {
           ) : error ? (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
               <p style={{ color: '#d32f2f' }}>Error loading team: {error}</p>
-              <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>Check browser console for details</p>
             </div>
           ) : (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px' }}>
-              <p style={{ color: '#999' }}>No team members found. Make sure you have team members in your database.</p>
+              <p style={{ color: '#999' }}>Team members will appear here once added to the backend.</p>
             </div>
           )}
         </div>

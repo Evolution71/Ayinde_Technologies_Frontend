@@ -1,22 +1,25 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../api';  // ✅ NAMED import
+import { api } from '../api';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [token, setTokenState] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    // ✅ FIXED: Use consistent 'ayinde_token' key with api.js
+    const storedToken = localStorage.getItem('ayinde_token');
     const userData = localStorage.getItem('user');
 
-    if (token && userData) {
+    if (storedToken && userData) {
       try {
+        setTokenState(storedToken);
         setUser(JSON.parse(userData));
       } catch (err) {
         console.error('Failed to parse user data:', err);
-        localStorage.removeItem('token');
+        localStorage.removeItem('ayinde_token');
         localStorage.removeItem('user');
       }
     }
@@ -27,8 +30,10 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password, captchaToken, captchaAnswer) => {
     try {
       const response = await api.login(email, password, captchaToken, captchaAnswer);
-      localStorage.setItem('token', response.access_token);
+      // ✅ FIXED: Store token using 'ayinde_token' key to match api.js
+      localStorage.setItem('ayinde_token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      setTokenState(response.access_token);
       setUser(response.user);
       return response;
     } catch (error) {
@@ -40,8 +45,10 @@ export const AuthProvider = ({ children }) => {
   const register = async (first_name, last_name, email, password, captchaToken, captchaAnswer) => {
     try {
       const response = await api.register(first_name, last_name, email, password, captchaToken, captchaAnswer);
-      localStorage.setItem('token', response.access_token);
+      // ✅ FIXED: Store token using 'ayinde_token' key to match api.js
+      localStorage.setItem('ayinde_token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      setTokenState(response.access_token);
       setUser(response.user);
       return response;
     } catch (error) {
@@ -51,14 +58,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('ayinde_token');
     localStorage.removeItem('user');
+    setTokenState(null);
     setUser(null);
     api.logout?.();
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, token, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
