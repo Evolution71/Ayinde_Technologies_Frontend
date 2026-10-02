@@ -15,16 +15,57 @@ const AchievementsPage = () => {
         setLoading(true);
         setError(null);
 
-        // Fetch achievements
+        // ✅ FIXED: Fetch achievements with flexible response handling
         const achievementsResponse = await api.getAchievements();
-        setAchievements(achievementsResponse.achievements || []);
+        console.log('[AchievementsPage] Achievements response:', achievementsResponse);
 
-        // Fetch team members by gender
+        let achievementsData = [];
+        if (Array.isArray(achievementsResponse)) {
+          achievementsData = achievementsResponse;
+        } else if (achievementsResponse?.achievements && Array.isArray(achievementsResponse.achievements)) {
+          achievementsData = achievementsResponse.achievements;
+        } else if (achievementsResponse?.data && Array.isArray(achievementsResponse.data)) {
+          achievementsData = achievementsResponse.data;
+        }
+        setAchievements(achievementsData);
+
+        // ✅ FIXED: Fetch male team members by gender with flexible response handling
         const maleResponse = await api.getTeamMembersByGender('male');
-        setMaleTeamMembers(maleResponse.team_members || []);
+        console.log('[AchievementsPage] Male team response:', maleResponse);
 
+        let maleData = [];
+        if (Array.isArray(maleResponse)) {
+          maleData = maleResponse;
+        } else if (maleResponse?.team_members && Array.isArray(maleResponse.team_members)) {
+          maleData = maleResponse.team_members;
+        } else if (maleResponse?.members && Array.isArray(maleResponse.members)) {
+          maleData = maleResponse.members;
+        } else if (maleResponse?.data && Array.isArray(maleResponse.data)) {
+          maleData = maleResponse.data;
+        } else if (maleResponse?.results && Array.isArray(maleResponse.results)) {
+          maleData = maleResponse.results;
+        }
+        setMaleTeamMembers(maleData);
+
+        // ✅ FIXED: Fetch female team members by gender with flexible response handling
         const femaleResponse = await api.getTeamMembersByGender('female');
-        setFemaleTeamMembers(femaleResponse.team_members || []);
+        console.log('[AchievementsPage] Female team response:', femaleResponse);
+
+        let femaleData = [];
+        if (Array.isArray(femaleResponse)) {
+          femaleData = femaleResponse;
+        } else if (femaleResponse?.team_members && Array.isArray(femaleResponse.team_members)) {
+          femaleData = femaleResponse.team_members;
+        } else if (femaleResponse?.members && Array.isArray(femaleResponse.members)) {
+          femaleData = femaleResponse.members;
+        } else if (femaleResponse?.data && Array.isArray(femaleResponse.data)) {
+          femaleData = femaleResponse.data;
+        } else if (femaleResponse?.results && Array.isArray(femaleResponse.results)) {
+          femaleData = femaleResponse.results;
+        }
+        setFemaleTeamMembers(femaleData);
+
+        console.log('[AchievementsPage] Loaded - achievements:', achievementsData.length, 'male:', maleData.length, 'female:', femaleData.length);
       } catch (err) {
         console.error('[AchievementsPage] Error fetching data:', err);
         setError(err.message || 'Failed to load achievements and team data');

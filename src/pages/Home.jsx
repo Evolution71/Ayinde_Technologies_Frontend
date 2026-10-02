@@ -26,39 +26,31 @@ const Home = () => {
         setLoading(true);
         setError(null);
 
-        // ✅ FIXED: Use getTeam() and handle multiple response formats
-        const response = await api.getTeam();
-
+        // Use the api client method
+        const response = await api.getTeamMembers();
         console.log('[Home] Team response:', response);
-        console.log('[Home] Response type:', typeof response);
-        console.log('[Home] Is array:', Array.isArray(response));
 
-        // ✅ FIXED: Handle flexible response formats
+        // Handle flexible response formats
         let teamData = [];
-        
-        // Check if direct array
         if (Array.isArray(response)) {
+          // Direct array response
           teamData = response;
-        } 
-        // Check common wrapper keys
-        else if (response && typeof response === 'object') {
-          // Try multiple possible keys where team data might be nested
-          if (Array.isArray(response.team)) {
-            teamData = response.team;
-          } else if (Array.isArray(response.all_members)) {
-            teamData = response.all_members;
-          } else if (Array.isArray(response.members)) {
-            teamData = response.members;
-          } else if (Array.isArray(response.data)) {
-            teamData = response.data;
-          } else if (Array.isArray(response.results)) {
-            teamData = response.results;
-          }
+        } else if (response?.all_members && Array.isArray(response.all_members)) {
+          // Wrapped in all_members
+          teamData = response.all_members;
+        } else if (response?.team_members && Array.isArray(response.team_members)) {
+          // Wrapped in team_members
+          teamData = response.team_members;
+        } else if (response?.members && Array.isArray(response.members)) {
+          // Wrapped in members
+          teamData = response.members;
+        } else if (response?.data && Array.isArray(response.data)) {
+          // Wrapped in data
+          teamData = response.data;
         }
 
-        console.log('[Home] Extracted team data:', teamData);
-        console.log('[Home] Team count:', teamData.length);
         setTeamMembers(teamData);
+        console.log('[Home] Loaded team members:', teamData.length);
 
       } catch (err) {
         console.error('[Home] Error fetching team:', err);
@@ -351,7 +343,7 @@ const Home = () => {
                   {member.name}
                 </h3>
                 <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
-                  {member.role || member.title}
+                  {member.title}
                 </p>
                 {member.quote && (
                   <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', marginTop: '10px' }}>
