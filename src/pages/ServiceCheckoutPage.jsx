@@ -32,6 +32,7 @@ const ServiceCheckoutPage = () => {
 
   // Redirect if no payment data
   useEffect(() => {
+    // Check redirects first
     if (!paymentData) {
       navigate('/services');
       return;
@@ -44,10 +45,11 @@ const ServiceCheckoutPage = () => {
 
     // Initialize Square Card - only once
     if (cardInitializedRef.current) {
-      setLoading(false);
-      setCardReady(true);
       return;
     }
+
+    // Prevent further initialization attempts
+    cardInitializedRef.current = true;
 
     const initializeSquareCard = async () => {
       try {
@@ -60,6 +62,7 @@ const ServiceCheckoutPage = () => {
           script.async = true;
           script.onload = () => setupSquare();
           script.onerror = () => {
+            cardInitializedRef.current = false;
             setError('Failed to load Square payment system. Please refresh and try again.');
             setLoading(false);
           };
@@ -68,24 +71,17 @@ const ServiceCheckoutPage = () => {
           setupSquare();
         }
       } catch (err) {
+        cardInitializedRef.current = false;
         setError('Failed to load payment system: ' + err.message);
         setLoading(false);
       }
     };
 
     initializeSquareCard();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paymentData, user, navigate]);
 
   const setupSquare = async () => {
     try {
-      // Prevent duplicate initialization
-      if (cardInitializedRef.current) {
-        setCardReady(true);
-        setLoading(false);
-        return;
-      }
-
       const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
       if (!appId) {
         throw new Error('Square App ID not configured');
@@ -99,12 +95,11 @@ const ServiceCheckoutPage = () => {
 
       await card.attach('#sq-card-container');
 
-      // Mark as initialized to prevent re-attachment
-      cardInitializedRef.current = true;
       setCardReady(true);
       setLoading(false);
     } catch (err) {
       console.error('[ServiceCheckout] Card initialization error:', err);
+      cardInitializedRef.current = false; // Reset flag on error
       setError('Card initialization failed: ' + err.message);
       setLoading(false);
     }
