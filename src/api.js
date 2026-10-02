@@ -1,10 +1,6 @@
 /**
  * API Client for Ayinde Technologies
  * Updated with Service endpoints for 12-page website structure
- * Fixed: verifyPayment now accepts and sends billing info
- * Fixed: All protected endpoints include authHeaders()
- * Fixed: Token key is consistent ('ayinde_token')
- * Fixed: Added console logging for debugging token flow
  *
  * Usage:
  *   import { api } from '../api'
@@ -21,36 +17,24 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const setToken = (token) => {
   if (token) {
     localStorage.setItem('ayinde_token', token);
-    console.log('[API] ✅ Token saved to localStorage');
   } else {
     localStorage.removeItem('ayinde_token');
-    console.log('[API] 🔄 Token cleared from localStorage');
   }
 };
 
-const getToken = () => {
-  const token = localStorage.getItem('ayinde_token');
-  console.log('[API] Token check:', token ? `Found (${token.substring(0, 20)}...)` : 'NOT FOUND');
-  return token;
-};
+const getToken = () => localStorage.getItem('ayinde_token');
 
 // ========== HELPER FUNCTIONS ==========
 
 const authHeaders = () => {
   const token = getToken();
-  if (!token) {
-    console.warn('[API] ⚠️ No token found - request will be unauthenticated');
-    return {};
-  }
-  const headers = { 'Authorization': `Bearer ${token}` };
-  console.log('[API] ✅ Auth headers added');
-  return headers;
+  if (!token) return {};
+  return { 'Authorization': `Bearer ${token}` };
 };
 
 const parseOrThrow = async (res) => {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    console.error('[API] ❌ Request failed:', res.status, errorData);
     throw new Error(errorData.detail || `HTTP ${res.status}`);
   }
   return res.json();
@@ -63,7 +47,6 @@ export const api = {
   // ========== AUTH ENDPOINTS ==========
 
   async login(email, password) {
-    console.log('[API] 🔐 Logging in:', email);
     const res = await fetch(`${API_URL}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,12 +54,10 @@ export const api = {
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
-    console.log('[API] ✅ Login successful');
     return data;
   },
 
   async register(first_name, last_name, email, password) {
-    console.log('[API] 📝 Registering:', email);
     const res = await fetch(`${API_URL}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -84,17 +65,14 @@ export const api = {
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
-    console.log('[API] ✅ Registration successful');
     return data;
   },
 
   async logout() {
-    console.log('[API] 🔓 Logging out');
     setToken(null);
   },
 
   async getCurrentUser() {
-    console.log('[API] 👤 Fetching current user');
     const res = await fetch(`${API_URL}/api/auth/me/`, {
       headers: authHeaders()
     });
@@ -115,7 +93,6 @@ export const api = {
      *
      * Frontend should display captcha_image and ask user to enter it
      */
-    console.log('[API] 🔐 Generating captcha');
     const res = await fetch(`${API_URL}/api/captcha/`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' }
@@ -137,7 +114,6 @@ export const api = {
      *   score: 1.0 if valid, 0.0 if not
      * }
      */
-    console.log('[API] ✓ Verifying captcha answer');
     const res = await fetch(`${API_URL}/api/captcha/verify/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -153,7 +129,6 @@ export const api = {
     /**
      * Delete a captcha (for form cancellations)
      */
-    console.log('[API] 🗑️ Deleting captcha:', captchaId);
     const res = await fetch(`${API_URL}/api/captcha/${captchaId}/`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
@@ -164,7 +139,6 @@ export const api = {
   // ========== COURSE ENDPOINTS ==========
 
   async getCourses() {
-    console.log('[API] 📚 Fetching all courses');
     const res = await fetch(`${API_URL}/api/courses/`, {
       headers: { 'Content-Type': 'application/json' }
     });
@@ -172,15 +146,13 @@ export const api = {
   },
 
   async getCourseDetail(courseId) {
-    console.log('[API] 📖 Fetching course detail:', courseId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/`, {
-      headers: { ...authHeaders(), 'Content-Type': 'application/json' }
+      headers: authHeaders()
     });
     return parseOrThrow(res);
   },
 
   async getMyEnrollments() {
-    console.log('[API] 🎓 Fetching my enrollments');
     const res = await fetch(`${API_URL}/api/courses/me/enrollments/`, {
       headers: authHeaders()
     });
@@ -188,16 +160,14 @@ export const api = {
   },
 
   async enrollInCourse(courseId) {
-    console.log('[API] ✏️ Enrolling in course:', courseId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enroll/`, {
       method: 'POST',
-      headers: { ...authHeaders(), 'Content-Type': 'application/json' }
+      headers: authHeaders()
     });
     return parseOrThrow(res);
   },
 
   async getEnrollmentStatus(courseId) {
-    console.log('[API] 🔍 Checking enrollment status:', courseId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/enrollment-status/`, {
       headers: authHeaders()
     });
@@ -205,7 +175,6 @@ export const api = {
   },
 
   async savePaymentMethod(courseId, nonce) {
-    console.log('[API] 💳 Saving payment method for course:', courseId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/save-payment-method/`, {
       method: 'POST',
       headers: {
@@ -218,7 +187,6 @@ export const api = {
   },
 
   async cancelSubscription(courseId) {
-    console.log('[API] ❌ Canceling subscription for course:', courseId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/cancel/`, {
       method: 'POST',
       headers: authHeaders()
@@ -227,7 +195,6 @@ export const api = {
   },
 
   async getCourseProgress(courseId) {
-    console.log('[API] 📊 Getting course progress:', courseId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/progress/`, {
       headers: authHeaders()
     });
@@ -237,7 +204,6 @@ export const api = {
   // ========== LESSON ENDPOINTS ==========
 
   async getLesson(courseId, lessonId) {
-    console.log('[API] 📄 Getting lesson:', lessonId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/`, {
       headers: authHeaders()
     });
@@ -245,7 +211,6 @@ export const api = {
   },
 
   async completeLesson(courseId, lessonId) {
-    console.log('[API] ✅ Marking lesson complete:', lessonId);
     const res = await fetch(`${API_URL}/api/courses/${courseId}/lessons/${lessonId}/complete/`, {
       method: 'POST',
       headers: authHeaders()
@@ -253,42 +218,61 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== SERVICE ENDPOINTS ==========
+  // ========== SERVICE ENDPOINTS (NEW - 12-Page Website Services) ==========
 
+  /**
+   * Get all services overview (for home page display)
+   * Returns all available services with basic info
+   * @returns {array} List of all services with tiers and basic details
+   */
   async getServices() {
-    console.log('[API] 🔧 Fetching services');
     const res = await fetch(`${API_URL}/api/services/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Get all service tiers for a specific service type
+   * @param {string} serviceType - 'website' | 'applications' | 'consultation' | 'premium'
+   * @returns {object} Service tiers with pricing and features
+   */
   async getServiceTiers(serviceType) {
-    console.log('[API] 💎 Fetching service tiers:', serviceType);
     const res = await fetch(`${API_URL}/api/services/tiers/${serviceType}/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Get all available service packages
+   * @returns {array} List of all service packages across all service types
+   */
   async getServicePackages() {
-    console.log('[API] 📦 Fetching service packages');
     const res = await fetch(`${API_URL}/api/services/packages/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Get user's current service subscriptions
+   * @returns {array} User's active service subscriptions
+   */
   async getServiceSubscriptions() {
-    console.log('[API] 📋 Fetching my service subscriptions');
     const res = await fetch(`${API_URL}/api/services/my-subscriptions/`, {
       headers: authHeaders()
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Verify and apply promotional code
+   * @param {string} promoCode - Promotional code to apply
+   * @param {number} amount - Original amount before discount
+   * @returns {object} { valid: bool, discount_percentage: number, discount_amount: number, final_amount: number, message: string }
+   */
   async applyPromoCode(promoCode, amount) {
-    console.log('[API] 🎁 Applying promo code:', promoCode);
     const res = await fetch(`${API_URL}/api/services/promo-code/verify/`, {
       method: 'POST',
       headers: {
@@ -303,8 +287,28 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create service checkout (initiate purchase)
+   * IMPORTANT: This is the CORRECT method to use for service payments
+   *
+   * @param {object} checkoutData - {
+   *   service_type: 'website' | 'applications' | 'consultation' | 'premium',
+   *   tier: 'starter' | 'professional' | 'advanced' | 'premium',
+   *   payment_option: 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down',
+   *   hours: number (for consultation only),
+   *   promo_code: string (optional),
+   *   amount: number,
+   *   payment_method_nonce: string (from Square tokenization),
+   *   billing_email: string,
+   *   billing_name: string,
+   *   billing_phone: string,
+   *   billing_company: string,
+   *   billing_postal_code: string,
+   *   billing_country: string
+   * }
+   * @returns {object} Checkout response with session ID and confirmation details
+   */
   async createServiceCheckout(checkoutData) {
-    console.log('[API] 🛒 Creating service checkout');
     const res = await fetch(`${API_URL}/api/services/checkout/`, {
       method: 'POST',
       headers: {
@@ -316,16 +320,24 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Get checkout status
+   * @param {string} checkoutId - ID from createServiceCheckout response
+   * @returns {object} Checkout status and details
+   */
   async getCheckoutStatus(checkoutId) {
-    console.log('[API] 🔄 Checking checkout status:', checkoutId);
     const res = await fetch(`${API_URL}/api/services/checkout/${checkoutId}/`, {
       headers: authHeaders()
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Cancel a service subscription
+   * @param {string} subscriptionId - Service subscription ID
+   * @returns {object} Cancellation confirmation
+   */
   async cancelServiceSubscription(subscriptionId) {
-    console.log('[API] ❌ Canceling service subscription:', subscriptionId);
     const res = await fetch(`${API_URL}/api/services/subscriptions/${subscriptionId}/cancel/`, {
       method: 'POST',
       headers: authHeaders()
@@ -333,8 +345,14 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Upgrade or downgrade service tier
+   * @param {string} subscriptionId - Current subscription ID
+   * @param {string} newTier - 'starter' | 'professional' | 'advanced' | 'premium'
+   * @param {string} paymentOption - 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down'
+   * @returns {object} Updated subscription details
+   */
   async upgradeServiceTier(subscriptionId, newTier, paymentOption) {
-    console.log('[API] 📈 Upgrading service tier');
     const res = await fetch(`${API_URL}/api/services/subscriptions/${subscriptionId}/upgrade/`, {
       method: 'POST',
       headers: {
@@ -349,8 +367,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Save payment method for service (alternative to full checkout)
+   * @param {string} paymentMethodNonce - From Square tokenization
+   * @returns {object} Saved payment method details
+   */
   async saveServicePaymentMethod(paymentMethodNonce) {
-    console.log('[API] 💳 Saving service payment method');
     const res = await fetch(`${API_URL}/api/services/payment-method/save/`, {
       method: 'POST',
       headers: {
@@ -364,8 +386,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create a service order/purchase with Square payment token
+   * @param {object} purchaseData - { tier, tierName, amount, currency, paymentOption, discountPercent, period, fullName, email, phone, company, postalCode, country, sourceId }
+   * @returns {object} Service order confirmation with order_id
+   */
   async createServicePurchase(purchaseData) {
-    console.log('[API] 🎯 Creating service purchase');
     const res = await fetch(`${API_URL}/api/services/purchase/`, {
       method: 'POST',
       headers: {
@@ -379,50 +405,69 @@ export const api = {
 
   // ========== ACHIEVEMENT & TEAM ENDPOINTS ==========
 
+  /**
+   * Get all active achievements
+   * @returns {array} List of achievements (title, description, category, icon)
+   */
   async getAchievements() {
-    console.log('[API] 🏆 Fetching achievements');
     const res = await fetch(`${API_URL}/api/achievements/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Get all active team members
+   * @returns {object} Team members grouped by gender and full list
+   */
   async getTeamMembers() {
-    console.log('[API] 👥 Fetching team members');
     const res = await fetch(`${API_URL}/api/team/`, {
       headers: { 'Content-Type': 'application/json' }
     });
-    const data = await parseOrThrow(res);
-    console.log('[API] ✅ Team members received:', Array.isArray(data) ? data.length : '?', 'members');
-    return data;
+    return parseOrThrow(res);
   },
 
+  /**
+   * Get team members filtered by gender
+   * @param {string} gender - 'male' | 'female' | 'other'
+   * @returns {array} Filtered team members
+   */
   async getTeamMembersByGender(gender) {
-    console.log('[API] 👥 Fetching team members by gender:', gender);
     const res = await fetch(`${API_URL}/api/team-members/by-gender/${gender}/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Get all active quotes
+   * @returns {object} { success: bool, quotes: array }
+   */
   async getQuotes() {
-    console.log('[API] 💬 Fetching quotes');
     const res = await fetch(`${API_URL}/api/quotes/`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Get quotes by category
+   * @param {string} category - Quote category
+   * @returns {object} { success: bool, quotes: array }
+   */
   async getQuotesByCategory(category) {
-    console.log('[API] 💬 Fetching quotes by category:', category);
     const res = await fetch(`${API_URL}/api/quotes/?category=${category}`, {
       headers: { 'Content-Type': 'application/json' }
     });
     return parseOrThrow(res);
   },
 
+  /**
+   * Create achievement (admin only)
+   * @param {object} achievementData - { title, description, category, icon, order }
+   * @returns {object} Created achievement details
+   */
   async createAchievement(achievementData) {
-    console.log('[API] 🏆 Creating achievement');
     const res = await fetch(`${API_URL}/api/achievements/`, {
       method: 'POST',
       headers: {
@@ -434,8 +479,13 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Update achievement (admin only)
+   * @param {number} achievementId - Achievement ID
+   * @param {object} updateData - Fields to update
+   * @returns {object} Updated achievement details
+   */
   async updateAchievement(achievementId, updateData) {
-    console.log('[API] ✏️ Updating achievement:', achievementId);
     const res = await fetch(`${API_URL}/api/achievements/${achievementId}/`, {
       method: 'PUT',
       headers: {
@@ -447,8 +497,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Delete achievement (admin only)
+   * @param {number} achievementId - Achievement ID
+   * @returns {object} Deletion confirmation
+   */
   async deleteAchievement(achievementId) {
-    console.log('[API] 🗑️ Deleting achievement:', achievementId);
     const res = await fetch(`${API_URL}/api/achievements/${achievementId}/`, {
       method: 'DELETE',
       headers: authHeaders()
@@ -456,8 +510,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Create team member (admin only)
+   * @param {object} memberData - { name, title, quote, achievement, image, gender, category, order }
+   * @returns {object} Created member details
+   */
   async createTeamMember(memberData) {
-    console.log('[API] 👤 Creating team member');
     const res = await fetch(`${API_URL}/api/team/`, {
       method: 'POST',
       headers: {
@@ -469,8 +527,13 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Update team member (admin only)
+   * @param {number} memberId - Team member ID
+   * @param {object} updateData - Fields to update
+   * @returns {object} Updated member details
+   */
   async updateTeamMember(memberId, updateData) {
-    console.log('[API] ✏️ Updating team member:', memberId);
     const res = await fetch(`${API_URL}/api/team/${memberId}/`, {
       method: 'PUT',
       headers: {
@@ -482,8 +545,12 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  /**
+   * Delete team member (admin only)
+   * @param {number} memberId - Team member ID
+   * @returns {object} Deletion confirmation
+   */
   async deleteTeamMember(memberId) {
-    console.log('[API] 🗑️ Deleting team member:', memberId);
     const res = await fetch(`${API_URL}/api/team/${memberId}/`, {
       method: 'DELETE',
       headers: authHeaders()
@@ -494,46 +561,30 @@ export const api = {
   // ========== PAYMENT ENDPOINTS ==========
 
   async createPaymentIntent(courseId, amount) {
-    console.log('[API] 💰 Creating payment intent - Course:', courseId, 'Amount:', amount);
     const res = await fetch(`${API_URL}/api/payments/create-intent/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...authHeaders()  // ✅ CRITICAL: Auth header included
+        ...authHeaders()
       },
       body: JSON.stringify({ course_id: courseId, amount })
     });
-    const data = await parseOrThrow(res);
-    console.log('[API] ✅ Payment intent created:', data);
-    return data;
+    return parseOrThrow(res);
   },
 
-  // ✅ FIXED: Now accepts and sends billing information
-  async verifyPayment(paymentId, nonce, billingInfo = {}) {
-    console.log('[API] 🔐 Verifying payment - PaymentId:', paymentId);
-    const requestBody = {
-      payment_id: paymentId,
-      nonce,
-      billing_postal_code: billingInfo.billingPostalCode || '',
-      billing_country: billingInfo.billingCountry || ''
-    };
-    console.log('[API] Request body:', requestBody);
-
+  async verifyPayment(paymentId, nonce) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...authHeaders()  // ✅ CRITICAL: Auth header included
+        ...authHeaders()
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({ payment_id: paymentId, nonce })
     });
-    const data = await parseOrThrow(res);
-    console.log('[API] ✅ Payment verified:', data);
-    return data;
+    return parseOrThrow(res);
   },
 
   async getPaymentStatus(paymentId) {
-    console.log('[API] 📊 Getting payment status:', paymentId);
     const res = await fetch(`${API_URL}/api/payments/${paymentId}/`, {
       headers: authHeaders()
     });
@@ -543,7 +594,6 @@ export const api = {
   // ========== CONTACT ENDPOINTS ==========
 
   async submitContactForm(formData) {
-    console.log('[API] 📧 Submitting contact form');
     const res = await fetch(`${API_URL}/api/contact/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -555,12 +605,13 @@ export const api = {
   // ========== TEAM ENDPOINTS ==========
 
   async getTeam() {
-    console.log('[API] 👥 Fetching team (alias for getTeamMembers)');
-    return this.getTeamMembers();
+    const res = await fetch(`${API_URL}/api/team/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
   },
 
   async getTeamMember(memberId) {
-    console.log('[API] 👤 Getting team member:', memberId);
     const res = await fetch(`${API_URL}/api/team/${memberId}/`, {
       headers: { 'Content-Type': 'application/json' }
     });
@@ -570,7 +621,6 @@ export const api = {
   // ========== PROJECTS ENDPOINTS ==========
 
   async getProjects() {
-    console.log('[API] 📁 Fetching projects');
     const res = await fetch(`${API_URL}/api/projects/`, {
       headers: authHeaders()
     });
@@ -578,7 +628,6 @@ export const api = {
   },
 
   async getProject(projectId) {
-    console.log('[API] 📄 Getting project:', projectId);
     const res = await fetch(`${API_URL}/api/projects/${projectId}/`, {
       headers: authHeaders()
     });
