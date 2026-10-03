@@ -14,7 +14,7 @@ const FamousQuotesPage = () => {
       title: "Stability AI Founder",
       category: "tech-ceos",
       icon: "🤖",
-      image: "/images/emad-mostaque.jpg"
+      image: "https://content.fortune.com/wp-content/uploads/2023/05/52547687473_698f4dbe7c_o-e1684073804720.jpg?w=1440&q=75"
     },
     {
       id: 102,
@@ -23,7 +23,7 @@ const FamousQuotesPage = () => {
       title: "CEO of Alphabet",
       category: "tech-ceos",
       icon: "🧠",
-      image: "/images/sundar-pichai.jpg"
+      image: "https://tse1.mm.bing.net/th/id/OIP.9D6fSQ-6W2BJpEdH6AJWewHaE8?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     },
     {
       id: 103,
@@ -32,7 +32,7 @@ const FamousQuotesPage = () => {
       title: "Chairman Emeritus of Cisco & CEO of JC2 Ventures",
       category: "tech-ceos",
       icon: "⚡",
-      image: "/images/john-chambers.jpg"
+      image: "https://tse2.mm.bing.net/th/id/OIP.YKfG5VdmsbuxAkHl-4Q4awHaJQ?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     },
     {
       id: 104,
@@ -41,7 +41,7 @@ const FamousQuotesPage = () => {
       title: "Nvidia CEO and Co-founder",
       category: "tech-ceos",
       icon: "💼",
-      image: "/images/jensen-huang.jpg"
+      image: "https://tse4.mm.bing.net/th/id/OIP.1D8lfQlpBPQvHqXg-iAYhAHaFj?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     },
     {
       id: 105,
@@ -50,7 +50,7 @@ const FamousQuotesPage = () => {
       title: "Co-founder of Microsoft",
       category: "tech-ceos",
       icon: "🌐",
-      image: "/images/bill-gates.jpg"
+      image: "https://th.bing.com/th/id/R.84581c066095e193013f502301b6f839?rik=h6pCbb50tRPbMg&pid=ImgRaw&r=0"
     },
     {
       id: 106,
@@ -59,7 +59,7 @@ const FamousQuotesPage = () => {
       title: "Founder of Amazon",
       category: "tech-ceos",
       icon: "🎯",
-      image: "/images/jeff-bezos.jpg"
+      image: "https://wallpapers.com/images/hd/jeff-bezos-smiling-bdb8zimqljhfcpu3.jpg"
     },
     {
       id: 107,
@@ -68,7 +68,7 @@ const FamousQuotesPage = () => {
       title: "CEO of Tesla & SpaceX",
       category: "tech-ceos",
       icon: "🚀",
-      image: "/images/elon-musk.jpg"
+      image: "https://tse3.mm.bing.net/th/id/OIP.dRbbHZfiHfsyqSv2MfqIgwHaJu?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     },
     {
       id: 108,
@@ -77,7 +77,7 @@ const FamousQuotesPage = () => {
       title: "Fashion Entrepreneur & Founder",
       category: "tech-ceos",
       icon: "✨",
-      image: "/images/tory-burch.jpg"
+      image: "https://tse4.mm.bing.net/th/id/OIP._PFzMHJJbDF_jDZdTEMbzwHaKE?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"
     },
     // Original Quotes
 
