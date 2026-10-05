@@ -74,16 +74,16 @@ const Navigation = () => {
             {servicesDropdown && (
               <div className="dropdown-menu">
                 <Link to="/services/website" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  🌐 Website Development
+                  <img src={logo} alt="" className="dropdown-icon" /> Website Development
                 </Link>
                 <Link to="/services/applications" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  📱 App Development
+                  <img src={logo} alt="" className="dropdown-icon" /> App Development
                 </Link>
                 <Link to="/services/consultation" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  💡 Tech Consultation
+                  <img src={logo} alt="" className="dropdown-icon" /> Tech Consultation
                 </Link>
                 <Link to="/services/premium" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  👑 Premium Services
+                  <img src={logo} alt="" className="dropdown-icon" /> Premium Services
                 </Link>
               </div>
             )}
