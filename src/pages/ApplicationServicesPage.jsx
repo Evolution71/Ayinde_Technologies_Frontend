@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.svg';
 
 const ApplicationServicesPage = () => {
   const navigate = useNavigate();
@@ -168,7 +169,9 @@ const ApplicationServicesPage = () => {
       transform: selectedTier === tierKey ? 'translateY(-5px)' : 'translateY(0)'
     }}
     onClick={() => setSelectedTier(tierKey)}>
-      <div style={{ fontSize: '32px', marginBottom: '10px' }}>{tier.icon}</div>
+      <div style={{ marginBottom: '10px' }}>
+        <img src={logo} alt="Ayinde Technologies" style={{ height: '40px', width: 'auto' }} />
+      </div>
       <h3 style={{ color: tier.color, marginBottom: '8px' }}>{tier.name}</h3>
       <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>{tier.description}</p>
 
