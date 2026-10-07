@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthForms from '../components/AuthForms';
 
 /**
- * Login Page - Renders the AuthForms modal with login/register tabs
+ * Login Page - Renders the AuthForms modals with login/register tabs
  */
 const Login = () => {
   const navigate = useNavigate();
