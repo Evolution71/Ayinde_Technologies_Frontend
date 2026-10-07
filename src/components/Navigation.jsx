@@ -69,7 +69,7 @@ const Navigation = () => {
               onClick={(e) => handleDropdownToggle(e, 'services')}
               aria-expanded={servicesDropdown}
               aria-label="Services submenu">
-              Services ▼
+              🌐 Services ▼
             </button>
             {servicesDropdown && (
               <div className="dropdown-menu">
@@ -103,7 +103,7 @@ const Navigation = () => {
             {coursesDropdown && (
               <div className="dropdown-menu">
                 <Link to="/courses" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  Browse All Courses
+                  📖 Browse All Courses
                 </Link>
                 <Link to="/achievements" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   🏆 Achievements

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.svg';
 
 const ConsultationServicesPage = () => {
   const navigate = useNavigate();
@@ -116,8 +115,8 @@ const ConsultationServicesPage = () => {
       transform: selectedPackage === packageKey ? 'translateY(-5px)' : 'translateY(0)'
     }}
     onClick={() => setSelectedPackage(packageKey)}>
-      <div style={{ marginBottom: '10px' }}>
-        <img src={logo} alt="Ayinde Technologies" style={{ height: '40px', width: 'auto' }} />
+      <div style={{ marginBottom: '10px', fontSize: '40px' }}>
+        {pkg.icon}
       </div>
       <h3 style={{ color: pkg.color, marginBottom: '8px' }}>{pkg.name}</h3>
       <p style={{ color: '#666', fontSize: '13px', marginBottom: '20px' }}>{pkg.description}</p>

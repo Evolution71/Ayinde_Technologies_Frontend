@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.svg';
 
 const PremiumServicesPage = () => {
   const navigate = useNavigate();
@@ -325,8 +324,8 @@ const PremiumServicesPage = () => {
           marginBottom: '60px'
         }}>
           <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-            <div style={{ marginBottom: '15px' }}>
-              <img src={logo} alt="Ayinde Technologies" style={{ height: '50px', width: 'auto' }} />
+            <div style={{ marginBottom: '15px', fontSize: '50px' }}>
+              {tiers.supreme.icon}
             </div>
             <h2 style={{ fontSize: '32px', fontWeight: 'bold', color: tiers.supreme.color, marginBottom: '10px' }}>
               Supreme VIP Platinum

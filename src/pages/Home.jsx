@@ -64,6 +64,33 @@ const Home = () => {
     fetchTeam();
   }, []);
 
+  // Load NextivaCX widget
+  useEffect(() => {
+    // Load the NextivaCX widget script
+    const script = document.createElement('script');
+    script.src = 'https://cdn.nextiva.com/widget.js';
+    script.async = true;
+    script.onload = () => {
+      // Initialize NextivaCX widget with your widget ID
+      // Replace 'YOUR_WIDGET_ID' with the actual widget ID from your email
+      if (window.NextivaCX) {
+        window.NextivaCX.init({
+          widgetId: 'YOUR_WIDGET_ID', // Get this from support@ayindetechnologies.com email
+          position: 'bottom-right',
+          theme: 'light'
+        });
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup: remove script if component unmounts
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, []);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       {/* ========== HERO SECTION ========== */}
@@ -528,13 +555,79 @@ const Home = () => {
       </div>
 
       {/* ========== FOOTER ========== */}
-      <div style={{ backgroundColor: '#1e40af', color: 'white', padding: '40px', textAlign: 'center', marginTop: '60px' }}>
-        <h3 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
-          Ayinde Technologies
-        </h3>
-        <p style={{ marginBottom: '10px' }}>
-          Building practical digital solutions for businesses ready to grow.
-        </p>
+      <div style={{ backgroundColor: '#1e40af', color: 'white', padding: '40px', marginTop: '60px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '40px' }}>
+          {/* Company Info */}
+          <div>
+            <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
+              Ayinde Technologies
+            </h3>
+            <p style={{ opacity: 0.9, lineHeight: '1.6' }}>
+              Building practical digital solutions for businesses ready to grow.
+            </p>
+            <p style={{ marginTop: '10px', opacity: 0.8, fontSize: '13px' }}>
+              Company ID: 4346238
+            </p>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#fbbf24' }}>
+              Contact Us
+            </h4>
+            <p style={{ marginBottom: '8px' }}>
+              📞 <strong>(949) 662-7869</strong>
+            </p>
+            <p style={{ marginBottom: '8px' }}>
+              📧 <strong>support@ayindetechnologies.com</strong>
+            </p>
+            <p style={{ marginBottom: '8px' }}>
+              🏢 <strong>Delaware, USA</strong>
+            </p>
+            <p style={{ marginBottom: '0' }}>
+              📍 <strong>1-302-208-4855</strong>
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#fbbf24' }}>
+              Quick Links
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#services" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                  🌐 Services
+                </a>
+              </li>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#team" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                  👥 Our Team
+                </a>
+              </li>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#contact" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                  📝 Contact
+                </a>
+              </li>
+              <li>
+                <a href="/courses" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                  📖 Courses
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Footer */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '20px', textAlign: 'center', opacity: 0.8, fontSize: '13px' }}>
+          <p style={{ margin: 0 }}>
+            © 2026 Ayinde Technologies Limited. All rights reserved.
+          </p>
+          <p style={{ margin: '8px 0 0 0' }}>
+            🔒 Trusted by businesses across the globe to deliver technology that works.
+          </p>
+        </div>
       </div>
     </div>
   );
