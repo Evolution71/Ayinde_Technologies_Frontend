@@ -1,243 +1,256 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import aboutIllustration from '../assets/about-illustration.svg';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.svg';
 
-export default function About() {
-  const [isVisible, setIsVisible] = useState(false);
+const Navigation = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [coursesDropdown, setCoursesDropdown] = useState(false);
+  const [servicesDropdown, setServicesDropdown] = useState(false);
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const onHome = location.pathname === '/';
 
-  useEffect(() => {
-    setIsVisible(true);
+  const sectionHref = (hash) => (onHome ? hash : `/${hash}`);
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.nav-dropdown')) {
+        setServicesDropdown(false);
+        setCoursesDropdown(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // Close dropdowns when navigating
+  React.useEffect(() => {
+    setServicesDropdown(false);
+    setCoursesDropdown(false);
+  }, [location]);
+
+  const handleDropdownToggle = (e, dropdownType) => {
+    e.preventDefault();
+    if (dropdownType === 'services') {
+      setServicesDropdown(!servicesDropdown);
+      setCoursesDropdown(false);
+    } else if (dropdownType === 'courses') {
+      setCoursesDropdown(!coursesDropdown);
+      setServicesDropdown(false);
+    }
+  };
+
+  const handleDropdownSelect = (callback) => {
+    callback();
+    setServicesDropdown(false);
+    setCoursesDropdown(false);
+    setIsOpen(false);
+  };
+
   return (
-    <>
+    <nav className="navbar">
+      <div className="nav-container">
+        <Link to="/" className="nav-logo">
+          <img src={logo} alt="Ayinde Technologies" className="nav-logo-img" />
+        </Link>
+        <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
+          <Link to="/" className="nav-link nav-home" onClick={() => setIsOpen(false)}>
+            Home
+          </Link>
+
+          {/* Services Dropdown */}
+          <div className={`nav-dropdown ${servicesDropdown ? 'active' : ''}`}
+            onMouseEnter={() => setServicesDropdown(true)}
+            onMouseLeave={() => setServicesDropdown(false)}>
+            <button
+              className="nav-link dropdown-toggle"
+              onClick={(e) => handleDropdownToggle(e, 'services')}
+              aria-expanded={servicesDropdown}
+              aria-label="Services submenu">
+              🌐 Services ▼
+            </button>
+            {servicesDropdown && (
+              <div className="dropdown-menu services-menu">
+                <Link to="/services/website" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">🌐</span>
+                  <span className="item-text">Website Development</span>
+                </Link>
+                <Link to="/services/applications" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">📱</span>
+                  <span className="item-text">App Development</span>
+                </Link>
+                <Link to="/services/consultation" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">💬</span>
+                  <span className="item-text">Tech Consultation</span>
+                </Link>
+                <Link to="/services/premium" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">👑</span>
+                  <span className="item-text">Premium Services</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Courses Dropdown */}
+          <div className={`nav-dropdown ${coursesDropdown ? 'active' : ''}`}
+            onMouseEnter={() => setCoursesDropdown(true)}
+            onMouseLeave={() => setCoursesDropdown(false)}>
+            <button
+              className="nav-link dropdown-toggle"
+              onClick={(e) => handleDropdownToggle(e, 'courses')}
+              aria-expanded={coursesDropdown}
+              aria-label="Courses submenu">
+              📖 Courses ▼
+            </button>
+            {coursesDropdown && (
+              <div className="dropdown-menu courses-menu">
+                <Link to="/courses" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">📖</span>
+                  <span className="item-text">Browse All Courses</span>
+                </Link>
+                <Link to="/achievements" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">🏆</span>
+                  <span className="item-text">Achievements</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <Link to="/about" className="nav-link" onClick={() => setIsOpen(false)}>
+            About Us
+          </Link>
+
+          <Link to="/quotes" className="nav-link" onClick={() => setIsOpen(false)}>
+            💬 Quotes
+          </Link>
+
+          <a href={sectionHref('#team')} className="nav-link" onClick={() => setIsOpen(false)}>
+            Team
+          </a>
+
+          <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>
+            Contact
+          </a>
+
+          {user ? (
+            <span className="nav-user">
+              Hi, {user.first_name} · <button className="link-btn" onClick={logout}>Log out</button>
+            </span>
+          ) : (
+            <Link to="/login" className="nav-link" onClick={() => setIsOpen(false)}>
+              Log in
+            </Link>
+          )}
+        </div>
+
+        <button
+          className="hamburger"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle menu"
+        >
+          ☰
+        </button>
+      </div>
+
       <style>{`
-        .page-header {
-          background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #182d52 100%);
-          color: white;
-          padding: 80px 20px;
-          text-align: center;
-          position: relative;
-          overflow: hidden;
-          animation: fadeInDown 0.8s ease-out;
-        }
-
-        @keyframes fadeInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .page-header::before {
-          content: '';
-          position: absolute;
+        .navbar {
+          background: linear-gradient(135deg, rgba(30, 64, 175, 0.98) 0%, rgba(25, 51, 140, 0.98) 100%);
+          backdrop-filter: blur(10px);
+          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+          position: sticky;
           top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background:
-            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.2) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(191, 144, 0, 0.1) 0%, transparent 50%);
-          pointer-events: none;
+          z-index: 999;
+          transition: all 0.3s ease;
         }
 
-        .page-header h1 {
-          position: relative;
-          z-index: 1;
-          font-size: 2.5rem;
-          line-height: 1.2;
-          margin: 20px 0;
-          animation: fadeInUp 0.8s ease-out 0.2s both;
-        }
-
-        .page-eyebrow {
-          color: #fbbf24;
-          font-weight: 600;
-          font-size: 14px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          animation: fadeInUp 0.8s ease-out 0.1s both;
-        }
-
-        .page-header-sub {
-          position: relative;
-          z-index: 1;
-          font-size: 18px;
-          opacity: 0.95;
-          max-width: 600px;
-          margin: 20px auto;
-          line-height: 1.6;
-          animation: fadeInUp 0.8s ease-out 0.3s both;
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .about-story {
-          padding: 80px 20px;
-          background: #f9fafb;
-        }
-
-        .about-story-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 60px;
-          align-items: center;
-        }
-
-        .about-story > div > div > div {
-          animation: slideInLeft 0.8s ease-out;
-        }
-
-        @keyframes slideInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .about-illustration {
-          animation: slideInRight 0.8s ease-out;
+        .nav-logo-img {
           transition: transform 0.3s ease;
         }
 
-        .about-illustration:hover {
-          transform: scale(1.02);
+        .nav-logo:hover .nav-logo-img {
+          transform: scale(1.05);
         }
 
-        @keyframes slideInRight {
-          from {
-            opacity: 0;
-            transform: translateX(40px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        .section-eyebrow {
-          color: #1e40af;
-          font-weight: 600;
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin-bottom: 10px;
-        }
-
-        .about-story h2 {
-          font-size: 2rem;
-          color: #1f2937;
-          margin-bottom: 20px;
-          line-height: 1.3;
-        }
-
-        .about-story p {
-          color: #6b7280;
-          font-size: 16px;
-          line-height: 1.8;
-          margin-bottom: 20px;
-        }
-
-        .about-mission {
-          background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-          color: white;
-          padding: 100px 20px;
-          text-align: center;
-          position: relative;
-          overflow: hidden;
-          animation: fadeIn 1s ease-out;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        .mission-eyebrow {
-          color: #fbbf24;
-          font-weight: 600;
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          margin-bottom: 20px;
-        }
-
-        .mission-statement {
-          font-size: 3rem;
-          font-weight: 700;
-          line-height: 1.2;
-          margin: 0;
-          animation: zoomIn 0.8s ease-out;
-        }
-
-        @keyframes zoomIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-
-        .about-values {
-          padding: 80px 20px;
-          background: white;
-        }
-
-        .section-title {
-          text-align: center;
-          font-size: 2.5rem;
-          color: #1f2937;
-          margin-bottom: 60px;
-          animation: fadeInUp 0.8s ease-out;
-        }
-
-        .values-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 40px;
-        }
-
-        .value-card {
-          background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
-          padding: 40px;
-          border-radius: 12px;
-          border: 1px solid #e5e7eb;
+        .nav-link {
           transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          animation: slideUp 0.6s ease-out both;
           position: relative;
-          overflow: hidden;
         }
 
-        .value-card:nth-child(1) { animation-delay: 0.1s; }
-        .value-card:nth-child(2) { animation-delay: 0.2s; }
-        .value-card:nth-child(3) { animation-delay: 0.3s; }
-        .value-card:nth-child(4) { animation-delay: 0.4s; }
+        .nav-link:hover {
+          color: #fbbf24;
+          transform: translateY(-2px);
+        }
 
-        @keyframes slideUp {
+        .nav-link::after {
+          content: '';
+          position: absolute;
+          width: 0;
+          height: 2px;
+          bottom: -5px;
+          left: 0;
+          background: linear-gradient(90deg, #fbbf24, #f59e0b);
+          transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .nav-link:hover::after {
+          width: 100%;
+        }
+
+        .contact-btn {
+          background: linear-gradient(135deg, #ff6b35, #ff8c42);
+          padding: 8px 20px !important;
+          border-radius: 20px;
+          color: white !important;
+          box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+          transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+          box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
+          transform: translateY(-3px);
+        }
+
+        .nav-dropdown {
+          position: relative;
+          display: inline-block;
+        }
+
+        .dropdown-toggle {
+          background: none;
+          border: none;
+          padding: 0;
+          cursor: pointer;
+          font-size: inherit;
+          font-family: inherit;
+          color: inherit;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: white;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          min-width: 220px;
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+          z-index: 1000;
+          padding: 8px 0;
+          margin-top: 10px;
+          animation: slideDownMenu 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          backdrop-filter: blur(20px);
+        }
+
+        @keyframes slideDownMenu {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(-15px);
           }
           to {
             opacity: 1;
@@ -245,243 +258,114 @@ export default function About() {
           }
         }
 
-        .value-card::before {
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 20px;
+          color: #1f2937;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .dropdown-item::before {
           content: '';
           position: absolute;
-          top: 0;
           left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #fbbf24, #ff6b35);
-          transform: scaleX(0);
-          transition: transform 0.4s ease;
-          transform-origin: left;
+          top: 0;
+          height: 100%;
+          width: 4px;
+          background: linear-gradient(180deg, #fbbf24, #ff6b35);
+          transform: scaleY(0);
+          transition: transform 0.3s ease;
+          transform-origin: center;
         }
 
-        .value-card:hover::before {
-          transform: scaleX(1);
+        .dropdown-item:hover {
+          background: linear-gradient(90deg, #f3f4f6, #ffffff);
+          padding-left: 24px;
         }
 
-        .value-card:hover {
-          box-shadow: 0 20px 50px rgba(30, 64, 175, 0.15);
-          border-color: #fbbf24;
-          transform: translateY(-8px);
+        .dropdown-item:hover::before {
+          transform: scaleY(1);
         }
 
-        .value-card h3 {
-          color: #1e40af;
-          font-size: 20px;
-          margin-bottom: 15px;
-          transition: color 0.3s ease;
-        }
-
-        .value-card:hover h3 {
-          color: #ff6b35;
-        }
-
-        .value-card p {
-          color: #6b7280;
-          line-height: 1.7;
-          margin: 0;
-        }
-
-        .about-location {
-          padding: 80px 20px;
-          background: #f9fafb;
-        }
-
-        .about-location-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 60px;
-          align-items: center;
-        }
-
-        .about-location address {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          border-left: 4px solid #1e40af;
-          margin: 20px 0;
-          font-style: normal;
-          line-height: 1.8;
-          color: #1f2937;
-          font-weight: 500;
-        }
-
-        .about-location a {
-          color: #1e40af;
-          text-decoration: none;
-          font-weight: 600;
-          transition: all 0.3s ease;
+        .item-icon {
+          font-size: 18px;
           display: inline-block;
+          transition: transform 0.3s ease;
         }
 
-        .about-location a:hover {
-          color: #ff6b35;
-          transform: translateX(5px);
+        .dropdown-item:hover .item-icon {
+          transform: scale(1.2) rotate(5deg);
         }
 
-        .about-cta-card {
-          background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
-          color: white;
-          padding: 50px;
-          border-radius: 12px;
-          text-align: center;
-          box-shadow: 0 20px 50px rgba(30, 64, 175, 0.2);
-          animation: slideInRight 0.8s ease-out;
+        .item-text {
+          flex: 1;
         }
 
-        .about-cta-card h3 {
-          font-size: 24px;
-          margin-bottom: 15px;
-        }
-
-        .about-cta-card p {
-          color: rgba(255, 255, 255, 0.9);
-          margin-bottom: 30px;
-          line-height: 1.6;
-        }
-
-        .btn {
-          display: inline-block;
-          padding: 14px 40px;
-          border-radius: 8px;
-          text-decoration: none;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          cursor: pointer;
+        .hamburger {
+          background: none;
           border: none;
-          font-size: 16px;
-        }
-
-        .btn-primary {
-          background: linear-gradient(135deg, #fbbf24, #ff6b35);
           color: white;
-          box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+          font-size: 28px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: none;
         }
 
-        .btn-primary:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 12px 30px rgba(255, 107, 53, 0.5);
+        .hamburger:hover {
+          transform: rotate(90deg);
         }
 
         @media (max-width: 768px) {
-          .page-header h1 {
-            font-size: 1.8rem;
+          .hamburger {
+            display: block;
           }
 
-          .about-story-grid,
-          .about-location-grid {
-            grid-template-columns: 1fr;
-            gap: 40px;
+          .dropdown-menu {
+            position: static;
+            display: none;
+            box-shadow: none;
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+            margin-top: 0;
+            border-radius: 0;
+            animation: slideInMobile 0.3s ease;
           }
 
-          .mission-statement {
-            font-size: 2rem;
+          @keyframes slideInMobile {
+            from {
+              opacity: 0;
+              max-height: 0;
+            }
+            to {
+              opacity: 1;
+              max-height: 500px;
+            }
           }
 
-          .values-grid {
-            grid-template-columns: 1fr;
+          .nav-dropdown.active .dropdown-menu {
+            display: block;
           }
 
-          .about-cta-card {
-            padding: 30px;
+          .dropdown-item {
+            padding: 15px 20px;
+            font-size: 15px;
+          }
+
+          .dropdown-item:hover {
+            padding-left: 20px;
           }
         }
       `}</style>
-
-      <section className="page-header">
-        <div className="container">
-          <p className="page-eyebrow">About Ayinde Technologies</p>
-          <h1>We guide, build, and stay hands-on until it's actually running.</h1>
-          <p className="page-header-sub">
-            A technology partner for businesses that want more than a delivered product —
-            a plan that made sense before anything was built, and support after launch.
-          </p>
-        </div>
-      </section>
-
-      <section className="about-story">
-        <div className="container about-story-grid">
-          <div>
-            <p className="section-eyebrow">Our story</p>
-            <h2>Built around one idea: technology should follow a plan, not replace one.</h2>
-            <p>
-              Ayinde Technologies started from a simple observation: most businesses don't fail
-              at technology because the code is bad they fail because the app, website, or AI
-              feature they paid for was never the right thing to build in the first place.
-            </p>
-            <p>
-              So we work in three stages instead of one. We guide sitting down with a business,
-              marketing, or proposal plan before touching a keyboard. We build AI applications
-              and websites, from a first working version through to something production-ready.
-              And we implement — staying involved through rollout, so the team that has to run
-              the thing we built actually can.
-            </p>
-            <p>
-              We're also a straightforward consulting practice for teams that need the strategy
-              conversation on its own, without a build attached to it.
-            </p>
-          </div>
-          <img src={aboutIllustration} alt="" className="about-illustration" />
-        </div>
-      </section>
-
-      <section className="about-mission">
-        <div className="container">
-          <p className="mission-eyebrow">Our mission</p>
-          <p className="mission-statement">"To provide businesses all their technology needs."</p>
-        </div>
-      </section>
-
-      <section className="about-values">
-        <div className="container">
-          <h2 className="section-title">How we work</h2>
-          <div className="values-grid">
-            <div className="value-card">
-              <h3>📋 Plan first</h3>
-              <p>We'd rather spend a week on the right plan than a month building the wrong product.</p>
-            </div>
-            <div className="value-card">
-              <h3>🤝 Stay hands-on</h3>
-              <p>Delivery isn't the finish line - we stick around through rollout and adoption.</p>
-            </div>
-            <div className="value-card">
-              <h3>📚 Teach as we go</h3>
-              <p>Through our tutoring courses, we help teams build the skills to maintain what we hand off.</p>
-            </div>
-            <div className="value-card">
-              <h3>💬 Be straightforward</h3>
-              <p>Clear proposals, clear pricing, clear next steps — no jargon standing in for a plan.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="about-location">
-        <div className="container about-location-grid">
-          <div>
-            <p className="section-eyebrow">Where we are</p>
-            <h2>Based in Delaware, USA.</h2>
-            <p>
-              We're a US-based team working with clients locally and internationally, with hours
-              that overlap US Eastern and Pacific time zones.
-            </p>
-            <address>
-              📍 Delaware, USA<br />
-              Company ID: 4346238
-            </address>
-            <p><a href="tel:+13022084855">📞 1-302-208-4855</a></p>
-            <p><a href="mailto:support@ayindetechnologies.com">📧 support@ayindetechnologies.com</a></p>
-          </div>
-          <div className="about-cta-card">
-            <h3>Have a project in mind?</h3>
-            <p>Tell us what you're building — we'll tell you honestly whether it's ready to build yet.</p>
-            <Link to="/#contact" className="btn btn-primary">Start a conversation</Link>
-          </div>
-        </div>
-      </section>
-    </>
+    </nav>
   );
-}
+};
+
+export default Navigation;
