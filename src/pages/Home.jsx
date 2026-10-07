@@ -64,23 +64,12 @@ const Home = () => {
     fetchTeam();
   }, []);
 
-  // Load NextivaCX widget
+  // Load NextivaCX widget - Insert before closing body tag
   useEffect(() => {
-    // Load the NextivaCX widget script
+    // Add NextivaCX widget script
     const script = document.createElement('script');
-    script.src = 'https://cdn.nextiva.com/widget.js';
-    script.async = true;
-    script.onload = () => {
-      // Initialize NextivaCX widget with your widget ID
-      // Replace 'YOUR_WIDGET_ID' with the actual widget ID from your email
-      if (window.NextivaCX) {
-        window.NextivaCX.init({
-          widgetId: 'YOUR_WIDGET_ID', // Get this from support@ayindetechnologies.com email
-          position: 'bottom-right',
-          theme: 'light'
-        });
-      }
-    };
+    script.id = 'nextivacx-code-snippet';
+    script.src = 'https://d3po7etsbw5eiv.cloudfront.net/Simplify360Chat.js?key=NmFjNTAyYTgxODk3OWMxODM2NjllNzY0fDQzNDYyMzg=';
     document.body.appendChild(script);
 
     return () => {
@@ -576,16 +565,18 @@ const Home = () => {
               Contact Us
             </h4>
             <p style={{ marginBottom: '8px' }}>
-              📞 <strong>(949) 662-7869</strong>
+              📞 <strong>Albert Cabrera: +1 949-662-7869</strong>
+            </p>
+            <p style={{ marginBottom: '8px' }}>
+              🔐 <strong>PIN: 0909</strong>
             </p>
             <p style={{ marginBottom: '8px' }}>
               📧 <strong>support@ayindetechnologies.com</strong>
             </p>
-            <p style={{ marginBottom: '8px' }}>
-              🏢 <strong>Delaware, USA</strong>
-            </p>
-            <p style={{ marginBottom: '0' }}>
-              📍 <strong>1-302-208-4855</strong>
+            <p style={{ marginBottom: '0', fontSize: '12px', opacity: 0.9 }}>
+              📍 <strong>Delaware:</strong><br/>
+              1-302-208-4855<br/>
+              Company ID: 4346238
             </p>
           </div>
 
