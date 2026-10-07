@@ -575,8 +575,7 @@ const Home = () => {
             </p>
             <p style={{ marginBottom: '0', fontSize: '12px', opacity: 0.9 }}>
               📍 <strong>Delaware:</strong><br/>
-              1-302-208-4855<br/>
-              Company ID: 4346238
+              1-302-208-4855
             </p>
           </div>
 
