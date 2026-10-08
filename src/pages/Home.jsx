@@ -72,10 +72,67 @@ const Home = () => {
     script.src = 'https://d3po7etsbw5eiv.cloudfront.net/Simplify360Chat.js?key=NmFjNTAyYTgxODk3OWMxODM2NjllNzY0fDQzNDYyMzg=';
     document.body.appendChild(script);
 
+    // Add CSS styling for the chat widget
+    const style = document.createElement('style');
+    style.innerHTML = `
+      /* NextivaCX Chat Widget Styling */
+      .s360-frame,
+      .s360-launcher,
+      .s360-chat-widget,
+      [class*="s360"],
+      iframe[src*="simplify360"],
+      [class*="chat-widget"],
+      [class*="conversation"] {
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      /* Blinking animation */
+      @keyframes blinkUp {
+        0%, 100% {
+          transform: translateY(0px);
+          opacity: 0.95;
+          box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+        }
+        50% {
+          transform: translateY(-8px);
+          opacity: 1;
+          box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6);
+        }
+      }
+
+      /* Apply animation to chat widget */
+      .s360-frame,
+      .s360-launcher,
+      [class*="s360"],
+      iframe[src*="simplify360"] {
+        animation: blinkUp 2s ease-in-out infinite !important;
+      }
+
+      /* Enhance visibility of text inside widget */
+      .s360-frame *,
+      .s360-launcher *,
+      [class*="s360"] * {
+        color: #ffffff !important;
+        font-weight: 600 !important;
+      }
+
+      /* Background color for better contrast */
+      .s360-frame,
+      [class*="s360"] {
+        background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%) !important;
+        border: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
     return () => {
       // Cleanup: remove script if component unmounts
       if (script.parentNode) {
         script.parentNode.removeChild(script);
+      }
+      if (style.parentNode) {
+        style.parentNode.removeChild(style);
       }
     };
   }, []);
@@ -565,10 +622,7 @@ const Home = () => {
               Contact Us
             </h4>
             <p style={{ marginBottom: '8px' }}>
-              📞 <strong>Albert Cabrera: +1 949-662-7869</strong>
-            </p>
-            <p style={{ marginBottom: '8px' }}>
-              🔐 <strong>PIN: 0909</strong>
+              📞 <strong>Albert Cabrera: +1 302-208-4855</strong>
             </p>
             <p style={{ marginBottom: '8px' }}>
               📧 <strong>support@ayindetechnologies.com</strong>
