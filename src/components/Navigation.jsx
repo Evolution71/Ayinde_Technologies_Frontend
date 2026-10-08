@@ -176,6 +176,8 @@ const Navigation = () => {
         .nav-link {
           transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           position: relative;
+          color: white;
+          font-weight: 700;
         }
 
         .nav-link:hover {
@@ -263,10 +265,10 @@ const Navigation = () => {
           align-items: center;
           gap: 12px;
           padding: 12px 20px;
-          color: #1f2937;
+          color: #0a0e27;
           text-decoration: none;
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 15px;
+          font-weight: 700;
           transition: all 0.2s ease;
           position: relative;
           overflow: hidden;
