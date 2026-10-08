@@ -296,25 +296,144 @@ const Home = () => {
     };
   }, []);
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Hero carousel images (using gradient overlays with icons for now)
+  const heroImages = [
+    {
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+      icon: '🌐'
+    },
+    {
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      icon: '💻'
+    },
+    {
+      gradient: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+      icon: '🚀'
+    }
+  ];
+
+  // Auto-rotate carousel every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       {/* ========== HERO SECTION ========== */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+          background: heroImages[currentImageIndex].gradient,
+          backgroundAttachment: 'fixed',
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
           color: 'white',
           padding: '80px 40px',
-          textAlign: 'center'
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: '500px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          transition: 'background 0.8s ease-in-out'
         }}
       >
-        <h1 style={{ fontSize: '48px', marginBottom: '20px', fontWeight: 'bold' }}>
-          Technology That Helps Your Business Grow
-        </h1>
-        <p style={{ fontSize: '18px', marginBottom: '20px', opacity: 1, maxWidth: '800px', margin: '0 auto 20px' }}>
-          We build websites, software and digital solutions that solve real business problems.
-        </p>
+        {/* Hero Icon Animation */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontSize: '120px',
+            opacity: 0.15,
+            animation: 'float 6s ease-in-out infinite',
+            zIndex: 1
+          }}
+        >
+          {heroImages[currentImageIndex].icon}
+        </div>
 
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        {/* Carousel Navigation Dots */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '40px',
+            display: 'flex',
+            gap: '10px',
+            zIndex: 10
+          }}
+        >
+          {heroImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentImageIndex(index)}
+              style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: index === currentImageIndex ? '#fbbf24' : 'rgba(255, 255, 255, 0.5)',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+            50% { transform: translate(-50%, -50%) translateY(-30px); }
+          }
+
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
+
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <h1 style={{
+            fontSize: '48px',
+            marginBottom: '20px',
+            fontWeight: 'bold',
+            animation: 'slideIn 0.8s ease-out'
+          }}>
+            Technology That Helps Your Business Grow
+          </h1>
+          <p style={{
+            fontSize: '18px',
+            marginBottom: '20px',
+            opacity: 1,
+            maxWidth: '800px',
+            margin: '0 auto 20px',
+            animation: 'slideIn 0.8s ease-out 0.2s both'
+          }}>
+            We build websites, software and digital solutions that solve real business problems.
+          </p>
+
+          <div style={{
+            display: 'flex',
+            gap: '20px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            animation: 'slideIn 0.8s ease-out 0.4s both'
+          }}>
           <button
             onClick={() => navigate('/services')}
             style={{
@@ -345,6 +464,7 @@ const Home = () => {
           >
             View Our Courses
           </button>
+          </div>
         </div>
       </div>
 

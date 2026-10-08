@@ -329,12 +329,17 @@ export default function About() {
         .about-cta-card h3 {
           font-size: 24px;
           margin-bottom: 15px;
+          color: white;
+          font-weight: 800;
+          opacity: 1;
         }
 
         .about-cta-card p {
-          color: rgba(255, 255, 255, 0.9);
+          color: white;
           margin-bottom: 30px;
           line-height: 1.6;
+          font-weight: 500;
+          opacity: 1;
         }
 
         .btn {
@@ -352,12 +357,16 @@ export default function About() {
         .btn-primary {
           background: linear-gradient(135deg, #fbbf24, #ff6b35);
           color: white;
-          box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+          box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 1px;
         }
 
         .btn-primary:hover {
           transform: translateY(-3px);
-          box-shadow: 0 12px 30px rgba(255, 107, 53, 0.5);
+          box-shadow: 0 12px 30px rgba(255, 107, 53, 0.6);
+          background: linear-gradient(135deg, #ff6b35, #ff5722);
         }
 
         @media (max-width: 768px) {

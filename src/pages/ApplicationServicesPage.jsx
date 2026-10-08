@@ -8,6 +8,15 @@ const ApplicationServicesPage = () => {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [showBreakdown, setShowBreakdown] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    appType: '',
+    timeline: ''
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const tiers = {
     starter: {
@@ -96,6 +105,36 @@ const ApplicationServicesPage = () => {
         'White Label Options',
         'Priority Feature Development'
       ]
+    }
+  };
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      console.log('App Development Inquiry:', formData);
+      setFormSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        phone: '',
+        appType: '',
+        timeline: ''
+      });
+      setTimeout(() => setFormSubmitted(false), 5000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -466,6 +505,191 @@ const ApplicationServicesPage = () => {
               <p style={{ color: '#666', lineHeight: '1.6' }}>Real-time insights and performance tracking</p>
             </div>
           </div>
+        </div>
+
+        {/* App Development Inquiry Form */}
+        <div style={{
+          backgroundColor: '#f0f9ff',
+          borderRadius: '12px',
+          padding: '40px',
+          marginTop: '40px'
+        }}>
+          <h2 style={{ marginBottom: '30px', fontSize: '24px', fontWeight: 'bold', color: '#1f2937', textAlign: 'center' }}>
+            Let's Build Your App
+          </h2>
+          <form onSubmit={handleFormSubmit} style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Name <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  required
+                  placeholder="Your name"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Email <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleFormChange}
+                  required
+                  placeholder="your@email.com"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Company
+                </label>
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleFormChange}
+                  placeholder="Your company"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleFormChange}
+                  placeholder="+1 (555) 123-4567"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                What type of app? <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <select
+                name="appType"
+                value={formData.appType}
+                onChange={handleFormChange}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="">Select an option</option>
+                <option value="ios">iOS App</option>
+                <option value="android">Android App</option>
+                <option value="crossplatform">Cross-Platform</option>
+                <option value="webapp">Web App</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                Timeline <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <select
+                name="timeline"
+                value={formData.timeline}
+                onChange={handleFormChange}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="">Select timeline</option>
+                <option value="urgent">Within 2 weeks</option>
+                <option value="month">Within a month</option>
+                <option value="flexible">Flexible timeline</option>
+              </select>
+            </div>
+
+            {formSubmitted && (
+              <div style={{
+                padding: '15px',
+                marginBottom: '20px',
+                backgroundColor: '#d1fae5',
+                color: '#047857',
+                borderRadius: '6px',
+                fontWeight: '600'
+              }}>
+                ✓ Thank you! We'll be in touch soon.
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px',
+                fontSize: '16px',
+                backgroundColor: loading ? '#9ca3af' : '#06b6d4',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {loading ? 'Submitting...' : 'Schedule a Demo'}
+            </button>
+          </form>
         </div>
       </div>
 

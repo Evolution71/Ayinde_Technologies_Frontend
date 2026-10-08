@@ -111,10 +111,11 @@ const Footer = () => {
 
         .footer-section h4 {
           font-size: 16px;
-          font-weight: 700;
+          font-weight: 800;
           margin-bottom: 20px;
           position: relative;
           padding-bottom: 10px;
+          color: #fbbf24 !important;
         }
 
         .footer-section h4::after {
@@ -208,11 +209,15 @@ const Footer = () => {
         }
 
         .footer-bottom {
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
           padding-top: 30px;
-          text-align: center;
           opacity: 1;
           animation: fadeIn 1s ease-out 0.6s both;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
         }
 
         @keyframes fadeIn {
@@ -224,11 +229,69 @@ const Footer = () => {
           margin: 0;
           font-size: 13px;
           transition: all 0.3s ease;
+          opacity: 1;
+          color: white;
         }
 
         .footer-bottom p:hover {
-          opacity: 1;
           color: #fbbf24;
+        }
+
+        .footer-legal {
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+          align-items: center;
+          opacity: 1;
+        }
+
+        .footer-legal a {
+          color: white;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          opacity: 1;
+        }
+
+        .footer-legal a:hover {
+          color: #fbbf24;
+        }
+
+        .footer-legal::before {
+          content: '⚖️';
+          font-size: 16px;
+          color: #fbbf24;
+          margin-right: 10px;
+        }
+
+        .footer-legal-link {
+          color: white !important;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+          opacity: 1;
+        }
+
+        .footer-legal-link:hover {
+          color: #fbbf24 !important;
+        }
+
+        @media (max-width: 768px) {
+          .footer-bottom {
+            flex-direction: column;
+            text-align: center;
+            justify-content: center;
+          }
+
+          .footer-legal {
+            justify-content: center;
+          }
+
+          .social-links {
+            justify-content: center;
+          }
         }
 
         @media (max-width: 768px) {
@@ -294,7 +357,16 @@ const Footer = () => {
         </div>
         <div className="footer-bottom">
           <p>&copy; {currentYear} Ayinde Technologies. All rights reserved.</p>
-          <p>🔒 Trusted by businesses across the globe to deliver technology that works.</p>
+          <div className="footer-legal">
+            <Link to="/privacy" className="footer-legal-link">Privacy Policy</Link>
+            <span style={{ opacity: 0.5 }}>·</span>
+            <Link to="/terms" className="footer-legal-link">Terms of Service</Link>
+          </div>
+          <div className="social-links">
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-icon">in</a>
+            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon">𝕏</a>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="social-icon">f</a>
+          </div>
         </div>
       </div>
     </footer>

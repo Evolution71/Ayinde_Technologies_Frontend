@@ -7,6 +7,15 @@ const ConsultationServicesPage = () => {
   const [hoursNeeded, setHoursNeeded] = useState(3);
   const [showBreakdown, setShowBreakdown] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    consultationType: '',
+    challenge: ''
+  });
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const consultationPackages = {
     standard: {
@@ -67,6 +76,36 @@ const ConsultationServicesPage = () => {
       items: ['Market expansion', 'Product development', 'Revenue optimization', 'Customer acquisition']
     }
   ];
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      console.log('Consultation Inquiry:', formData);
+      setFormSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        phone: '',
+        consultationType: '',
+        challenge: ''
+      });
+      setTimeout(() => setFormSubmitted(false), 5000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const calculateTotal = () => {
     const pkg = consultationPackages[selectedPackage];
@@ -493,6 +532,189 @@ const ConsultationServicesPage = () => {
               <p style={{ color: '#666', lineHeight: '1.6' }}>Strategies backed by data and results from hundreds of clients</p>
             </div>
           </div>
+        </div>
+
+        {/* Consultation Inquiry Form */}
+        <div style={{
+          backgroundColor: '#f0f9ff',
+          borderRadius: '12px',
+          padding: '40px',
+          marginTop: '40px'
+        }}>
+          <h2 style={{ marginBottom: '30px', fontSize: '24px', fontWeight: 'bold', color: '#1f2937', textAlign: 'center' }}>
+            Book Your Consultation Today
+          </h2>
+          <form onSubmit={handleFormSubmit} style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Name <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  required
+                  placeholder="Your name"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Email <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleFormChange}
+                  required
+                  placeholder="your@email.com"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Company
+                </label>
+                <input
+                  type="text"
+                  name="company"
+                  value={formData.company}
+                  onChange={handleFormChange}
+                  placeholder="Your company"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleFormChange}
+                  placeholder="+1 (555) 123-4567"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                What's your main challenge? <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <select
+                name="consultationType"
+                value={formData.consultationType}
+                onChange={handleFormChange}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <option value="">Select a challenge</option>
+                <option value="strategy">Business Strategy</option>
+                <option value="technology">Technology Planning</option>
+                <option value="digital">Digital Transformation</option>
+                <option value="optimization">Process Optimization</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#1f2937' }}>
+                Tell us more about your needs
+              </label>
+              <textarea
+                name="challenge"
+                value={formData.challenge}
+                onChange={handleFormChange}
+                placeholder="Describe your business challenge..."
+                rows="4"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+
+            {formSubmitted && (
+              <div style={{
+                padding: '15px',
+                marginBottom: '20px',
+                backgroundColor: '#d1fae5',
+                color: '#047857',
+                borderRadius: '6px',
+                fontWeight: '600'
+              }}>
+                ✓ Thank you! Our team will contact you soon.
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px',
+                fontSize: '16px',
+                backgroundColor: loading ? '#9ca3af' : '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {loading ? 'Submitting...' : 'Book a Free Consultation'}
+            </button>
+          </form>
         </div>
       </div>
 
