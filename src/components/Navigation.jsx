@@ -156,7 +156,7 @@ const Navigation = () => {
 
       <style>{`
         .navbar {
-          background: linear-gradient(135deg, rgba(30, 64, 175, 0.98) 0%, rgba(25, 51, 140, 0.98) 100%);
+          background: linear-gradient(135deg, rgba(90, 140, 230, 0.98) 0%, rgba(70, 120, 210, 0.98) 100%);
           backdrop-filter: blur(10px);
           box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
           position: sticky;
