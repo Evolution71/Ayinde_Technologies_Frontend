@@ -543,7 +543,7 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== TEAM ENDPOINTS ==========
+  // ========== TEAM ENDPOINT ==========
 
   async getTeam() {
     const res = await fetch(`${API_URL}/api/team/`, {
