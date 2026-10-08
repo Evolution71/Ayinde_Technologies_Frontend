@@ -18,5 +18,5 @@
 
   <!-- Wordmark -->
   <text x="70" y="34" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="24" font-weight="700" fill="#0a0e27">Ayinde</text>
-  <text x="70" y="54" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="500" fill="#185FA5" letter-spacing="2">TECHNOLOGIES</text>
+  <text x="70" y="54" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="800" fill="#0a0e27" letter-spacing="2">TECHNOLOGIES</text>
 </svg>
