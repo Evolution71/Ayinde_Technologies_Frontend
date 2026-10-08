@@ -84,7 +84,7 @@ const Footer = () => {
         }
 
         .footer-section p {
-          opacity: 0.9;
+          opacity: 1;
           line-height: 1.8;
           margin: 10px 0;
           font-size: 14px;
@@ -140,7 +140,7 @@ const Footer = () => {
 
         .footer-section li {
           margin-bottom: 12px;
-          opacity: 0.85;
+          opacity: 1;
           transition: all 0.3s ease;
         }
 
@@ -211,13 +211,13 @@ const Footer = () => {
           border-top: 1px solid rgba(255, 255, 255, 0.1);
           padding-top: 30px;
           text-align: center;
-          opacity: 0.8;
+          opacity: 1;
           animation: fadeIn 1s ease-out 0.6s both;
         }
 
         @keyframes fadeIn {
           from { opacity: 0; }
-          to { opacity: 0.8; }
+          to { opacity: 1; }
         }
 
         .footer-bottom p {
@@ -257,8 +257,7 @@ const Footer = () => {
             <img src={logoWhite} alt="Ayinde Technologies" className="footer-logo-img" />
             <p>Guide, Build &amp; Implement AI Technologies</p>
             <p className="footer-address">
-              📍 Delaware, USA<br />
-              Company ID: 4346238
+              📍 Delaware, USA
             </p>
             <p className="footer-phone"><a href="tel:+13022084855">📞 1-302-208-4855</a></p>
           </div>

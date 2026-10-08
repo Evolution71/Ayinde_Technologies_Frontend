@@ -62,7 +62,7 @@ export default function About() {
           position: relative;
           z-index: 1;
           font-size: 18px;
-          opacity: 0.95;
+          opacity: 1;
           max-width: 600px;
           margin: 20px auto;
           line-height: 1.6;

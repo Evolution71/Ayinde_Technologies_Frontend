@@ -310,7 +310,7 @@ const Home = () => {
         <h1 style={{ fontSize: '48px', marginBottom: '20px', fontWeight: 'bold' }}>
           Technology That Helps Your Business Grow
         </h1>
-        <p style={{ fontSize: '18px', marginBottom: '20px', opacity: 0.9, maxWidth: '800px', margin: '0 auto 20px' }}>
+        <p style={{ fontSize: '18px', marginBottom: '20px', opacity: 1, maxWidth: '800px', margin: '0 auto 20px' }}>
           We build websites, software and digital solutions that solve real business problems.
         </p>
 
@@ -767,7 +767,7 @@ const Home = () => {
             <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
               Ayinde Technologies
             </h3>
-            <p style={{ opacity: 0.9, lineHeight: '1.6' }}>
+            <p style={{ opacity: 1, lineHeight: '1.6' }}>
               Building practical digital solutions for businesses ready to grow.
             </p>
           </div>
@@ -783,7 +783,7 @@ const Home = () => {
             <p style={{ marginBottom: '8px' }}>
               📧 <strong>support@ayindetechnologies.com</strong>
             </p>
-            <p style={{ marginBottom: '0', fontSize: '12px', opacity: 0.9 }}>
+            <p style={{ marginBottom: '0', fontSize: '12px', opacity: 1 }}>
               📍 <strong>Delaware:</strong><br/>
               1-302-208-4855
             </p>
@@ -796,22 +796,22 @@ const Home = () => {
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               <li style={{ marginBottom: '8px' }}>
-                <a href="#services" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                <a href="#services" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
                   🌐 Services
                 </a>
               </li>
               <li style={{ marginBottom: '8px' }}>
-                <a href="#team" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                <a href="#team" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
                   👥 Our Team
                 </a>
               </li>
               <li style={{ marginBottom: '8px' }}>
-                <a href="#contact" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                <a href="#contact" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
                   📝 Contact
                 </a>
               </li>
               <li>
-                <a href="/courses" style={{ color: '#fff', textDecoration: 'none', opacity: 0.9, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '1'} onMouseLeave={(e) => e.target.style.opacity = '0.9'}>
+                <a href="/courses" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
                   📖 Courses
                 </a>
               </li>
@@ -820,7 +820,7 @@ const Home = () => {
         </div>
 
         {/* Bottom Footer */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '20px', textAlign: 'center', opacity: 0.8, fontSize: '13px' }}>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '20px', textAlign: 'center', opacity: 1, fontSize: '13px' }}>
           <p style={{ margin: 0 }}>
             © 2026 Ayinde Technologies Limited. All rights reserved.
           </p>

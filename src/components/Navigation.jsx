@@ -226,11 +226,14 @@ const Navigation = () => {
           cursor: pointer;
           font-size: inherit;
           font-family: inherit;
-          color: inherit;
+          color: white;
+          font-weight: 700;
           margin: 0;
           display: flex;
           align-items: center;
           gap: 5px;
+          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+          letter-spacing: 0.3px;
         }
 
         .dropdown-menu {
