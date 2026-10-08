@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 // Pages
 import Home from './pages/Home';
 import About from './pages/About';
+import ContactForm from './pages/ContactForm';
 import Login from './pages/login';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
@@ -39,6 +40,7 @@ const App = () => {
             {/* Main Pages */}
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact-form" element={<ContactForm />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
 

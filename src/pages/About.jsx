@@ -471,7 +471,7 @@ export default function About() {
           <div className="about-cta-card">
             <h3>Have a project in mind?</h3>
             <p>Tell us what you're building — we'll tell you honestly whether it's ready to build yet.</p>
-            <Link to="/#contact" className="btn btn-primary">Start a conversation</Link>
+            <Link to="/contact-form" className="btn btn-primary">Start a conversation</Link>
           </div>
         </div>
       </section>
