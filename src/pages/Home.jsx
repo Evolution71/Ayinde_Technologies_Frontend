@@ -87,17 +87,17 @@ const Home = () => {
         visibility: visible !important;
       }
 
-      /* Blinking animation */
+      /* Blinking animation with enhanced motion */
       @keyframes blinkUp {
         0%, 100% {
-          transform: translateY(0px);
-          opacity: 0.95;
-          box-shadow: 0 4px 20px rgba(255, 107, 53, 0.4);
+          transform: translateY(0px) scale(1);
+          opacity: 1;
+          box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.3);
         }
         50% {
-          transform: translateY(-8px);
+          transform: translateY(-12px) scale(1.05);
           opacity: 1;
-          box-shadow: 0 8px 30px rgba(255, 107, 53, 0.6);
+          box-shadow: 0 12px 40px rgba(255, 107, 53, 0.7), 0 0 30px rgba(255, 107, 53, 0.5);
         }
       }
 
@@ -107,21 +107,63 @@ const Home = () => {
       [class*="s360"],
       iframe[src*="simplify360"] {
         animation: blinkUp 2s ease-in-out infinite !important;
+        border-radius: 30px !important;
+        padding: 20px !important;
       }
 
-      /* Enhance visibility of text inside widget */
+      /* Enhance visibility of text inside widget - VERY BOLD */
       .s360-frame *,
       .s360-launcher *,
       [class*="s360"] * {
         color: #ffffff !important;
-        font-weight: 600 !important;
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        letter-spacing: 0.5px !important;
       }
 
-      /* Background color for better contrast */
+      /* Target conversation message specifically */
+      [class*="conversation"],
+      [class*="message"],
+      [class*="text"] {
+        color: #ffffff !important;
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4) !important;
+      }
+
+      /* Enhanced background with vibrant gradient */
       .s360-frame,
       [class*="s360"] {
-        background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%) !important;
-        border: none !important;
+        background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 50%, #ff9f5a 100%) !important;
+        border: 3px solid #ff5722 !important;
+        border-radius: 30px !important;
+        box-shadow: 0 8px 35px rgba(255, 107, 53, 0.6) !important;
+      }
+
+      /* Flower decorations using pseudo-elements */
+      .s360-launcher::before,
+      .s360-launcher::after {
+        content: '🌸' !important;
+        font-size: 24px !important;
+        margin: 0 8px !important;
+        display: inline-block !important;
+      }
+
+      .s360-frame::before {
+        content: '🌺 🌸 🌼 ' !important;
+        display: block !important;
+        text-align: center !important;
+        font-size: 20px !important;
+        margin-bottom: 10px !important;
+      }
+
+      .s360-frame::after {
+        content: ' 🌼 🌸 🌺' !important;
+        display: block !important;
+        text-align: center !important;
+        font-size: 20px !important;
+        margin-top: 10px !important;
       }
     `;
     document.head.appendChild(style);
@@ -610,9 +652,6 @@ const Home = () => {
             </h3>
             <p style={{ opacity: 0.9, lineHeight: '1.6' }}>
               Building practical digital solutions for businesses ready to grow.
-            </p>
-            <p style={{ marginTop: '10px', opacity: 0.8, fontSize: '13px' }}>
-              Company ID: 4346238
             </p>
           </div>
 
