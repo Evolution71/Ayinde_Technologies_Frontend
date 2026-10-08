@@ -463,8 +463,7 @@ export default function About() {
               that overlap US Eastern and Pacific time zones.
             </p>
             <address>
-              📍 Delaware, USA<br />
-              Company ID: 4346238
+              📍 Delaware, USA
             </address>
             <p><a href="tel:+13022084855">📞 1-302-208-4855</a></p>
             <p><a href="mailto:support@ayindetechnologies.com">📧 support@ayindetechnologies.com</a></p>
