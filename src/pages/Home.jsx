@@ -165,6 +165,123 @@ const Home = () => {
         font-size: 20px !important;
         margin-top: 10px !important;
       }
+
+      /* Hide automatic download transcript popup */
+      [class*="transcript"],
+      [class*="download"],
+      [class*="modal"],
+      [class*="popup"],
+      [class*="overlay"],
+      button:contains('DOWNLOAD') {
+        display: none !important;
+      }
+
+      /* Style for end-of-conversation confirmation dialog */
+      .end-of-chat-modal,
+      [class*="end-chat"],
+      [class*="conversation-end"] {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 20px !important;
+        padding: 30px !important;
+        background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+      }
+
+      /* Confirmation message styling */
+      [class*="thank"],
+      [class*="ended"],
+      [class*="end-message"] {
+        font-size: 20px !important;
+        font-weight: 800 !important;
+        color: #1f2937 !important;
+        text-align: center !important;
+      }
+
+      /* Buttons container */
+      [class*="button-group"],
+      [class*="actions"] {
+        display: flex !important;
+        gap: 15px !important;
+        width: 100% !important;
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+      }
+
+      /* Download button styling - make it subtle until confirmed */
+      [class*="download"],
+      button[class*="transcript"],
+      a[class*="transcript"],
+      a:contains('DOWNLOAD') {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+        color: white !important;
+        padding: 12px 24px !important;
+        border-radius: 8px !important;
+        border: none !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;
+      }
+
+      [class*="download"]:hover,
+      button[class*="transcript"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
+      }
+
+      /* Cancel/Close button styling */
+      button[class*="cancel"],
+      button[class*="close"],
+      button[class*="dismiss"],
+      .cancel-btn,
+      .close-btn {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        color: white !important;
+        padding: 12px 24px !important;
+        border-radius: 8px !important;
+        border: none !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        font-size: 14px !important;
+      }
+
+      button[class*="cancel"]:hover,
+      button[class*="close"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
+      }
+
+      /* Add cancel button if not present */
+      [class*="download-section"]::after,
+      [class*="modal-footer"]::before {
+        content: 'CANCEL' !important;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        color: white !important;
+        padding: 12px 24px !important;
+        border-radius: 8px !important;
+        border: none !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        font-size: 14px !important;
+        display: inline-block !important;
+        margin-left: 10px !important;
+      }
+
+      /* Confirmation text before download */
+      [class*="modal"]::before {
+        content: '✓ Conversation Ended Successfully' !important;
+        display: block !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        color: #10b981 !important;
+        margin-bottom: 20px !important;
+        text-align: center !important;
+      }
     `;
     document.head.appendChild(style);
 
