@@ -268,10 +268,10 @@ const Navigation = () => {
           align-items: center;
           gap: 12px;
           padding: 12px 20px;
-          color: #0a0e27;
+          color: #1e40af;
           text-decoration: none;
           font-size: 15px;
-          font-weight: 700;
+          font-weight: 800;
           transition: all 0.2s ease;
           position: relative;
           overflow: hidden;
@@ -311,6 +311,15 @@ const Navigation = () => {
 
         .item-text {
           flex: 1;
+          color: #1e40af !important;
+          font-weight: 800;
+        }
+
+        .dropdown-item a,
+        .dropdown-item a:visited,
+        .dropdown-item a:hover {
+          color: #1e40af !important;
+          text-decoration: none;
         }
 
         .hamburger {
