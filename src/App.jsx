@@ -14,6 +14,7 @@ import Terms from './pages/Terms';
 import Courses from './components/Courses';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
+import ServiceFlyers from './components/ServiceFlyers';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';
@@ -54,6 +55,7 @@ const App = () => {
 
             {/* Services Routes - 12-Page Structure */}
             <Route path="/services" element={<ServicesOverviewPage />} />
+            <Route path="/services/flyers" element={<ServiceFlyers />} />
             <Route path="/services/website" element={<WebsiteServicesPage />} />
             <Route path="/services/applications" element={<ApplicationServicesPage />} />
             <Route path="/services/consultation" element={<ConsultationServicesPage />} />

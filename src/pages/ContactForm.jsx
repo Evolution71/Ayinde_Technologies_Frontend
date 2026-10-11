@@ -417,8 +417,11 @@ const ContactForm = () => {
               </a>
             </div>
             <div>
-              <p style={{ fontWeight: 'bold', color: '#1f2937', marginBottom: '5px' }}>📍 Location</p>
-              <p style={{ color: '#666', fontWeight: '600' }}>Delaware, USA</p>
+              <p style={{ fontWeight: 'bold', color: '#1f2937', marginBottom: '5px' }}>📍 Offices</p>
+              <p style={{ color: '#666', fontWeight: '600' }}>
+                East Coast: Delaware, USA<br/>
+                Westcoast: California, USA
+              </p>
             </div>
           </div>
         </div>

@@ -466,13 +466,18 @@ export default function About() {
         <div className="container about-location-grid">
           <div>
             <p className="section-eyebrow">Where we are</p>
-            <h2>Based in Delaware, USA.</h2>
+            <h2>Located across the United States.</h2>
             <p>
               We're a US-based team working with clients locally and internationally, with hours
               that overlap US Eastern and Pacific time zones.
             </p>
             <address>
-              📍 Delaware, USA
+              📍 <strong>East Coast Headquarters</strong><br/>
+              Delaware, USA
+            </address>
+            <address>
+              📍 <strong>Westcoast Division</strong><br/>
+              California, USA
             </address>
             <p><a href="tel:+13022084855">📞 1-302-208-4855</a></p>
             <p><a href="mailto:support@ayindetechnologies.com">📧 support@ayindetechnologies.com</a></p>

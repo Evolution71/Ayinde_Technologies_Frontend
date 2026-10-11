@@ -19,38 +19,19 @@ const Home = () => {
     }
   }, [location]);
 
-  // Fetch team members from backend
+  // Fetch interspersed team members from backend
   useEffect(() => {
     const fetchTeam = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Use the api client method
-        const response = await api.getTeamMembers();
-        console.log('[Home] Team response:', response);
+        // ✅ NEW: Use interspersed team members (male and female alternating)
+        const response = await api.getInterspersedTeamMembers();
+        console.log('[Home] Interspersed team response:', response);
 
-        // Handle flexible response formats
-        let teamData = [];
-        if (Array.isArray(response)) {
-          // Direct array response
-          teamData = response;
-        } else if (response?.all_members && Array.isArray(response.all_members)) {
-          // Wrapped in all_members
-          teamData = response.all_members;
-        } else if (response?.team_members && Array.isArray(response.team_members)) {
-          // Wrapped in team_members
-          teamData = response.team_members;
-        } else if (response?.members && Array.isArray(response.members)) {
-          // Wrapped in members
-          teamData = response.members;
-        } else if (response?.data && Array.isArray(response.data)) {
-          // Wrapped in data
-          teamData = response.data;
-        }
-
-        setTeamMembers(teamData);
-        console.log('[Home] Loaded team members:', teamData.length);
+        setTeamMembers(response);
+        console.log('[Home] Loaded interspersed team members:', response.length);
 
       } catch (err) {
         console.error('[Home] Error fetching team:', err);
@@ -64,237 +45,23 @@ const Home = () => {
     fetchTeam();
   }, []);
 
-  // Load NextivaCX widget - Insert before closing body tag
-  useEffect(() => {
-    // Add NextivaCX widget script
-    const script = document.createElement('script');
-    script.id = 'nextivacx-code-snippet';
-    script.src = 'https://d3po7etsbw5eiv.cloudfront.net/Simplify360Chat.js?key=NmFjNTAyYTgxODk3OWMxODM2NjllNzY0fDQzNDYyMzg=';
-    document.body.appendChild(script);
+  // Load NextivaCX widget on demand
+  const openChat = () => {
+    // Load NextivaCX widget script
+    if (!document.getElementById('nextivacx-code-snippet')) {
+      const script = document.createElement('script');
+      script.id = 'nextivacx-code-snippet';
+      script.src = 'https://d3po7etsbw5eiv.cloudfront.net/Simplify360Chat.js?key=NmFjNTAyYTgxODk3OWMxODM2NjllNzY0fDQzNDYyMzg=';
+      document.body.appendChild(script);
+    }
 
-    // Add CSS styling for the chat widget
-    const style = document.createElement('style');
-    style.innerHTML = `
-      /* NextivaCX Chat Widget Styling */
-      .s360-frame,
-      .s360-launcher,
-      .s360-chat-widget,
-      [class*="s360"],
-      iframe[src*="simplify360"],
-      [class*="chat-widget"],
-      [class*="conversation"] {
-        opacity: 1 !important;
-        visibility: visible !important;
+    // Trigger the chat widget to open
+    setTimeout(() => {
+      if (window.simplify360Chat) {
+        window.simplify360Chat.open();
       }
-
-      /* Blinking animation with enhanced motion */
-      @keyframes blinkUp {
-        0%, 100% {
-          transform: translateY(0px) scale(1);
-          opacity: 1;
-          box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5), 0 0 20px rgba(255, 107, 53, 0.3);
-        }
-        50% {
-          transform: translateY(-12px) scale(1.05);
-          opacity: 1;
-          box-shadow: 0 12px 40px rgba(255, 107, 53, 0.7), 0 0 30px rgba(255, 107, 53, 0.5);
-        }
-      }
-
-      /* Apply animation to chat widget */
-      .s360-frame,
-      .s360-launcher,
-      [class*="s360"],
-      iframe[src*="simplify360"] {
-        animation: blinkUp 2s ease-in-out infinite !important;
-        border-radius: 30px !important;
-        padding: 20px !important;
-      }
-
-      /* Enhance visibility of text inside widget - VERY BOLD */
-      .s360-frame *,
-      .s360-launcher *,
-      [class*="s360"] * {
-        color: #ffffff !important;
-        font-weight: 900 !important;
-        font-size: 18px !important;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-        letter-spacing: 0.5px !important;
-      }
-
-      /* Target conversation message specifically */
-      [class*="conversation"],
-      [class*="message"],
-      [class*="text"] {
-        color: #ffffff !important;
-        font-weight: 900 !important;
-        font-size: 18px !important;
-        text-shadow: 0 3px 10px rgba(0, 0, 0, 0.4) !important;
-      }
-
-      /* Enhanced background with vibrant gradient */
-      .s360-frame,
-      [class*="s360"] {
-        background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 50%, #ff9f5a 100%) !important;
-        border: 3px solid #ff5722 !important;
-        border-radius: 30px !important;
-        box-shadow: 0 8px 35px rgba(255, 107, 53, 0.6) !important;
-      }
-
-      /* Flower decorations using pseudo-elements */
-      .s360-launcher::before,
-      .s360-launcher::after {
-        content: '🌸' !important;
-        font-size: 24px !important;
-        margin: 0 8px !important;
-        display: inline-block !important;
-      }
-
-      .s360-frame::before {
-        content: '🌺 🌸 🌼 ' !important;
-        display: block !important;
-        text-align: center !important;
-        font-size: 20px !important;
-        margin-bottom: 10px !important;
-      }
-
-      .s360-frame::after {
-        content: ' 🌼 🌸 🌺' !important;
-        display: block !important;
-        text-align: center !important;
-        font-size: 20px !important;
-        margin-top: 10px !important;
-      }
-
-      /* Hide automatic download transcript popup */
-      [class*="transcript"],
-      [class*="download"],
-      [class*="modal"],
-      [class*="popup"],
-      [class*="overlay"],
-      button:contains('DOWNLOAD') {
-        display: none !important;
-      }
-
-      /* Style for end-of-conversation confirmation dialog */
-      .end-of-chat-modal,
-      [class*="end-chat"],
-      [class*="conversation-end"] {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 20px !important;
-        padding: 30px !important;
-        background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%) !important;
-        border-radius: 20px !important;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
-      }
-
-      /* Confirmation message styling */
-      [class*="thank"],
-      [class*="ended"],
-      [class*="end-message"] {
-        font-size: 20px !important;
-        font-weight: 800 !important;
-        color: #1f2937 !important;
-        text-align: center !important;
-      }
-
-      /* Buttons container */
-      [class*="button-group"],
-      [class*="actions"] {
-        display: flex !important;
-        gap: 15px !important;
-        width: 100% !important;
-        justify-content: center !important;
-        flex-wrap: wrap !important;
-      }
-
-      /* Download button styling - make it subtle until confirmed */
-      [class*="download"],
-      button[class*="transcript"],
-      a[class*="transcript"],
-      a:contains('DOWNLOAD') {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
-        color: white !important;
-        padding: 12px 24px !important;
-        border-radius: 8px !important;
-        border: none !important;
-        font-weight: 700 !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        font-size: 14px !important;
-      }
-
-      [class*="download"]:hover,
-      button[class*="transcript"]:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
-      }
-
-      /* Cancel/Close button styling */
-      button[class*="cancel"],
-      button[class*="close"],
-      button[class*="dismiss"],
-      .cancel-btn,
-      .close-btn {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-        color: white !important;
-        padding: 12px 24px !important;
-        border-radius: 8px !important;
-        border: none !important;
-        font-weight: 700 !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        font-size: 14px !important;
-      }
-
-      button[class*="cancel"]:hover,
-      button[class*="close"]:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4) !important;
-      }
-
-      /* Add cancel button if not present */
-      [class*="download-section"]::after,
-      [class*="modal-footer"]::before {
-        content: 'CANCEL' !important;
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-        color: white !important;
-        padding: 12px 24px !important;
-        border-radius: 8px !important;
-        border: none !important;
-        font-weight: 700 !important;
-        cursor: pointer !important;
-        font-size: 14px !important;
-        display: inline-block !important;
-        margin-left: 10px !important;
-      }
-
-      /* Confirmation text before download */
-      [class*="modal"]::before {
-        content: '✓ Conversation Ended Successfully' !important;
-        display: block !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
-        color: #10b981 !important;
-        margin-bottom: 20px !important;
-        text-align: center !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      // Cleanup: remove script if component unmounts
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-      if (style.parentNode) {
-        style.parentNode.removeChild(style);
-      }
-    };
-  }, []);
+    }, 500);
+  };
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -834,12 +601,12 @@ const Home = () => {
       </div>
 
       {/* ========== CTA ========== */}
-      <div style={{ maxWidth: '1000px', margin: '60px auto', padding: '40px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '20px', fontSize: '32px', fontWeight: 'bold' }}>
-          Have a Business Challenge We Can Solve?
+      <div style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center' }}>
+        <h2 style={{ marginBottom: '12px', fontSize: '24px', fontWeight: 'bold' }}>
+          Ready to Get Started?
         </h2>
-        <p style={{ color: '#666', marginBottom: '30px', fontSize: '16px' }}>
-          Let's turn your idea into technology that works.
+        <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
+          Connect with our team or explore our services.
         </p>
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -853,29 +620,44 @@ const Home = () => {
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#1e3a8a';
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#1e40af';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             Book a Free Consultation
           </button>
-          <a
-            href="https://wa.me/yourwhatsappnumber"
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={openChat}
             style={{
               padding: '14px 32px',
               fontSize: '16px',
-              backgroundColor: '#25d366',
+              backgroundColor: '#ff6b35',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              textDecoration: 'none'
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#ff5722';
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#ff6b35';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
-            💬 Chat on WhatsApp
-          </a>
+            💬 Chat with us
+          </button>
         </div>
       </div>
 
@@ -895,17 +677,21 @@ const Home = () => {
           {/* Contact Info */}
           <div>
             <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#fbbf24' }}>
-              Contact Us
+              Sales & Support
             </h4>
             <p style={{ marginBottom: '8px' }}>
-              📞 <strong>Albert Cabrera: +1 302-208-4855</strong>
+              📞 <strong>+1 302-208-4855</strong>
             </p>
             <p style={{ marginBottom: '8px' }}>
               📧 <strong>support@ayindetechnologies.com</strong>
             </p>
+            <p style={{ marginBottom: '8px', fontSize: '12px', opacity: 1 }}>
+              📍 <strong>East Coast Headquarters:</strong><br/>
+              Delaware, USA
+            </p>
             <p style={{ marginBottom: '0', fontSize: '12px', opacity: 1 }}>
-              📍 <strong>Delaware:</strong><br/>
-              1-302-208-4855
+              📍 <strong>Westcoast Division:</strong><br/>
+              California, USA
             </p>
           </div>
 

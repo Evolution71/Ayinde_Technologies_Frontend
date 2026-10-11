@@ -404,6 +404,69 @@ export const api = {
   },
 
   /**
+   * Get all team members with interspersed genders (alternating male/female)
+   * Useful for displaying team members with foreign names interspersed throughout
+   * @returns {array} Team members alternating between genders
+   */
+  async getInterspersedTeamMembers() {
+    try {
+      const maleResponse = await this.getTeamMembersByGender('male');
+      const femaleResponse = await this.getTeamMembersByGender('female');
+
+      // Extract arrays from various possible response formats
+      let maleData = [];
+      if (Array.isArray(maleResponse)) {
+        maleData = maleResponse;
+      } else if (maleResponse?.team_members && Array.isArray(maleResponse.team_members)) {
+        maleData = maleResponse.team_members;
+      } else if (maleResponse?.members && Array.isArray(maleResponse.members)) {
+        maleData = maleResponse.members;
+      } else if (maleResponse?.data && Array.isArray(maleResponse.data)) {
+        maleData = maleResponse.data;
+      } else if (maleResponse?.results && Array.isArray(maleResponse.results)) {
+        maleData = maleResponse.results;
+      }
+
+      let femaleData = [];
+      if (Array.isArray(femaleResponse)) {
+        femaleData = femaleResponse;
+      } else if (femaleResponse?.team_members && Array.isArray(femaleResponse.team_members)) {
+        femaleData = femaleResponse.team_members;
+      } else if (femaleResponse?.members && Array.isArray(femaleResponse.members)) {
+        femaleData = femaleResponse.members;
+      } else if (femaleResponse?.data && Array.isArray(femaleResponse.data)) {
+        femaleData = femaleResponse.data;
+      } else if (femaleResponse?.results && Array.isArray(femaleResponse.results)) {
+        femaleData = femaleResponse.results;
+      }
+
+      // Intersperse arrays: alternate between male and female
+      const interspersed = [];
+      const maxLength = Math.max(maleData.length, femaleData.length);
+
+      for (let i = 0; i < maxLength; i++) {
+        if (i < maleData.length) {
+          interspersed.push({
+            ...maleData[i],
+            _gender: 'male'
+          });
+        }
+        if (i < femaleData.length) {
+          interspersed.push({
+            ...femaleData[i],
+            _gender: 'female'
+          });
+        }
+      }
+
+      return interspersed;
+    } catch (err) {
+      console.error('[API] Error interspersing team members:', err);
+      throw err;
+    }
+  },
+
+  /**
    * Create achievement (admin only)
    * @param {object} achievementData - { title, description, category, icon, order }
    * @returns {object} Created achievement details
@@ -513,6 +576,39 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  // ✅ NEW: Wrapper method for Square payment initialization
+  async initiatePayment(courseId, amount, currency = 'USD') {
+    try {
+      const response = await this.createPaymentIntent(courseId, amount);
+
+      // Handle different response formats from backend
+      let paymentData = {
+        client_token: null,
+        payment_id: null,
+        amount: amount,
+        currency: currency,
+        course_id: courseId
+      };
+
+      if (response.client_token) {
+        paymentData.client_token = response.client_token;
+      }
+      if (response.payment_id) {
+        paymentData.payment_id = response.payment_id;
+      } else if (response.id) {
+        paymentData.payment_id = response.id;
+      }
+      if (response.square_token) {
+        paymentData.client_token = response.square_token;
+      }
+
+      return paymentData;
+    } catch (err) {
+      console.error('[API] Payment initiation error:', err);
+      throw err;
+    }
+  },
+
   async verifyPayment(paymentId, nonce) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
@@ -543,7 +639,7 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== TEAM ENDPOINT ==========
+  // ========== TEAM ENDPOINTS ==========
 
   async getTeam() {
     const res = await fetch(`${API_URL}/api/team/`, {
