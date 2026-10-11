@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
+import BackToTopButton from './components/BackToTopButton';
 
 // Pages
 import Home from './pages/Home';
@@ -34,9 +36,11 @@ const App = () => {
 
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <Navigation />
         <main style={{ minHeight: 'calc(100vh - 120px)' }}>
+          <BackToTopButton />
           <Routes>
             {/* Main Pages */}
             <Route path="/" element={<Home />} />
