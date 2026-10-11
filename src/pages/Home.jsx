@@ -244,7 +244,7 @@ const Home = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '30px'
           }}
         >
@@ -296,7 +296,7 @@ const Home = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '30px'
           }}
         >
@@ -379,7 +379,7 @@ const Home = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '20px'
           }}
         >
@@ -416,7 +416,7 @@ const Home = () => {
           Why Work With Ayinde Technologies?
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '30px' }}>
           {[
             { title: 'We Listen Before We Build', desc: 'We understand the problem before recommending solutions.' },
             { title: 'We Build for Your Needs', desc: 'Your business is different. Your technology should be too.' },
@@ -477,7 +477,7 @@ const Home = () => {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '25px', marginBottom: '40px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '40px' }}>
           {[
             {
               icon: '❤️',
@@ -558,7 +558,7 @@ const Home = () => {
           Our Team
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '30px' }}>
           {!loading && teamMembers.length > 0 ? (
             teamMembers.map((member, i) => (
               <div key={i}
@@ -663,7 +663,7 @@ const Home = () => {
 
       {/* ========== FOOTER ========== */}
       <div style={{ backgroundColor: '#1e40af', color: 'white', padding: '40px', marginTop: '60px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '40px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginBottom: '40px' }}>
           {/* Company Info */}
           <div>
             <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
