@@ -94,10 +94,6 @@ const Home = () => {
       {/* ========== HERO SECTION ========== */}
       <div
         style={{
-          background: heroImages[currentImageIndex].gradient,
-          backgroundAttachment: 'fixed',
-          backgroundPosition: 'center',
-          backgroundSize: 'cover',
           color: 'white',
           padding: '80px 40px',
           textAlign: 'center',
@@ -107,10 +103,40 @@ const Home = () => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center',
-          transition: 'background 0.8s ease-in-out'
+          alignItems: 'center'
         }}
       >
+        {/* Video Background */}
+        <video
+          autoPlay
+          muted
+          loop
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0
+          }}
+        >
+          <source src="/videos/hero-bg.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+
+        {/* Dark Gradient Overlay for Text Readability */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.7) 0%, rgba(59, 130, 246, 0.7) 100%)',
+            zIndex: 1
+          }}
+        ></div>
         {/* Hero Icon Animation */}
         <div
           style={{
@@ -121,7 +147,7 @@ const Home = () => {
             fontSize: '120px',
             opacity: 0.15,
             animation: 'float 6s ease-in-out infinite',
-            zIndex: 1
+            zIndex: 3
           }}
         >
           {heroImages[currentImageIndex].icon}
@@ -135,7 +161,7 @@ const Home = () => {
             right: '40px',
             display: 'flex',
             gap: '10px',
-            zIndex: 10
+            zIndex: 5
           }}
         >
           {heroImages.map((_, index) => (
@@ -174,7 +200,7 @@ const Home = () => {
           }
         `}</style>
 
-        <div style={{ position: 'relative', zIndex: 2 }}>
+        <div style={{ position: 'relative', zIndex: 4 }}>
           <h1 style={{
             fontSize: '48px',
             marginBottom: '20px',
