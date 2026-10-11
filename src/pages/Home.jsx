@@ -601,7 +601,7 @@ const Home = () => {
       </div>
 
       {/* ========== CTA ========== */}
-      <div style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center' }}>
+      <div id="contact" style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center', scrollMarginTop: '80px' }}>
         <h2 style={{ marginBottom: '12px', fontSize: '24px', fontWeight: 'bold' }}>
           Ready to Get Started?
         </h2>
