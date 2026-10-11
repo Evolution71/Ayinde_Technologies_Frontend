@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ConsultationServicesPage = () => {
   const navigate = useNavigate();
-  const [selectedPackage, setSelectedPackage] = useState('standard');
+  const [selectedPackage, setSelectedPackage] = useState('starter');
   const [hoursNeeded, setHoursNeeded] = useState(3);
   const [showBreakdown, setShowBreakdown] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,22 @@ const ConsultationServicesPage = () => {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const consultationPackages = {
+    starter: {
+      name: 'Starter Consultation',
+      hourlyRate: 50,
+      minHours: 1,
+      description: 'Perfect for initial discovery & quick advice',
+      color: '#10b981',
+      icon: '🚀',
+      includes: [
+        '1-hour focused consultation',
+        'Initial discovery & assessment',
+        'Quick expert advice',
+        'Basic recommendations',
+        'Q&A session',
+        'Email follow-up'
+      ]
+    },
     standard: {
       name: 'Standard Consultation',
       hourlyRate: 100,
@@ -444,7 +460,7 @@ const ConsultationServicesPage = () => {
         {/* Consultation Packages */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '30px',
           marginBottom: '60px'
         }}>
