@@ -138,14 +138,17 @@ const ConsultationServicesPage = () => {
       const totalAmount = calculateTotal();
 
       const paymentData = {
-        service: 'consultation',
-        type: selectedPackage,
-        packageName: pkg.name,
-        hourlyRate: pkg.hourlyRate,
-        hours: hours,
-        amount: Math.round(totalAmount * 100),
+        serviceType: 'consultation',
+        tier: selectedPackage,
+        tierName: pkg.name,
+        originalPrice: Math.round(totalAmount * 100), // in cents
+        finalPrice: Math.round(totalAmount * 100), // in cents
+        discountAmount: 0, // no discount for consultations
+        discountPercent: 0,
         currency: 'USD',
-        includes: pkg.includes
+        period: `${hours} hour${hours > 1 ? 's' : ''}`,
+        paymentOption: 'one-time',
+        features: pkg.includes
       };
 
       localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
