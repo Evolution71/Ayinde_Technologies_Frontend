@@ -49,18 +49,6 @@ const Navigation = () => {
     setIsOpen(false);
   };
 
-  const handleLinkClick = () => {
-    // Close mobile menu and dropdowns on any link click
-    setIsOpen(false);
-    setServicesDropdown(false);
-    setCoursesDropdown(false);
-
-    // Small delay to allow animation before navigation
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 50);
-  };
-
   return (
     <nav className="navbar">
       <div className="nav-container">
