@@ -1,231 +1,324 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { stripePromise } from '../lib/stripe';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 
-const ServiceCheckoutPage = () => {
+const CARD_OPTIONS = {
+  style: {
+    base: {
+      fontSize: '16px',
+      color: '#1f2937',
+      '::placeholder': { color: '#9ca3af' },
+    },
+    invalid: { color: '#dc2626' },
+  },
+};
+
+const COUNTRIES = [
+  { code: 'US', name: 'United States' },
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'IN', name: 'India' },
+];
+
+const inputStyle = {
+  width: '100%',
+  padding: '10px',
+  border: '1px solid #ddd',
+  borderRadius: '6px',
+  fontSize: '14px',
+  boxSizing: 'border-box',
+};
+
+const labelStyle = { display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' };
+
+function readPendingPayment() {
+  try {
+    return JSON.parse(localStorage.getItem('pendingPayment'));
+  } catch {
+    return null;
+  }
+}
+
+function ServiceCheckoutForm({ paymentData, user }) {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { user } = useAuth();
+  const stripe = useStripe();
+  const elements = useElements();
 
-  // Payment data from PricingPage
-  const paymentData = location.state?.paymentData || localStorage.getItem('pendingPayment') 
-    ? JSON.parse(localStorage.getItem('pendingPayment')) 
-    : null;
-
-  const [loading, setLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
-  const [cardReady, setCardReady] = useState(false);
+  const [cardComplete, setCardComplete] = useState(false);
   const [billingInfo, setBillingInfo] = useState({
     fullName: user?.name || '',
     email: user?.email || '',
     phone: '',
     company: '',
     postalCode: '',
-    country: 'US'
+    country: 'US',
   });
 
-  const paymentsRef = useRef(null);
-  const cardRef = useRef(null);
-  const cardInitializedRef = useRef(false);
+  const finalPrice = paymentData.finalPrice / 100;
 
-  // Redirect if no payment data
-  useEffect(() => {
-    // Check redirects first
-    if (!paymentData) {
-      navigate('/services');
-      return;
-    }
-
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-
-    // Initialize Square Card - only once
-    if (cardInitializedRef.current) {
-      return;
-    }
-
-    // Prevent further initialization attempts
-    cardInitializedRef.current = true;
-
-    const initializeSquareCard = async () => {
-      try {
-        setLoading(true);
-
-        // Load Square SDK if not already loaded
-        if (!window.Square) {
-          const script = document.createElement('script');
-          script.src = 'https://web.squarecdn.com/v1/square.js';
-          script.async = true;
-          script.onload = () => setupSquare();
-          script.onerror = () => {
-            cardInitializedRef.current = false;
-            setError('Failed to load Square payment system. Please refresh and try again.');
-            setLoading(false);
-          };
-          document.head.appendChild(script);
-        } else {
-          setupSquare();
-        }
-      } catch (err) {
-        cardInitializedRef.current = false;
-        setError('Failed to load payment system: ' + err.message);
-        setLoading(false);
-      }
-    };
-
-    initializeSquareCard();
-  }, [paymentData, user, navigate]);
-
-  const setupSquare = async () => {
-    try {
-      const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
-      if (!appId) {
-        throw new Error('Square App ID not configured');
-      }
-
-      const payments = window.Square.payments(appId);
-      paymentsRef.current = payments;
-
-      const card = await payments.card();
-      cardRef.current = card;
-
-      await card.attach('#sq-card-container');
-
-      setCardReady(true);
-      setLoading(false);
-    } catch (err) {
-      console.error('[ServiceCheckout] Card initialization error:', err);
-      cardInitializedRef.current = false; // Reset flag on error
-      setError('Card initialization failed: ' + err.message);
-      setLoading(false);
-    }
-  };
-
-  // Handle input change
   const handleBillingChange = (field, value) => {
-    setBillingInfo(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setBillingInfo((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Handle payment submission
   const handlePayment = async (e) => {
     e.preventDefault();
+    setError(null);
 
-    if (!cardRef.current) {
-      setError('Card not initialized');
+    if (!stripe || !elements) {
+      setError('Payment system is still loading. Please wait a moment and try again.');
       return;
     }
 
     if (!billingInfo.fullName || !billingInfo.email || !billingInfo.postalCode) {
-      setError('Please fill in all required fields (name, email, postal code)');
+      setError('Please fill in all required fields (name, email, postal code).');
       return;
     }
 
+    if (!cardComplete) {
+      setError('Please enter your complete card details.');
+      return;
+    }
+
+    setProcessing(true);
+
     try {
-      setProcessing(true);
-      setError(null);
+      // 1. Turn the card into a Stripe PaymentMethod. Card data goes straight to Stripe, not to our server.
+      const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: elements.getElement(CardElement),
+        billing_details: {
+          name: billingInfo.fullName,
+          email: billingInfo.email,
+          phone: billingInfo.phone || undefined,
+          address: {
+            postal_code: billingInfo.postalCode,
+            country: billingInfo.country,
+          },
+        },
+      });
 
-      // Tokenize card
-      const tokenResult = await cardRef.current.tokenize();
-
-      if (tokenResult.status !== 'OK') {
-        // Parse Square card error messages
-        const squareError = tokenResult.errors?.[0];
-        let errorMessage = 'Card error: Unable to process card';
-
-        if (squareError) {
-          if (squareError.code === 'INVALID_CARD_DATA' || squareError.message?.includes('invalid')) {
-            errorMessage = '❌ Invalid card details. Please check your card number, expiry date, and CVV.';
-          } else if (squareError.message?.includes('declined')) {
-            errorMessage = '❌ Card was declined. Please check your card or try a different payment method.';
-          } else {
-            errorMessage = 'Card error: ' + squareError.message;
-          }
-        }
-
-        setError(errorMessage);
-        setProcessing(false);
+      if (pmError) {
+        setError(pmError.message || 'Card error. Please check your details.');
         return;
       }
 
-      const token = tokenResult.token;
-
-      // Create service order via backend
-      const orderData = {
-        serviceType: paymentData.serviceType || 'website', // Include service type
+      // 2. Send the PaymentMethod id to the backend, which charges it
+      const response = await api.createServicePurchase({
+        serviceType: paymentData.serviceType || 'website',
         tier: paymentData.tier,
         tierName: paymentData.tierName,
-        amount: paymentData.finalPrice / 100, // Convert back from cents
+        amount: finalPrice,
         currency: paymentData.currency,
         paymentOption: paymentData.paymentOption,
         discountPercent: paymentData.discountPercent,
         period: paymentData.period,
-        // Billing info
         fullName: billingInfo.fullName,
         email: billingInfo.email,
         phone: billingInfo.phone,
         company: billingInfo.company,
         postalCode: billingInfo.postalCode,
         country: billingInfo.country,
-        // Square token
-        sourceId: token
-      };
-
-      console.log('[ServiceCheckout] Submitting order:', orderData);
-
-      // Call backend to process payment
-      const response = await api.createServicePurchase(orderData);
+        sourceId: paymentMethod.id,
+      });
 
       if (response.success) {
-        // Clear pending payment
         localStorage.removeItem('pendingPayment');
 
-        alert(`✅ Payment successful! \n\nWelcome to ${paymentData.tierName}!\n\nA confirmation email has been sent to ${billingInfo.email}`);
+        alert(
+          `✅ Payment successful!\n\nWelcome to ${paymentData.tierName}!\n\nA confirmation email has been sent to ${billingInfo.email}`
+        );
 
-        // Redirect to dashboard or confirmation page
         navigate('/dashboard', {
           state: {
             serviceOrder: response.order,
-            message: `You have successfully subscribed to ${paymentData.tierName}`
-          }
+            message: `You have successfully subscribed to ${paymentData.tierName}`,
+          },
         });
-      } else {
-        // Handle backend payment errors
-        const backendError = response.message || 'Payment processing failed';
-
-        if (backendError.includes('insufficient') || backendError.includes('funds')) {
-          setError('❌ Insufficient funds on your card. Please check your account balance or use a different card.');
-        } else if (backendError.includes('declined')) {
-          setError('❌ Your card was declined. Please try a different card.');
-        } else {
-          setError(backendError);
-        }
+        return;
       }
+
+      setError(response.message || 'Payment processing failed.');
     } catch (err) {
       console.error('[ServiceCheckout] Error:', err);
-
-      // Enhanced error message parsing
-      const errorMsg = err.message || 'Unknown error';
-
-      if (errorMsg.includes('insufficient')) {
-        setError('❌ Insufficient funds. Please check your card balance.');
-      } else if (errorMsg.includes('declined') || errorMsg.includes('invalid')) {
-        setError('❌ Card was declined or invalid. Please check your card details.');
-      } else if (errorMsg.includes('Network')) {
-        setError('❌ Network error. Please check your connection and try again.');
-      } else {
-        setError('❌ Payment failed: ' + errorMsg);
-      }
+      setError(err.message || 'Payment failed. Please try again.');
     } finally {
       setProcessing(false);
     }
   };
+
+  const submitDisabled = processing || !stripe || !cardComplete;
+
+  return (
+    <form onSubmit={handlePayment}>
+      {error && (
+        <div style={{
+          padding: '15px',
+          backgroundColor: '#fee2e2',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          color: '#991b1b',
+          border: '1px solid #fca5a5',
+        }}>
+          ❌ {error}
+        </div>
+      )}
+
+      <div style={{ marginBottom: '30px' }}>
+        <h3 style={{ fontSize: '16px', marginBottom: '15px', color: '#333' }}>Billing Information</h3>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={labelStyle}>Full Name *</label>
+          <input
+            type="text"
+            value={billingInfo.fullName}
+            onChange={(e) => handleBillingChange('fullName', e.target.value)}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={labelStyle}>Email *</label>
+          <input
+            type="email"
+            value={billingInfo.email}
+            onChange={(e) => handleBillingChange('email', e.target.value)}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={labelStyle}>Phone</label>
+          <input
+            type="tel"
+            value={billingInfo.phone}
+            onChange={(e) => handleBillingChange('phone', e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={labelStyle}>Company</label>
+          <input
+            type="text"
+            value={billingInfo.company}
+            onChange={(e) => handleBillingChange('company', e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={labelStyle}>Postal Code *</label>
+          <input
+            type="text"
+            value={billingInfo.postalCode}
+            onChange={(e) => handleBillingChange('postalCode', e.target.value)}
+            required
+            style={inputStyle}
+          />
+        </div>
+
+        <div style={{ marginBottom: '15px' }}>
+          <label style={labelStyle}>Country *</label>
+          <select
+            value={billingInfo.country}
+            onChange={(e) => handleBillingChange('country', e.target.value)}
+            style={inputStyle}
+          >
+            {COUNTRIES.map((c) => (
+              <option key={c.code} value={c.code}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '30px' }}>
+        <h3 style={{ fontSize: '16px', marginBottom: '15px', color: '#333' }}>Card Details</h3>
+        <div style={{
+          border: '1px solid #ddd',
+          padding: '12px',
+          borderRadius: '6px',
+          minHeight: '50px',
+        }}>
+          <CardElement
+            options={CARD_OPTIONS}
+            onChange={(e) => {
+              setCardComplete(e.complete);
+              if (e.error) setError(e.error.message);
+            }}
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={submitDisabled}
+        style={{
+          width: '100%',
+          padding: '14px',
+          backgroundColor: submitDisabled ? '#ccc' : '#1e40af',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: submitDisabled ? 'not-allowed' : 'pointer',
+          marginBottom: '10px',
+        }}
+      >
+        {processing ? '🔄 Processing Payment...' : `💳 Pay $${finalPrice.toFixed(2)}`}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => navigate('/services')}
+        style={{
+          width: '100%',
+          padding: '12px',
+          backgroundColor: '#e5e7eb',
+          color: '#333',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          fontSize: '14px',
+        }}
+      >
+        ← Cancel
+      </button>
+
+      <p style={{ fontSize: '12px', color: '#666', textAlign: 'center', marginTop: '15px' }}>
+        🔒 Secure payment processing by Stripe<br />
+        Your card details are sent directly to Stripe and never stored on our servers
+      </p>
+    </form>
+  );
+}
+
+export default function ServiceCheckoutPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+
+  // Read once on mount so the object stays stable across renders
+  const [paymentData] = useState(
+    () => location.state?.paymentData || readPendingPayment()
+  );
+
+  useEffect(() => {
+    if (!paymentData) {
+      navigate('/services');
+    } else if (!user) {
+      navigate('/login');
+    }
+  }, [paymentData, user, navigate]);
 
   if (!paymentData) {
     return (
@@ -236,15 +329,13 @@ const ServiceCheckoutPage = () => {
     );
   }
 
-  const tier = paymentData.tierName;
-  const finalPrice = paymentData.finalPrice / 100;
   const originalPrice = paymentData.originalPrice / 100;
   const discount = paymentData.discountAmount / 100;
+  const finalPrice = paymentData.finalPrice / 100;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', paddingTop: '20px', paddingBottom: '40px' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '20px' }}>
-        {/* Back button */}
         <button
           onClick={() => navigate('/services')}
           style={{
@@ -254,7 +345,7 @@ const ServiceCheckoutPage = () => {
             color: '#1e40af',
             cursor: 'pointer',
             fontSize: '16px',
-            fontWeight: '500'
+            fontWeight: '500',
           }}
         >
           ← Back to Services
@@ -262,48 +353,23 @@ const ServiceCheckoutPage = () => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
           {/* Left: Order Summary */}
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '30px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-          }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
             <h2 style={{ marginTop: 0, color: '#1e40af' }}>Order Summary</h2>
 
-            <div style={{
-              backgroundColor: '#f0f9ff',
-              padding: '20px',
-              borderRadius: '8px',
-              marginBottom: '20px'
-            }}>
+            <div style={{ backgroundColor: '#f0f9ff', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
               <div style={{ marginBottom: '20px' }}>
-                <h3 style={{ margin: 0, color: '#1e40af', fontSize: '20px' }}>
-                  {tier}
-                </h3>
-                <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '14px' }}>
-                  Premium Service Package
-                </p>
+                <h3 style={{ margin: 0, color: '#1e40af', fontSize: '20px' }}>{paymentData.tierName}</h3>
+                <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '14px' }}>Premium Service Package</p>
               </div>
 
               <div style={{ borderTop: '1px solid #e0e7ff', paddingTop: '15px' }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginBottom: '10px',
-                  fontSize: '14px'
-                }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px' }}>
                   <span>Original Price:</span>
                   <span>${originalPrice.toFixed(2)}</span>
                 </div>
 
                 {discount > 0 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginBottom: '10px',
-                    fontSize: '14px',
-                    color: '#16a34a'
-                  }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '14px', color: '#16a34a' }}>
                     <span>Discount ({paymentData.discountPercent}%):</span>
                     <span>-${discount.toFixed(2)}</span>
                   </div>
@@ -316,7 +382,7 @@ const ServiceCheckoutPage = () => {
                   fontWeight: 'bold',
                   color: '#1e40af',
                   borderTop: '1px solid #e0e7ff',
-                  paddingTop: '10px'
+                  paddingTop: '10px',
                 }}>
                   <span>Final Price ({paymentData.period}):</span>
                   <span>${finalPrice.toFixed(2)}</span>
@@ -324,7 +390,6 @@ const ServiceCheckoutPage = () => {
               </div>
             </div>
 
-            {/* Features preview */}
             <div>
               <h4 style={{ marginTop: 0, marginBottom: '15px' }}>What's Included:</h4>
               <div style={{ fontSize: '13px', color: '#666' }}>
@@ -344,226 +409,15 @@ const ServiceCheckoutPage = () => {
           </div>
 
           {/* Right: Checkout Form */}
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '30px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-          }}>
+          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '30px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
             <h2 style={{ marginTop: 0, marginBottom: '30px' }}>Complete Your Purchase</h2>
 
-            {error && (
-              <div style={{
-                padding: '15px',
-                backgroundColor: '#fee2e2',
-                borderRadius: '8px',
-                marginBottom: '20px',
-                color: '#991b1b',
-                border: '1px solid #fca5a5'
-              }}>
-                ❌ {error}
-              </div>
-            )}
-
-            <form onSubmit={handlePayment}>
-              {/* Billing Information */}
-              <div style={{ marginBottom: '30px' }}>
-                <h3 style={{ fontSize: '16px', marginBottom: '15px', color: '#333' }}>
-                  Billing Information
-                </h3>
-
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' }}>
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={billingInfo.fullName}
-                    onChange={(e) => handleBillingChange('fullName', e.target.value)}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' }}>
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    value={billingInfo.email}
-                    onChange={(e) => handleBillingChange('email', e.target.value)}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' }}>
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    value={billingInfo.phone}
-                    onChange={(e) => handleBillingChange('phone', e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' }}>
-                    Company
-                  </label>
-                  <input
-                    type="text"
-                    value={billingInfo.company}
-                    onChange={(e) => handleBillingChange('company', e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' }}>
-                    Postal Code *
-                  </label>
-                  <input
-                    type="text"
-                    value={billingInfo.postalCode}
-                    onChange={(e) => handleBillingChange('postalCode', e.target.value)}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', fontSize: '14px' }}>
-                    Country *
-                  </label>
-                  <select
-                    value={billingInfo.country}
-                    onChange={(e) => handleBillingChange('country', e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  >
-                    <option value="US">United States</option>
-                    <option value="NG">Nigeria</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                    <option value="IN">India</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Card Payment */}
-              <div style={{ marginBottom: '30px' }}>
-                <h3 style={{ fontSize: '16px', marginBottom: '15px', color: '#333' }}>
-                  Card Details
-                </h3>
-                <div
-                  id="sq-card-container"
-                  style={{
-                    border: '1px solid #ddd',
-                    padding: '12px',
-                    borderRadius: '6px',
-                    minHeight: '50px'
-                  }}
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={processing || !cardReady || loading}
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  backgroundColor: processing || !cardReady || loading ? '#ccc' : '#1e40af',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  cursor: processing || !cardReady || loading ? 'not-allowed' : 'pointer',
-                  marginBottom: '10px'
-                }}
-              >
-                {processing ? '🔄 Processing Payment...' : `💳 Pay $${finalPrice.toFixed(2)}`}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/services')}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  backgroundColor: '#e5e7eb',
-                  color: '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                ← Cancel
-              </button>
-
-              <p style={{
-                fontSize: '12px',
-                color: '#666',
-                textAlign: 'center',
-                marginTop: '15px'
-              }}>
-                🔒 Secure payment processing by Square<br />
-                Your information is encrypted and safe
-              </p>
-            </form>
+            <Elements stripe={stripePromise}>
+              <ServiceCheckoutForm paymentData={paymentData} user={user} />
+            </Elements>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default ServiceCheckoutPage;
+}
