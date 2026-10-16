@@ -639,6 +639,137 @@ export const api = {
     return parseOrThrow(res);
   },
 
+  // ========== BOOKINGS (public) ==========
+
+  async getAvailability(isoDate) {
+    const res = await fetch(`${API_URL}/api/bookings/availability?date=${encodeURIComponent(isoDate)}`);
+    return parseOrThrow(res);
+  },
+
+  async createBooking(bookingData) {
+    const res = await fetch(`${API_URL}/api/bookings/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookingData)
+    });
+    return parseOrThrow(res);
+  },
+
+  // ========== FORMS (public) ==========
+
+  async getPublicForm(slug) {
+    const res = await fetch(`${API_URL}/api/forms/${encodeURIComponent(slug)}`);
+    return parseOrThrow(res);
+  },
+
+  async submitPublicForm(slug, submission) {
+    const res = await fetch(`${API_URL}/api/forms/${encodeURIComponent(slug)}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(submission)
+    });
+    return parseOrThrow(res);
+  },
+
+  // ========== CRM & ADMIN (logged in, admin emails only) ==========
+
+  async listContacts(params = {}) {
+    const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')).toString();
+    const res = await fetch(`${API_URL}/api/crm/contacts/${qs ? `?${qs}` : ''}`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
+  async createContact(contactData) {
+    const res = await fetch(`${API_URL}/api/crm/contacts/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(contactData)
+    });
+    return parseOrThrow(res);
+  },
+
+  async updateContact(contactId, updates) {
+    const res = await fetch(`${API_URL}/api/crm/contacts/${contactId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(updates)
+    });
+    return parseOrThrow(res);
+  },
+
+  async deleteContact(contactId) {
+    const res = await fetch(`${API_URL}/api/crm/contacts/${contactId}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  async moveContactStage(contactId, stage) {
+    const res = await fetch(`${API_URL}/api/crm/contacts/${contactId}/stage`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ stage })
+    });
+    return parseOrThrow(res);
+  },
+
+  async getPipeline() {
+    const res = await fetch(`${API_URL}/api/crm/pipeline`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
+  async listBookings(status) {
+    const qs = status ? `?status=${encodeURIComponent(status)}` : '';
+    const res = await fetch(`${API_URL}/api/bookings/admin/${qs}`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
+  async updateBookingStatus(bookingId, status) {
+    const res = await fetch(`${API_URL}/api/bookings/admin/${bookingId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ status })
+    });
+    return parseOrThrow(res);
+  },
+
+  async listForms() {
+    const res = await fetch(`${API_URL}/api/forms/admin/`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
+  async createForm(formData) {
+    const res = await fetch(`${API_URL}/api/forms/admin/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(formData)
+    });
+    return parseOrThrow(res);
+  },
+
+  async updateForm(formId, updates) {
+    const res = await fetch(`${API_URL}/api/forms/admin/${formId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(updates)
+    });
+    return parseOrThrow(res);
+  },
+
+  async deleteForm(formId) {
+    const res = await fetch(`${API_URL}/api/forms/admin/${formId}`, {
+      method: 'DELETE',
+      headers: authHeaders()
+    });
+    return parseOrThrow(res);
+  },
+
+  async getFormSubmissions(formId) {
+    const res = await fetch(`${API_URL}/api/forms/admin/${formId}/submissions`, { headers: authHeaders() });
+    return parseOrThrow(res);
+  },
+
   // ========== TEAM ENDPOINTS ==========
 
   async getTeam() {

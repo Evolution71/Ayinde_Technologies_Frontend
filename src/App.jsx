@@ -17,6 +17,9 @@ import Courses from './components/Courses';
 import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ServiceFlyers from './components/ServiceFlyers';
+import BookPage from './pages/BookPage';
+import FormPage from './pages/FormPage';
+import CRMPage from './pages/admin/CRMPage';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';
@@ -68,6 +71,11 @@ const App = () => {
 
             {/* Achievements/Quotes Page */}
             <Route path="/achievements" element={<AchievementsPage />} />
+
+            {/* Booking, forms and admin CRM */}
+            <Route path="/book" element={<BookPage />} />
+            <Route path="/forms/:slug" element={<FormPage />} />
+            <Route path="/admin/crm" element={<CRMPage />} />
             <Route path="/quotes" element={<FamousQuotesPage />} />
 
             {/* Catch-all - redirect to home */}

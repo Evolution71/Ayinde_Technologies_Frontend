@@ -3,20 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../api';
 import VideoBackground from '../components/VideoBackground';
 
-// Hero carousel slides (defined once, outside the component)
-const HERO_IMAGES = [
-  { gradient: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)', icon: '🌐' },
-  { gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', icon: '💻' },
-  { gradient: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', icon: '🚀' },
-];
-
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState([]);
   const [error, setError] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Scroll to hash on mount or when location changes
   useEffect(() => {
@@ -35,11 +27,13 @@ const Home = () => {
         setLoading(true);
         setError(null);
 
+        // ✅ NEW: Use interspersed team members (male and female alternating)
         const response = await api.getInterspersedTeamMembers();
         console.log('[Home] Interspersed team response:', response);
 
         setTeamMembers(response);
         console.log('[Home] Loaded interspersed team members:', response.length);
+
       } catch (err) {
         console.error('[Home] Error fetching team:', err);
         setError(err.message);
@@ -52,16 +46,9 @@ const Home = () => {
     fetchTeam();
   }, []);
 
-  // Auto-rotate hero carousel every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Load NextivaCX widget on demand
   const openChat = () => {
+    // Load NextivaCX widget script
     if (!document.getElementById('nextivacx-code-snippet')) {
       const script = document.createElement('script');
       script.id = 'nextivacx-code-snippet';
@@ -69,6 +56,7 @@ const Home = () => {
       document.body.appendChild(script);
     }
 
+    // Trigger the chat widget to open
     setTimeout(() => {
       if (window.simplify360Chat) {
         window.simplify360Chat.open();
@@ -76,31 +64,52 @@ const Home = () => {
     }, 500);
   };
 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Hero carousel images (using gradient overlays with icons for now)
+  const heroImages = [
+    {
+      gradient: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+      icon: '🌐'
+    },
+    {
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+      icon: '💻'
+    },
+    {
+      gradient: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
+      icon: '🚀'
+    }
+  ];
+
+  // Auto-rotate carousel every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       {/* ========== HERO SECTION WITH VIDEO BACKGROUND ========== */}
-      <VideoBackground minHeight="600px" overlayOpacity={0.35}>
-        {/* Floating icon, centred by a wrapper so the float animation can't move it off-centre */}
+      <VideoBackground minHeight="600px">
+        {/* Floating Icon */}
         <div
+          className="video-bg-accent"
           style={{
             position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-            zIndex: 0,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontSize: '120px',
+            zIndex: 0
           }}
         >
-          <span className="video-bg-accent" style={{ fontSize: '120px' }}>
-            {HERO_IMAGES[currentImageIndex].icon}
-          </span>
+          {heroImages[currentImageIndex].icon}
         </div>
 
-        {/* Carousel navigation dots */}
+        {/* Carousel Navigation Dots */}
         <div
           style={{
             position: 'absolute',
@@ -108,15 +117,13 @@ const Home = () => {
             right: '40px',
             display: 'flex',
             gap: '12px',
-            zIndex: 10,
+            zIndex: 10
           }}
         >
-          {HERO_IMAGES.map((_, index) => (
+          {heroImages.map((_, index) => (
             <button
               key={index}
-              type="button"
               onClick={() => setCurrentImageIndex(index)}
-              aria-label={`Slide ${index + 1}`}
               style={{
                 width: '14px',
                 height: '14px',
@@ -125,51 +132,43 @@ const Home = () => {
                 backgroundColor: index === currentImageIndex ? '#fbbf24' : 'rgba(255, 255, 255, 0.5)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
               }}
+              aria-label={`Slide ${index + 1}`}
             />
           ))}
         </div>
 
-        {/* Hero content */}
+        {/* Hero Content */}
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 5 }}>
-          <h1
-            className="video-bg-title"
-            style={{
-              fontSize: 'clamp(32px, 5vw, 56px)',
-              marginBottom: '20px',
-              fontWeight: '700',
-              lineHeight: '1.2',
-              textShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-            }}
-          >
+          <h1 className="video-bg-title" style={{
+            fontSize: 'clamp(32px, 5vw, 56px)',
+            marginBottom: '20px',
+            fontWeight: '700',
+            lineHeight: '1.2',
+            textShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+          }}>
             Technology That Helps Your Business Grow
           </h1>
 
-          <p
-            className="video-bg-subtitle"
-            style={{
-              fontSize: 'clamp(16px, 2vw, 20px)',
-              marginBottom: '40px',
-              maxWidth: '800px',
-              textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-              lineHeight: '1.6',
-            }}
-          >
+          <p className="video-bg-subtitle" style={{
+            fontSize: 'clamp(16px, 2vw, 20px)',
+            marginBottom: '40px',
+            maxWidth: '800px',
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+            lineHeight: '1.6'
+          }}>
             We build websites, software and digital solutions that solve real business problems.
           </p>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: '20px',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              animation: 'slideInUp 0.8s ease-out 0.4s both',
-            }}
-          >
+          <div style={{
+            display: 'flex',
+            gap: '20px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            animation: 'slideInUp 0.8s ease-out 0.4s both'
+          }}>
             <button
-              type="button"
               onClick={() => navigate('/services')}
               style={{
                 padding: '16px 36px',
@@ -182,21 +181,20 @@ const Home = () => {
                 fontWeight: '600',
                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
                 transition: 'all 0.3s ease',
-                transform: 'translateY(0)',
+                transform: 'translateY(0)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
               }}
             >
               Book a Free Consultation
             </button>
             <button
-              type="button"
               onClick={() => navigate('/courses')}
               style={{
                 padding: '16px 36px',
@@ -209,15 +207,15 @@ const Home = () => {
                 fontWeight: '600',
                 boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
                 transition: 'all 0.3s ease',
-                transform: 'translateY(0)',
+                transform: 'translateY(0)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
               }}
             >
               View Our Courses
@@ -232,37 +230,42 @@ const Home = () => {
           Your Business Deserves Technology That Works for You
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '30px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '30px'
+          }}
+        >
           {[
             {
               icon: '👥',
               title: 'Attract more customers',
-              desc: 'Build a professional digital presence that turns visitors into enquiries and customers.',
+              desc: 'Build a professional digital presence that turns visitors into enquiries and customers.'
             },
             {
               icon: '⏱️',
               title: 'Save time and reduce manual work',
-              desc: 'Replace repetitive processes with smarter digital systems and automation.',
+              desc: 'Replace repetitive processes with smarter digital systems and automation.'
             },
             {
               icon: '😊',
               title: 'Deliver better customer experiences',
-              desc: 'Give your customers faster, easier and more convenient ways to interact with your business.',
+              desc: 'Give your customers faster, easier and more convenient ways to interact with your business.'
             },
             {
               icon: '📈',
               title: 'Scale with confidence',
-              desc: 'Build technology that can grow alongside your business instead of holding it back.',
-            },
+              desc: 'Build technology that can grow alongside your business instead of holding it back.'
+            }
           ].map((value, i) => (
-            <div
-              key={i}
+            <div key={i}
               style={{
                 backgroundColor: 'white',
                 padding: '30px',
                 borderRadius: '8px',
                 textAlign: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
               }}
             >
               <div style={{ fontSize: '48px', marginBottom: '15px' }}>{value.icon}</div>
@@ -279,7 +282,13 @@ const Home = () => {
           What We Build
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '30px'
+          }}
+        >
           {[
             {
               icon: '🌐',
@@ -287,15 +296,15 @@ const Home = () => {
               shortDesc: 'Your website is often the first interaction a potential customer has with your business.',
               services: ['Corporate websites', 'Business websites', 'Landing pages', 'E-commerce websites', 'Web portals'],
               buttonText: 'Build My Website →',
-              link: '/services/website',
+              link: '/services/website'
             },
             {
               icon: '💻',
               title: 'Custom Software & Web Applications',
-              shortDesc: "Off-the-shelf software doesn't always fit the way your business operates.",
+              shortDesc: 'Off-the-shelf software doesn\'t always fit the way your business operates.',
               services: ['Business management systems', 'Customer portals', 'Booking systems', 'CRM solutions', 'Custom web applications'],
               buttonText: 'Discuss My Software Project →',
-              link: '/services/applications',
+              link: '/services/applications'
             },
             {
               icon: '📱',
@@ -303,20 +312,19 @@ const Home = () => {
               shortDesc: 'Transform your ideas into intuitive, reliable mobile experiences.',
               services: ['iOS & Android Apps', 'React Native Development', 'MVP Development', 'App Strategy'],
               buttonText: 'Build My App →',
-              link: '/services/applications',
-            },
+              link: '/services/applications'
+            }
           ].map((service, i) => (
-            <div
-              key={i}
+            <div key={i}
               style={{
                 backgroundColor: 'white',
                 padding: '30px',
                 borderRadius: '8px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                transition: 'transform 0.3s ease',
+                transition: 'transform 0.3s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-5px)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               <div style={{ fontSize: '40px', marginBottom: '15px' }}>{service.icon}</div>
               <h3 style={{ marginBottom: '10px', fontSize: '20px', fontWeight: 'bold' }}>{service.title}</h3>
@@ -331,7 +339,6 @@ const Home = () => {
               </div>
 
               <button
-                type="button"
                 onClick={() => navigate(service.link)}
                 style={{
                   width: '100%',
@@ -342,7 +349,7 @@ const Home = () => {
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontSize: '14px',
+                  fontSize: '14px'
                 }}
               >
                 {service.buttonText}
@@ -358,23 +365,28 @@ const Home = () => {
           From Challenge to Working Solution
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '20px'
+          }}
+        >
           {[
             { number: '01', title: 'Discover', desc: 'Understand your business and goals' },
             { number: '02', title: 'Plan', desc: 'Define scope and roadmap' },
             { number: '03', title: 'Design', desc: 'Create UX and visual direction' },
             { number: '04', title: 'Build', desc: 'Develop with regular communication' },
             { number: '05', title: 'Launch', desc: 'Deploy and verify' },
-            { number: '06', title: 'Support', desc: 'Maintenance and improvements' },
+            { number: '06', title: 'Support', desc: 'Maintenance and improvements' }
           ].map((step, i) => (
-            <div
-              key={i}
+            <div key={i}
               style={{
                 backgroundColor: 'white',
                 padding: '25px',
                 borderRadius: '8px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                textAlign: 'center',
+                textAlign: 'center'
               }}
             >
               <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
@@ -397,17 +409,16 @@ const Home = () => {
           {[
             { title: 'We Listen Before We Build', desc: 'We understand the problem before recommending solutions.' },
             { title: 'We Build for Your Needs', desc: 'Your business is different. Your technology should be too.' },
-            { title: 'We Communicate Clearly', desc: "You don't need to be a developer to understand progress." },
+            { title: 'We Communicate Clearly', desc: 'You don\'t need to be a developer to understand progress.' },
             { title: 'We Focus on Results', desc: 'We create solutions that deliver real value to your business.' },
-            { title: 'We Think Beyond Launch', desc: 'We provide ongoing support, maintenance and improvements.' },
+            { title: 'We Think Beyond Launch', desc: 'We provide ongoing support, maintenance and improvements.' }
           ].map((reason, i) => (
-            <div
-              key={i}
+            <div key={i}
               style={{
                 backgroundColor: 'white',
                 padding: '30px',
                 borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
               }}
             >
               <h3 style={{ marginBottom: '10px', fontSize: '18px', fontWeight: 'bold' }}>{reason.title}</h3>
@@ -426,32 +437,33 @@ const Home = () => {
           Wisdom and insights from tech visionaries to inspire your journey
         </p>
 
-        <div
-          style={{
-            background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-            borderRadius: '12px',
-            padding: '40px',
-            textAlign: 'center',
-            marginBottom: '40px',
-            borderLeft: '5px solid #3b82f6',
-          }}
-        >
+        <div style={{
+          backgroundColor: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+          borderRadius: '12px',
+          padding: '40px',
+          textAlign: 'center',
+          marginBottom: '40px',
+          borderLeft: '5px solid #3b82f6'
+        }}>
           <div style={{ fontSize: '48px', marginBottom: '20px' }}>💡</div>
-          <blockquote
-            style={{
-              fontSize: '22px',
-              fontStyle: 'italic',
-              color: '#1f2937',
-              margin: '0 auto 20px',
-              maxWidth: '800px',
-              fontWeight: '500',
-              lineHeight: '1.6',
-            }}
-          >
+          <blockquote style={{
+            fontSize: '22px',
+            fontStyle: 'italic',
+            color: '#1f2937',
+            marginBottom: '20px',
+            maxWidth: '800px',
+            margin: '0 auto 20px',
+            fontWeight: '500',
+            lineHeight: '1.6'
+          }}>
             "Innovation distinguishes between a leader and a follower."
           </blockquote>
-          <p style={{ color: '#374151', fontWeight: 'bold', marginBottom: '5px' }}>— Steve Jobs</p>
-          <p style={{ color: '#666', fontSize: '14px' }}>Apple Co-founder</p>
+          <p style={{ color: '#374151', fontWeight: 'bold', marginBottom: '5px' }}>
+            — Steve Jobs
+          </p>
+          <p style={{ color: '#666', fontSize: '14px' }}>
+            Apple Co-founder
+          </p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '40px' }}>
@@ -460,43 +472,48 @@ const Home = () => {
               icon: '❤️',
               quote: 'The only way to do great work is to love what you do.',
               author: 'Steve Jobs',
-              title: 'Apple Co-founder',
+              title: 'Apple Co-founder'
             },
             {
               icon: '🚀',
               quote: 'The only impossible journey is the one you never begin.',
               author: 'Tony Robbins',
-              title: 'Motivational Speaker',
+              title: 'Motivational Speaker'
             },
             {
               icon: '⚙️',
               quote: 'Ideas are nothing. Execution is everything.',
               author: 'Mark Zuckerberg',
-              title: 'Facebook Founder',
-            },
+              title: 'Facebook Founder'
+            }
           ].map((item, i) => (
-            <div
-              key={i}
-              style={{
-                backgroundColor: 'white',
-                padding: '25px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                borderLeft: '5px solid #3b82f6',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-5px)')}
-              onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
-            >
+            <div key={i} style={{
+              backgroundColor: 'white',
+              padding: '25px',
+              borderRadius: '8px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              borderLeft: '5px solid #3b82f6',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
               <div style={{ fontSize: '32px', marginBottom: '15px' }}>{item.icon}</div>
-              <p style={{ fontSize: '15px', fontStyle: 'italic', color: '#374151', marginBottom: '15px', lineHeight: '1.5' }}>
+              <p style={{
+                fontSize: '15px',
+                fontStyle: 'italic',
+                color: '#374151',
+                marginBottom: '15px',
+                lineHeight: '1.5'
+              }}>
                 "{item.quote}"
               </p>
               <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
                 <p style={{ margin: '0 0 3px 0', color: '#1f2937', fontWeight: 'bold', fontSize: '14px' }}>
                   — {item.author}
                 </p>
-                <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>{item.title}</p>
+                <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>
+                  {item.title}
+                </p>
               </div>
             </div>
           ))}
@@ -504,7 +521,6 @@ const Home = () => {
 
         <div style={{ textAlign: 'center' }}>
           <button
-            type="button"
             onClick={() => navigate('/quotes')}
             style={{
               padding: '14px 40px',
@@ -515,10 +531,10 @@ const Home = () => {
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.3s ease'
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#1e40af')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#3b82f6')}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e40af'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
           >
             View All Quotes & Categories →
           </button>
@@ -534,19 +550,22 @@ const Home = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '30px' }}>
           {!loading && teamMembers.length > 0 ? (
             teamMembers.map((member, i) => (
-              <div
-                key={i}
+              <div key={i}
                 style={{
                   backgroundColor: 'white',
                   padding: '30px',
                   borderRadius: '8px',
                   textAlign: 'center',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                 }}
               >
                 <div style={{ fontSize: '50px', marginBottom: '15px' }}>{member.image || '👤'}</div>
-                <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>{member.name}</h3>
-                <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>{member.title}</p>
+                <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
+                  {member.name}
+                </h3>
+                <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
+                  {member.title}
+                </p>
                 {member.quote && (
                   <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', marginTop: '10px' }}>
                     "{member.quote}"
@@ -571,26 +590,16 @@ const Home = () => {
       </div>
 
       {/* ========== CTA ========== */}
-      <div
-        id="contact"
-        style={{
-          maxWidth: '900px',
-          margin: '50px auto',
-          padding: '30px',
-          backgroundColor: '#f0f9ff',
-          borderRadius: '8px',
-          textAlign: 'center',
-          scrollMarginTop: '80px',
-        }}
-      >
-        <h2 style={{ marginBottom: '12px', fontSize: '24px', fontWeight: 'bold' }}>Ready to Get Started?</h2>
+      <div id="contact" style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center', scrollMarginTop: '80px' }}>
+        <h2 style={{ marginBottom: '12px', fontSize: '24px', fontWeight: 'bold' }}>
+          Ready to Get Started?
+        </h2>
         <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
           Connect with our team or explore our services.
         </p>
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            type="button"
             onClick={() => navigate('/services')}
             style={{
               padding: '14px 32px',
@@ -601,21 +610,20 @@ const Home = () => {
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#1e3a8a';
-              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.target.style.backgroundColor = '#1e3a8a';
+              e.target.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#1e40af';
-              e.currentTarget.style.transform = 'translateY(0)';
+              e.target.style.backgroundColor = '#1e40af';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             Book a Free Consultation
           </button>
           <button
-            type="button"
             onClick={openChat}
             style={{
               padding: '14px 32px',
@@ -626,15 +634,15 @@ const Home = () => {
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#ff5722';
-              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.target.style.backgroundColor = '#ff5722';
+              e.target.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#ff6b35';
-              e.currentTarget.style.transform = 'translateY(0)';
+              e.target.style.backgroundColor = '#ff6b35';
+              e.target.style.transform = 'translateY(0)';
             }}
           >
             💬 Chat with us
@@ -644,25 +652,18 @@ const Home = () => {
 
       {/* ========== FOOTER ========== */}
       <div style={{ backgroundColor: '#1e40af', color: 'white', padding: '40px', marginTop: '60px' }}>
-        <div
-          style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '40px',
-            marginBottom: '40px',
-          }}
-        >
-          {/* Company info */}
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginBottom: '40px' }}>
+          {/* Company Info */}
           <div>
-            <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>Ayinde Technologies</h3>
+            <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
+              Ayinde Technologies
+            </h3>
             <p style={{ opacity: 1, lineHeight: '1.6' }}>
               Building practical digital solutions for businesses ready to grow.
             </p>
           </div>
 
-          {/* Contact info */}
+          {/* Contact Info */}
           <div>
             <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#fbbf24' }}>
               Sales & Support
@@ -674,55 +675,50 @@ const Home = () => {
               📧 <strong>support@ayindetechnologies.com</strong>
             </p>
             <p style={{ marginBottom: '8px', fontSize: '12px', opacity: 1 }}>
-              📍 <strong>East Coast Headquarters:</strong>
-              <br />
+              📍 <strong>East Coast Headquarters:</strong><br/>
               Delaware, USA
             </p>
             <p style={{ marginBottom: '0', fontSize: '12px', opacity: 1 }}>
-              📍 <strong>Westcoast Division:</strong>
-              <br />
+              📍 <strong>Westcoast Division:</strong><br/>
               California, USA
             </p>
           </div>
 
-          {/* Quick links */}
+          {/* Quick Links */}
           <div>
             <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#fbbf24' }}>
               Quick Links
             </h4>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              {[
-                { href: '#services', label: '🌐 Services' },
-                { href: '#team', label: '👥 Our Team' },
-                { href: '#contact', label: '📝 Contact' },
-                { href: '/courses', label: '📖 Courses' },
-              ].map((link) => (
-                <li key={link.href} style={{ marginBottom: '8px' }}>
-                  <a
-                    href={link.href}
-                    style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#services" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  🌐 Services
+                </a>
+              </li>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#team" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  👥 Our Team
+                </a>
+              </li>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#contact" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  📝 Contact
+                </a>
+              </li>
+              <li>
+                <a href="/courses" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  📖 Courses
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom footer */}
-        <div
-          style={{
-            borderTop: '1px solid rgba(255,255,255,0.2)',
-            paddingTop: '20px',
-            textAlign: 'center',
-            opacity: 1,
-            fontSize: '13px',
-          }}
-        >
-          <p style={{ margin: 0 }}>© 2026 Ayinde Technologies Limited. All rights reserved.</p>
+        {/* Bottom Footer */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '20px', textAlign: 'center', opacity: 1, fontSize: '13px' }}>
+          <p style={{ margin: 0 }}>
+            © 2026 Ayinde Technologies Limited. All rights reserved.
+          </p>
           <p style={{ margin: '8px 0 0 0' }}>
             🔒 Trusted by businesses across the globe to deliver technology that works.
           </p>
