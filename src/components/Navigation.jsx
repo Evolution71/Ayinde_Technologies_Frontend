@@ -130,6 +130,10 @@ const Navigation = () => {
             Team
           </a>
 
+          <Link to="/book" className="nav-link" onClick={() => setIsOpen(false)}>
+            Book a call
+          </Link>
+
           <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>
             Contact
           </a>
