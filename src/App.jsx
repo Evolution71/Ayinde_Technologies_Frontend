@@ -20,6 +20,7 @@ import ServiceFlyers from './components/ServiceFlyers';
 import BookPage from './pages/BookPage';
 import FormPage from './pages/Formpage';
 import CRMPage from './pages/Admin/Crmpage';
+import Dashboard from './pages/Dashboard';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';
@@ -58,6 +59,7 @@ const App = () => {
             {/* Courses */}
             <Route path="/courses" element={<Courses />} />
             <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/checkout/:courseId" element={<CheckoutPage />} />
 
             {/* Services Routes - 12-Page Structure */}

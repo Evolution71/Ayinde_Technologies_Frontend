@@ -13,15 +13,26 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 // ========== TOKEN MANAGEMENT ==========
 
+// Must match the key AuthContext uses ('ayinde_token').
+const TOKEN_KEY = 'ayinde_token';
+
 const setToken = (token) => {
-  if (token) {
-    localStorage.setItem('token', token);
-  } else {
-    localStorage.removeItem('token');
-  }
+  try {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+  } catch (e) { /* storage blocked */ }
 };
 
-const getToken = () => localStorage.getItem('token');
+const getToken = () => {
+  try {
+    return localStorage.getItem(TOKEN_KEY);
+  } catch (e) {
+    return null;
+  }
+};
 
 // ========== HELPER FUNCTIONS ==========
 
