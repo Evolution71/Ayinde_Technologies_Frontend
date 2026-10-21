@@ -18,8 +18,8 @@ import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ServiceFlyers from './components/ServiceFlyers';
 import BookPage from './pages/BookPage';
-import FormPage from './pages/FormPage';
-import CRMPage from './pages/admin/CRMPage';
+import FormPage from './pages/Formpage';
+import CRMPage from './pages/Admin/Crmpage';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';

@@ -1,0 +1,79 @@
+/* CRM, booking and form pages. Uses the site's colour variables from App.css. */
+
+.crm-page {
+  padding: 24px 16px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+.crm-page h1 { font-size: clamp(1.5rem, 4vw, 2rem); margin: 0 0 8px; text-wrap: balance; }
+.crm-page h2 { font-size: 1.1rem; margin: 0 0 12px; overflow-wrap: anywhere; }
+.crm-narrow { max-width: 640px; }
+.crm-muted { color: var(--text-light, #666); font-size: 0.9rem; }
+.crm-error { color: #b00020; background: #fdecec; padding: 10px 12px; border-radius: 6px; }
+
+.crm-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+.crm-tab {
+  padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border-color, #e0e0e0);
+  background: var(--white, #fff); cursor: pointer; font: inherit;
+}
+.crm-tab.is-active { background: var(--primary-color, #185FA5); color: #fff; border-color: transparent; }
+
+.crm-form { display: flex; flex-direction: column; gap: 14px; }
+.crm-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 500; }
+.crm-form label.crm-checkbox { flex-direction: row; align-items: center; gap: 8px; font-weight: 400; }
+.crm-form input, .crm-form select, .crm-form textarea,
+.crm-toolbar input, .crm-toolbar select, .crm-field-row input, .crm-field-row select {
+  font: inherit; padding: 10px 12px; border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px; width: 100%; box-sizing: border-box; min-width: 0;
+}
+.crm-form fieldset { border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 12px; }
+.crm-form legend { padding: 0 6px; font-weight: 500; }
+
+.crm-btn {
+  font: inherit; padding: 10px 16px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--border-color, #e0e0e0); background: var(--white, #fff); color: var(--text-dark, #1a1a1a);
+  text-decoration: none; display: inline-block; text-align: center;
+}
+.crm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.crm-btn-primary { background: var(--primary-color, #185FA5); color: #fff; border-color: transparent; }
+.crm-btn-danger { color: #b00020; }
+.crm-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.crm-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.crm-toolbar input { flex: 1 1 220px; }
+
+.crm-slots .crm-slot-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.crm-slot {
+  padding: 10px; border-radius: 6px; border: 1px solid var(--border-color, #e0e0e0);
+  background: var(--white, #fff); cursor: pointer; font: inherit;
+}
+.crm-slot.is-selected { background: var(--primary-color, #185FA5); color: #fff; border-color: transparent; }
+
+.crm-split { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 900px) { .crm-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); } }
+
+.crm-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.crm-list-item {
+  width: 100%; text-align: left; padding: 12px; border-radius: 8px; cursor: pointer; font: inherit;
+  border: 1px solid var(--border-color, #e0e0e0); background: var(--white, #fff);
+  display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere;
+}
+.crm-list-item.is-selected { border-color: var(--primary-color, #185FA5); }
+
+.crm-card {
+  border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 12px;
+  display: flex; flex-direction: column; gap: 4px; background: var(--white, #fff); min-width: 0; overflow-wrap: anywhere;
+}
+
+/* Pipeline board: horizontal scroll inside its own container on phones */
+.crm-board { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
+.crm-column { min-width: 220px; flex: 0 0 220px; background: var(--light-bg, #f8f9fa); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.crm-column h2 { display: flex; justify-content: space-between; text-transform: capitalize; }
+.crm-count { background: var(--white, #fff); border-radius: 999px; padding: 2px 8px; font-size: 0.8rem; }
+
+.crm-field-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 8px; align-items: center; border: 1px solid var(--border-color, #e0e0e0); border-radius: 8px; padding: 10px; }
+.crm-field-row .crm-checkbox { font-weight: 400; }
+
+.crm-submissions { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.crm-submissions pre { white-space: pre-wrap; overflow-x: auto; background: var(--light-bg, #f8f9fa); padding: 8px; border-radius: 6px; font-size: 0.85rem; margin: 4px 0 0; }
