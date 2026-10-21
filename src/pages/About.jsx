@@ -471,16 +471,31 @@ export default function About() {
               We're a US-based team working with clients locally and internationally, with hours
               that overlap US Eastern and Pacific time zones.
             </p>
+            <p><strong>Ayinde Technologies Corporation</strong></p>
             <address>
               📍 <strong>East Coast Headquarters</strong><br/>
-              Delaware, USA
+              254 Chapman Rd, Ste. 208<br/>Newark, Delaware 19702<br/>United States
             </address>
             <address>
-              📍 <strong>Westcoast Division</strong><br/>
-              California, USA
+              📍 <strong>Westcoast Office</strong><br/>
+              112 S Market St, Ste. 1008<br/>Inglewood, California 90301<br/>United States
             </address>
-            <p><a href="tel:+13022084855">📞 1-302-208-4855</a></p>
-            <p><a href="mailto:support@ayindetechnologies.com">📧 support@ayindetechnologies.com</a></p>
+            <div className="about-contact-lines">
+              <p>
+                <strong>Sales Representative (Sophia)</strong><br/>
+                <a href="tel:+13025150227">+1 302 515 0227</a><br/>
+                <a href="mailto:sales@ayindetechnologies.com">Sales@ayindetechnologies.com</a>
+              </p>
+              <p>
+                <strong>Support Representative (Peter)</strong><br/>
+                <a href="tel:+12015342657">+1 201 534 2657</a><br/>
+                <a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a>
+              </p>
+              <p>
+                For more information, book a call or email:{' '}
+                <a href="mailto:info@ayindetechnologies.com">info@ayindetechnologies.com</a>
+              </p>
+            </div>
           </div>
           <div className="about-cta-card">
             <h3>Have a project in mind?</h3>

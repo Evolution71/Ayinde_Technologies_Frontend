@@ -329,8 +329,14 @@ const Footer = () => {
               📍 East Coast HQ: 254 Chapman Rd, Ste. 208, Newark, DE 19702<br/>
               📍 Westcoast Office: 112 S Market St, Ste. 1008, Inglewood, CA 90301
             </p>
-            <p className="footer-phone"><a href="tel:+13025150227">Sales: 1-302-515-0227</a></p>
-            <p className="footer-phone"><a href="tel:+12015342657">Support: 1-201-534-2657</a></p>
+            <p className="footer-phone"><strong>Sales Representative (Sophia)</strong><br/>
+              <a href="tel:+13025150227">+1 302 515 0227</a><br/>
+              <a href="mailto:sales@ayindetechnologies.com">Sales@ayindetechnologies.com</a></p>
+            <p className="footer-phone"><strong>Support Representative (Peter)</strong><br/>
+              <a href="tel:+12015342657">+1 201 534 2657</a><br/>
+              <a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a></p>
+            <p className="footer-phone">For more information, book a call or email:<br/>
+              <a href="mailto:info@ayindetechnologies.com">info@ayindetechnologies.com</a></p>
           </div>
           <div className="footer-section">
             <h4>🌐 Services</h4>
