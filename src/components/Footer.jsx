@@ -48,7 +48,8 @@ const Footer = () => {
 
         .footer-content {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          align-items: start;
           gap: 50px;
           margin-bottom: 50px;
         }
@@ -300,7 +301,7 @@ const Footer = () => {
           }
 
           .footer-content {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 30px;
           }
 
@@ -310,6 +311,11 @@ const Footer = () => {
 
           .social-links {
             justify-content: center;
+          }
+        }
+        @media (max-width: 560px) {
+          .footer-content {
+            grid-template-columns: minmax(0, 1fr);
           }
         }
       `}</style>
