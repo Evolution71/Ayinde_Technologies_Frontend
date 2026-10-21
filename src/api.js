@@ -639,7 +639,7 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== BOOKINGS (public) ==========
+  // ========== BOOKINGS (publicS) ==========
 
   async getAvailability(isoDate) {
     const res = await fetch(`${API_URL}/api/bookings/availability?date=${encodeURIComponent(isoDate)}`);
