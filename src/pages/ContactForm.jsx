@@ -406,12 +406,18 @@ const ContactForm = () => {
           <div style={{ display: 'flex', gap: '30px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <div>
               <p style={{ fontWeight: 'bold', color: '#1f2937', marginBottom: '5px' }}>📞 Phone</p>
-              <a href="tel:+13022084855" style={{ color: '#1e40af', textDecoration: 'none', fontWeight: '600' }}>
-                +1 302-208-4855
+              <a href="tel:+13025150227" style={{ color: '#1e40af', textDecoration: 'none', fontWeight: '600' }}>
+                Sales: 1-302-515-0227
+              </a><br/>
+              <a href="tel:+12015342657" style={{ color: '#1e40af', textDecoration: 'none', fontWeight: '600' }}>
+                Support: 1-201-534-2657
               </a>
             </div>
             <div>
               <p style={{ fontWeight: 'bold', color: '#1f2937', marginBottom: '5px' }}>📧 Email</p>
+              <a href="mailto:sales@ayindetechnologies.com" style={{ color: '#1e40af', textDecoration: 'none', fontWeight: '600' }}>
+                sales@ayindetechnologies.com
+              </a><br/>
               <a href="mailto:support@ayindetechnologies.com" style={{ color: '#1e40af', textDecoration: 'none', fontWeight: '600' }}>
                 support@ayindetechnologies.com
               </a>
@@ -419,8 +425,8 @@ const ContactForm = () => {
             <div>
               <p style={{ fontWeight: 'bold', color: '#1f2937', marginBottom: '5px' }}>📍 Offices</p>
               <p style={{ color: '#666', fontWeight: '600' }}>
-                East Coast: Delaware, USA<br/>
-                Westcoast: California, USA
+                East Coast HQ: 254 Chapman Rd, Ste. 208, Newark, DE 19702<br/>
+                Westcoast Office: 112 S Market St, Ste. 1008, Inglewood, CA 90301
               </p>
             </div>
           </div>

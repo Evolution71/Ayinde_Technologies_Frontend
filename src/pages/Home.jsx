@@ -169,7 +169,7 @@ const Home = () => {
             animation: 'slideInUp 0.8s ease-out 0.4s both'
           }}>
             <button
-              onClick={() => navigate('/services')}
+              onClick={() => navigate('/book')}
               style={{
                 padding: '16px 36px',
                 fontSize: '16px',
@@ -600,7 +600,7 @@ const Home = () => {
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={() => navigate('/services')}
+            onClick={() => navigate('/book')}
             style={{
               padding: '14px 32px',
               fontSize: '16px',
@@ -669,18 +669,20 @@ const Home = () => {
               Sales & Support
             </h4>
             <p style={{ marginBottom: '8px' }}>
-              📞 <strong>+1 302-208-4855</strong>
+              📞 <strong>Sales: 1-302-515-0227</strong><br/>
+              📞 <strong>Support: 1-201-534-2657</strong>
             </p>
             <p style={{ marginBottom: '8px' }}>
+              📧 <strong>sales@ayindetechnologies.com</strong><br/>
               📧 <strong>support@ayindetechnologies.com</strong>
             </p>
             <p style={{ marginBottom: '8px', fontSize: '12px', opacity: 1 }}>
               📍 <strong>East Coast Headquarters:</strong><br/>
-              Delaware, USA
+              254 Chapman Rd, Ste. 208, Newark, Delaware 19702
             </p>
             <p style={{ marginBottom: '0', fontSize: '12px', opacity: 1 }}>
-              📍 <strong>Westcoast Division:</strong><br/>
-              California, USA
+              📍 <strong>Westcoast Office:</strong><br/>
+              112 S Market St, Ste. 1008, Inglewood, California 90301
             </p>
           </div>
 
