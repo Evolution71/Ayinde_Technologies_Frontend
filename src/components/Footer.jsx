@@ -357,9 +357,9 @@ const Footer = () => {
               <li><Link to="/terms">Terms of Service</Link></li>
             </ul>
             <div className="social-links">
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-icon">in</a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon">𝕏</a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="social-icon">f</a>
+              <a href="https://www.linkedin.com/company/ayinde-technologies/" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">in</a>
+              <a href="https://www.instagram.com/ayindetechnologies" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">IG</a>
+              <a href="https://x.com/ayindetechhq" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X">𝕏</a>
             </div>
           </div>
         </div>
@@ -371,9 +371,9 @@ const Footer = () => {
             <Link to="/terms" className="footer-legal-link">Terms of Service</Link>
           </div>
           <div className="social-links">
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-icon">in</a>
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon">𝕏</a>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" className="social-icon">f</a>
+            <a href="https://www.linkedin.com/company/ayinde-technologies/" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">in</a>
+              <a href="https://www.instagram.com/ayindetechnologies" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">IG</a>
+              <a href="https://x.com/ayindetechhq" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X">𝕏</a>
           </div>
         </div>
       </div>
