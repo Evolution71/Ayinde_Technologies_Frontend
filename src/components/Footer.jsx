@@ -2,384 +2,362 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import logoWhite from '../assets/logo-white.svg';
 
+const SOCIALS = [
+  { href: 'https://www.linkedin.com/company/ayinde-technologies/', label: 'LinkedIn', text: 'in' },
+  { href: 'https://www.instagram.com/ayindetechnologies', label: 'Instagram', text: 'IG' },
+  { href: 'https://x.com/ayindetechhq', label: 'X', text: '𝕏' },
+];
+
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="footer">
+    <footer className="ayn-footer">
       <style>{`
-        .footer {
+        /* All classes are prefixed "ayn-" so Bootstrap (loaded on the design
+           pages) can't override the footer layout. */
+        .ayn-footer {
           background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #182d52 100%);
-          color: white;
-          padding: 60px 20px 30px;
+          color: #fff;
+          padding: 64px 24px 28px;
           position: relative;
           overflow: hidden;
+          font-size: 14px;
         }
 
-        .footer::before {
+        .ayn-footer::before {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
+          top: 0; left: 0; right: 0;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         }
 
-        .footer::after {
+        .ayn-footer::after {
           content: '';
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          inset: 0;
           background:
-            radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 80%, rgba(191, 144, 0, 0.05) 0%, transparent 50%);
+            radial-gradient(circle at 15% 30%, rgba(59,130,246,0.12) 0%, transparent 50%),
+            radial-gradient(circle at 85% 85%, rgba(251,191,36,0.06) 0%, transparent 50%);
           pointer-events: none;
         }
 
-        .container {
+        .ayn-footer-inner {
           position: relative;
           z-index: 1;
           max-width: 1200px;
           margin: 0 auto;
+          width: 100%;
         }
 
-        .footer-content {
+        /* ---------- Row 1: brand + link columns ---------- */
+        .ayn-footer-top {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: 1.4fr 1fr 1fr 1fr;
+          gap: 48px;
           align-items: start;
-          gap: 50px;
-          margin-bottom: 50px;
+          padding-bottom: 44px;
         }
 
-        .footer-section {
-          animation: fadeInUp 0.8s ease-out;
+        .ayn-footer-logo {
+          display: block;
+          height: 48px;
+          width: auto;
+          margin: 0 0 16px;
         }
 
-        .footer-section:nth-child(1) { animation-delay: 0.1s; }
-        .footer-section:nth-child(2) { animation-delay: 0.2s; }
-        .footer-section:nth-child(3) { animation-delay: 0.3s; }
-        .footer-section:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .ayn-footer-tagline {
+          margin: 0 0 22px;
+          font-size: 15px;
+          line-height: 1.6;
+          color: rgba(255,255,255,0.85);
+          max-width: 300px;
         }
 
-        .footer-logo-img {
-          max-height: 50px;
-          margin-bottom: 20px;
-          transition: transform 0.3s ease;
-        }
-
-        .footer-section:hover .footer-logo-img {
-          transform: scale(1.05);
-        }
-
-        .footer-section p {
-          opacity: 1;
-          line-height: 1.8;
-          margin: 10px 0;
-          font-size: 14px;
-          transition: opacity 0.3s ease;
-        }
-
-        .footer-section:hover p {
-          opacity: 1;
-        }
-
-        .footer-address {
-          background: rgba(255, 255, 255, 0.1);
-          padding: 15px;
-          border-radius: 8px;
-          border-left: 4px solid #fbbf24;
-          transition: all 0.3s ease;
-        }
-
-        .footer-address:hover {
-          background: rgba(255, 255, 255, 0.15);
-          border-left-color: #ff6b35;
-          transform: translateX(5px);
-        }
-
-        .footer-section h4 {
+        .ayn-footer-heading {
+          margin: 0 0 18px;
+          padding-bottom: 10px;
           font-size: 16px;
           font-weight: 800;
-          margin-bottom: 20px;
+          color: #fbbf24;
           position: relative;
-          padding-bottom: 10px;
-          color: #fbbf24 !important;
         }
 
-        .footer-section h4::after {
+        .ayn-footer-heading::after {
           content: '';
           position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 0;
-          height: 3px;
+          left: 0; bottom: 0;
+          width: 32px; height: 3px;
+          border-radius: 2px;
           background: linear-gradient(90deg, #fbbf24, #ff6b35);
-          transition: width 0.4s ease;
         }
 
-        .footer-section:hover h4::after {
-          width: 40px;
-        }
-
-        .footer-section ul {
+        .ayn-footer-links {
           list-style: none;
           padding: 0;
           margin: 0;
         }
 
-        .footer-section li {
-          margin-bottom: 12px;
-          opacity: 1;
-          transition: all 0.3s ease;
+        .ayn-footer-links li {
+          margin: 0 0 12px;
         }
 
-        .footer-section li:hover {
-          opacity: 1;
-          transform: translateX(5px);
-        }
-
-        .footer-section a {
-          color: white;
+        .ayn-footer a {
+          color: #fff;
           text-decoration: none;
-          position: relative;
+          transition: color 0.2s ease;
+        }
+
+        .ayn-footer a:hover {
+          color: #fbbf24;
+        }
+
+        .ayn-footer-links a {
           display: inline-block;
-          font-size: 14px;
+          transition: color 0.2s ease, transform 0.2s ease;
         }
 
-        .footer-section a::after {
-          content: '';
-          position: absolute;
-          bottom: -2px;
-          left: 0;
-          width: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #fbbf24, #ff6b35);
-          transition: width 0.3s ease;
+        .ayn-footer-links a:hover {
+          transform: translateX(4px);
         }
 
-        .footer-section a:hover::after {
-          width: 100%;
-        }
-
-        .footer-phone a {
-          font-weight: 600;
-          font-size: 15px;
-        }
-
-        .social-links {
+        /* ---------- Social icons ---------- */
+        .ayn-social {
           display: flex;
-          gap: 15px;
-          margin-top: 20px;
+          gap: 12px;
           flex-wrap: wrap;
         }
 
-        .social-icon {
+        .ayn-social a {
           width: 40px;
           height: 40px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.1);
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
-          text-decoration: none;
-          font-size: 12px;
-          font-weight: 600;
-          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          background: rgba(255,255,255,0.1);
+          border: 1px solid rgba(255,255,255,0.2);
+          font-size: 13px;
+          font-weight: 700;
+          transition: all 0.25s ease;
         }
 
-        .social-icon:hover {
+        .ayn-social a:hover {
+          color: #fff;
           background: linear-gradient(135deg, #fbbf24, #ff6b35);
           border-color: transparent;
-          transform: translateY(-5px);
-          box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(255,107,53,0.3);
         }
 
-        .footer-bottom {
-          border-top: 1px solid rgba(255, 255, 255, 0.2);
-          padding-top: 30px;
-          opacity: 1;
-          animation: fadeIn 1s ease-out 0.6s both;
+        /* ---------- Row 2: contact cards ---------- */
+        .ayn-footer-contact {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 20px;
+          padding: 32px 0;
+          border-top: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .ayn-contact-card {
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-left: 4px solid #fbbf24;
+          border-radius: 10px;
+          padding: 16px 18px;
+          transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .ayn-contact-card:hover {
+          background: rgba(255,255,255,0.11);
+          border-left-color: #ff6b35;
+        }
+
+        .ayn-contact-title {
+          margin: 0 0 10px;
+          font-size: 13px;
+          font-weight: 800;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+          color: #fbbf24;
+        }
+
+        .ayn-contact-card p {
+          margin: 0 0 6px;
+          line-height: 1.55;
+          color: rgba(255,255,255,0.9);
+        }
+
+        .ayn-contact-card p:last-child {
+          margin-bottom: 0;
+        }
+
+        .ayn-contact-name {
+          font-weight: 700;
+          color: #fff !important;
+        }
+
+        .ayn-contact-card a {
+          font-weight: 600;
+          word-break: break-word;
+        }
+
+        /* ---------- Row 3: bottom bar ---------- */
+        .ayn-footer-bottom {
           display: flex;
           flex-wrap: wrap;
           justify-content: space-between;
           align-items: center;
-          gap: 20px;
+          gap: 16px;
+          padding-top: 24px;
+          border-top: 1px solid rgba(255,255,255,0.15);
+          font-size: 13px;
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        .footer-bottom p {
+        .ayn-footer-bottom p {
           margin: 0;
-          font-size: 13px;
-          transition: all 0.3s ease;
-          opacity: 1;
-          color: white;
+          color: rgba(255,255,255,0.8);
         }
 
-        .footer-bottom p:hover {
-          color: #fbbf24;
-        }
-
-        .footer-legal {
+        .ayn-footer-legal {
           display: flex;
-          gap: 20px;
-          flex-wrap: wrap;
           align-items: center;
-          opacity: 1;
+          gap: 14px;
         }
 
-        .footer-legal a {
-          color: white;
-          text-decoration: none;
-          font-size: 13px;
+        .ayn-footer-legal a {
           font-weight: 600;
-          transition: all 0.3s ease;
-          opacity: 1;
         }
 
-        .footer-legal a:hover {
-          color: #fbbf24;
+        .ayn-footer-legal span {
+          opacity: 0.5;
         }
 
-        .footer-legal::before {
-          content: '⚖️';
-          font-size: 16px;
-          color: #fbbf24;
-          margin-right: 10px;
+        /* ---------- Responsive ---------- */
+        @media (max-width: 1024px) {
+          .ayn-footer-contact {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
         }
 
-        .footer-legal-link {
-          color: white !important;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          opacity: 1;
+        @media (max-width: 900px) {
+          .ayn-footer-top {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 32px;
+          }
+
+          .ayn-footer-brand {
+            grid-column: 1 / -1;
+          }
+
+          .ayn-footer-tagline {
+            max-width: none;
+          }
         }
 
-        .footer-legal-link:hover {
-          color: #fbbf24 !important;
-        }
+        @media (max-width: 600px) {
+          .ayn-footer {
+            padding: 44px 16px 24px;
+          }
 
-        @media (max-width: 768px) {
-          .footer-bottom {
+          .ayn-footer-top {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 28px;
+          }
+
+          .ayn-footer-contact {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .ayn-footer-bottom {
             flex-direction: column;
             text-align: center;
-            justify-content: center;
-          }
-
-          .footer-legal {
-            justify-content: center;
-          }
-
-          .social-links {
-            justify-content: center;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .footer {
-            padding: 40px 20px 20px;
-          }
-
-          .footer-content {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 30px;
-          }
-
-          .footer-section h4::after {
-            width: 30px;
-          }
-
-          .social-links {
-            justify-content: center;
-          }
-        }
-        @media (max-width: 560px) {
-          .footer-content {
-            grid-template-columns: minmax(0, 1fr);
           }
         }
       `}</style>
 
-      <div className="container">
-        <div className="footer-content">
-          <div className="footer-section">
-            <img src={logoWhite} alt="Ayinde Technologies" className="footer-logo-img" />
-            <p>Guide, Build &amp; Implement AI Technologies</p>
-            <p className="footer-address">
-              📍 East Coast HQ: 254 Chapman Rd, Ste. 208, Newark, DE 19702<br/>
-              📍 Westcoast Office: 112 S Market St, Ste. 1008, Inglewood, CA 90301
-            </p>
-            <p className="footer-phone"><strong>Sales Representative (Sophia)</strong><br/>
-              <a href="tel:+13025150227">+1 302 515 0227</a><br/>
-              <a href="mailto:sales@ayindetechnologies.com">Sales@ayindetechnologies.com</a></p>
-            <p className="footer-phone"><strong>Support Representative (Peter)</strong><br/>
-              <a href="tel:+12015342657">+1 201 534 2657</a><br/>
-              <a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a></p>
-            <p className="footer-phone">For more information, book a call or email:<br/>
-              <a href="mailto:info@ayindetechnologies.com">info@ayindetechnologies.com</a></p>
+      <div className="ayn-footer-inner">
+        {/* Row 1: brand + links */}
+        <div className="ayn-footer-top">
+          <div className="ayn-footer-brand">
+            <img src={logoWhite} alt="Ayinde Technologies" className="ayn-footer-logo" />
+            <p className="ayn-footer-tagline">Guide, Build &amp; Implement AI Technologies</p>
+            <div className="ayn-social">
+              {SOCIALS.map((s) => (
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+                  {s.text}
+                </a>
+              ))}
+            </div>
           </div>
-          <div className="footer-section">
-            <h4>🌐 Services</h4>
-            <ul>
-              <li><a href="/#services">AI App Development</a></li>
-              <li><a href="/#services">Web Development</a></li>
-              <li><a href="/#services">Tech Consulting</a></li>
-              <li><a href="/#courses">Online Courses</a></li>
+
+          <div>
+            <h4 className="ayn-footer-heading">🌐 Services</h4>
+            <ul className="ayn-footer-links">
+              <li><Link to="/app-development">AI App Development</Link></li>
+              <li><Link to="/website-development">Web Development</Link></li>
+              <li><Link to="/tech-consulting">Tech Consulting</Link></li>
+              <li><Link to="/premium-services">Premium Services</Link></li>
+              <li><Link to="/our-courses">Online Courses</Link></li>
             </ul>
           </div>
-          <div className="footer-section">
-            <h4>🏢 Company</h4>
-            <ul>
+
+          <div>
+            <h4 className="ayn-footer-heading">🏢 Company</h4>
+            <ul className="ayn-footer-links">
               <li><Link to="/about">About Us</Link></li>
               <li><a href="/#projects">Projects</a></li>
               <li><a href="/#team">Team</a></li>
               <li><a href="/#contact">Contact</a></li>
             </ul>
           </div>
-          <div className="footer-section">
-            <h4>⚖️ Legal</h4>
-            <ul>
+
+          <div>
+            <h4 className="ayn-footer-heading">⚖️ Legal</h4>
+            <ul className="ayn-footer-links">
               <li><Link to="/privacy">Privacy Policy</Link></li>
               <li><Link to="/terms">Terms of Service</Link></li>
             </ul>
-            <div className="social-links">
-              <a href="https://www.linkedin.com/company/ayinde-technologies/" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">in</a>
-              <a href="https://www.instagram.com/ayindetechnologies" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">IG</a>
-              <a href="https://x.com/ayindetechhq" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X">𝕏</a>
-            </div>
           </div>
         </div>
-        <div className="footer-bottom">
-          <p>&copy; {currentYear} Ayinde Technologies. All rights reserved.</p>
-          <div className="footer-legal">
-            <Link to="/privacy" className="footer-legal-link">Privacy Policy</Link>
-            <span style={{ opacity: 0.5 }}>·</span>
-            <Link to="/terms" className="footer-legal-link">Terms of Service</Link>
+
+        {/* Row 2: contact details */}
+        <div className="ayn-footer-contact">
+          <div className="ayn-contact-card">
+            <h5 className="ayn-contact-title">📍 Offices</h5>
+            <p><span className="ayn-contact-name">East Coast HQ</span><br />254 Chapman Rd, Ste. 208, Newark, DE 19702</p>
+            <p><span className="ayn-contact-name">West Coast</span><br />112 S Market St, Ste. 1008, Inglewood, CA 90301</p>
           </div>
-          <div className="social-links">
-            <a href="https://www.linkedin.com/company/ayinde-technologies/" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="LinkedIn">in</a>
-              <a href="https://www.instagram.com/ayindetechnologies" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="Instagram">IG</a>
-              <a href="https://x.com/ayindetechhq" target="_blank" rel="noopener noreferrer" className="social-icon" aria-label="X">𝕏</a>
+
+          <div className="ayn-contact-card">
+            <h5 className="ayn-contact-title">💼 Sales</h5>
+            <p className="ayn-contact-name">Sophia</p>
+            <p><a href="tel:+13025150227">+1 302 515 0227</a></p>
+            <p><a href="mailto:sales@ayindetechnologies.com">sales@ayindetechnologies.com</a></p>
+          </div>
+
+          <div className="ayn-contact-card">
+            <h5 className="ayn-contact-title">🛟 Support</h5>
+            <p className="ayn-contact-name">Peter</p>
+            <p><a href="tel:+12015342657">+1 201 534 2657</a></p>
+            <p><a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a></p>
+          </div>
+
+          <div className="ayn-contact-card">
+            <h5 className="ayn-contact-title">✉️ General Enquiries</h5>
+            <p>Book a call or email us:</p>
+            <p><a href="mailto:info@ayindetechnologies.com">info@ayindetechnologies.com</a></p>
+          </div>
+        </div>
+
+        {/* Row 3: bottom bar */}
+        <div className="ayn-footer-bottom">
+          <p>&copy; {currentYear} Ayinde Technologies. All rights reserved.</p>
+          <div className="ayn-footer-legal">
+            <Link to="/privacy">Privacy Policy</Link>
+            <span>·</span>
+            <Link to="/terms">Terms of Service</Link>
           </div>
         </div>
       </div>
