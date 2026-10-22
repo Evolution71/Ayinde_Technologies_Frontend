@@ -180,3 +180,19 @@
 .ayinde-site.courses-page .watch-link:hover{
         color: #FF0000;
     }
+
+/* Header text colours (do not rely on Bootstrap utilities) and course badges in flow */
+.ayinde-site.courses-page .courses-header h1 {
+  color: #ffffff;
+}
+.ayinde-site.courses-page .courses-header .lead {
+  color: rgba(255, 255, 255, 0.75);
+}
+.ayinde-site.courses-page .courses-header .badge-custom {
+  color: #ffffff;
+}
+.ayinde-site.courses-page .course-badge {
+  position: static;
+  display: inline-block;
+  margin-bottom: 8px;
+}

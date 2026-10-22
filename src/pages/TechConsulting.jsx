@@ -37,7 +37,7 @@ const TechConsulting = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site consulting-page">
         {/* Tech Consulting Specific CSS */}
         {/* === Hero Split Section (Plans + Form) === */}
         <section className="hero-split">

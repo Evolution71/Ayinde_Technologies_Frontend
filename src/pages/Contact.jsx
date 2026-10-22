@@ -40,7 +40,7 @@ const Contact = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site contact-page">
         <div>
           {/* Contact Page Specific CSS */}
           {/* === Page Header === */}

@@ -1,11 +1,47 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/site-base.css';
 import '../styles/home-page.css';
 import { api } from '../api';
 import Captcha from '../components/Captcha';
-import VideoBackground from '../components/VideoBackground';
 import { SERVICE_PLANS } from '../lib/servicePlans';
+
+const HERO_SLIDES = [
+  {
+    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000&auto=format&fit=crop',
+    overlay: null,
+    badge: 'badge-orange', dot: 'bg-warning',
+    kicker: 'Business Automation • EST 2026',
+    title: ['Technology Partner,', 'Not Just a Vendor'],
+    desc: 'Ayinde Technologies helps businesses automate operations with a clear plan before code, and support after launch. East + West Coast coverage.',
+    cta: 'Book Strategy Call', to: '/contact',
+    note: 'With Albert A.D. Cabrera, CEO',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2000&auto=format&fit=crop',
+    overlay: 'linear-gradient(120deg, rgba(10,34,72,0.95) 0%, rgba(14,47,97,0.8) 100%)',
+    badge: 'badge-blue', dot: 'bg-info',
+    kicker: 'Strategy • Build • Implement',
+    title: ['Plan Before', 'You Build'],
+    desc: 'We work through a business plan with you before touching a keyboard, from the first working MVP to production-ready AI apps and websites.',
+    cta: 'View Services', to: '/our-services',
+    note: 'Website • Mobile • Desktop',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop',
+    overlay: 'linear-gradient(45deg, rgba(10,34,72,0.95) 0%, rgba(11,30,61,0.9) 100%)',
+    badge: 'badge-orange', dot: 'bg-white',
+    kicker: 'Enterprise Ready',
+    title: ['Support After', 'Launch'],
+    desc: 'All-in-one enterprise solutions with advanced AI integration, a dedicated account manager, and flexible payments. We stay through rollout.',
+    cta: 'Explore Premium', to: '/premium-services',
+    note: 'Dedicated Support • Flexible Terms',
+  },
+];
+
+const MARQUEE_ITEMS = [
+  'AI APPS & WEBSITES', 'TECH CONSULTING', 'ONLINE COURSES', 'ENTERPRISE AUTOMATION', 'STRATEGY • BUILD • IMPLEMENT',
+];
 
 const Home = () => {
   const navigate = useNavigate();
@@ -82,36 +118,16 @@ const Home = () => {
     }, 500);
   };
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // Hero carousel images (using gradient overlays with icons for now)
-  const heroImages = [
-    {
-      gradient: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-      icon: '🌐'
-    },
-    {
-      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-      icon: '💻'
-    },
-    {
-      gradient: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
-      icon: '🚀'
-    }
-  ];
-
-  // Auto-rotate carousel every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [heroImages.length]);
 
   const [category, setCategory] = useState('website');
   const [contactStatus, setContactStatus] = useState('idle'); // idle | sending | sent
   const [contactError, setContactError] = useState('');
   const captchaRef = useRef(null);
+  const [heroSlide, setHeroSlide] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setHeroSlide((n) => (n + 1) % HERO_SLIDES.length), 6000);
+    return () => clearInterval(t);
+  }, []);
   const quoteRef = useRef(null);
   const quoteIndex = useRef(0);
 
@@ -183,137 +199,53 @@ const Home = () => {
 
   return (
     <div className="ayinde-site home-page" style={{ minHeight: '100vh', backgroundColor: '#F8FAFF' }}>
-      {/* ========== HERO SECTION WITH VIDEO BACKGROUND ========== */}
-      <VideoBackground minHeight="600px" overlayOpacity={0.8} gradientColor1="rgba(10, 34, 72, " gradientColor2="rgba(20, 60, 120, ">
-        {/* Floating Icon */}
-        <div
-          className="video-bg-accent"
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            fontSize: '120px',
-            zIndex: 0
-          }}
-        >
-          {heroImages[currentImageIndex].icon}
-        </div>
-
-        {/* Carousel Navigation Dots */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '40px',
-            right: '40px',
-            display: 'flex',
-            gap: '12px',
-            zIndex: 10
-          }}
-        >
-          {heroImages.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentImageIndex(index)}
-              style={{
-                width: '14px',
-                height: '14px',
-                borderRadius: '50%',
-                border: 'none',
-                backgroundColor: index === currentImageIndex ? '#FF7A1A' : 'rgba(255, 255, 255, 0.5)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
-              }}
-              aria-label={`Slide ${index + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* Hero Content */}
-        <div style={{ textAlign: 'center', position: 'relative', zIndex: 5 }}>
-          <h1 className="video-bg-title" style={{
-            fontSize: 'clamp(32px, 5vw, 56px)',
-            marginBottom: '20px',
-            fontWeight: '700',
-            lineHeight: '1.2',
-            textShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-          }}>
-            Technology That Helps Your Business Grow
-          </h1>
-
-          <p className="video-bg-subtitle" style={{
-            fontSize: 'clamp(16px, 2vw, 20px)',
-            marginBottom: '40px',
-            maxWidth: '800px',
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-            lineHeight: '1.6'
-          }}>
-            We build websites, software and digital solutions that solve real business problems.
-          </p>
-
-          <div style={{
-            display: 'flex',
-            gap: '20px',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            animation: 'slideInUp 0.8s ease-out 0.4s both'
-          }}>
-            <button
-              onClick={() => navigate('/our-services')}
-              style={{
-                padding: '16px 36px',
-                fontSize: '16px',
-                backgroundColor: 'white',
-                color: '#0A2248',
-                border: 'none',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                boxShadow: '0 8px 24px rgba(10,34,72,0.2)',
-                transition: 'all 0.3s ease',
-                transform: 'translateY(0)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
-              }}
-            >
-              Book a Free Consultation
-            </button>
-            <button
-              onClick={() => navigate('/our-courses')}
-              style={{
-                padding: '16px 36px',
-                fontSize: '16px',
-                backgroundColor: '#FF7A1A',
-                color: '#0A2248',
-                border: 'none',
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                boxShadow: '0 8px 24px rgba(10,34,72,0.2)',
-                transition: 'all 0.3s ease',
-                transform: 'translateY(0)'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
-              }}
-            >
-              View Our Courses
-            </button>
+      {/* ========== HERO (PHP design: three-slide carousel) ========== */}
+      <section id="home" className="hero-section p-0">
+        <div className="carousel slide hero-carousel">
+          <div className="carousel-inner">
+            {HERO_SLIDES.map((slide, i) => (
+              <div key={slide.title} className={`carousel-item${heroSlide === i ? ' active' : ''}`}>
+                <div className="hero-bg" style={{ backgroundImage: `url('${slide.image}')` }} />
+                <div className="hero-overlay" style={slide.overlay ? { background: slide.overlay } : undefined} />
+                <div className="container h-100 position-relative z-3">
+                  <div className="row h-100 align-items-center">
+                    <div className="col-lg-8 hero-content">
+                      <span className={`badge-custom ${slide.badge} text-white bg-white bg-opacity-10 border border-light mb-4`}>
+                        <span className={`rounded-circle ${slide.dot} d-inline-block me-2`} style={{ width: 8, height: 8 }} /> {slide.kicker}
+                      </span>
+                      <h1 className="hero-title display-font">{slide.title.map((line, n) => (<React.Fragment key={n}>{n > 0 && <br />}{line}</React.Fragment>))}</h1>
+                      <p className="hero-desc">{slide.desc}</p>
+                      <div className="d-flex align-items-center gap-3 flex-wrap mt-4">
+                        <Link to={slide.to} className="btn-accent">{slide.cta} ↗</Link>
+                        <span className="text-white-50 small">{slide.note}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="carousel-indicators">
+            {HERO_SLIDES.map((slide, i) => (
+              <button key={slide.title[0]} type="button" className={heroSlide === i ? 'active' : ''} aria-label={`Slide ${i + 1}`} aria-current={heroSlide === i ? 'true' : undefined} onClick={() => setHeroSlide(i)} />
+            ))}
           </div>
         </div>
-      </VideoBackground>
+      </section>
+
+      {/* ========== MARQUEE ========== */}
+      <div className="marquee-wrapper">
+        <div className="marquee-content">
+          {[0, 1].map((k) => (
+            <div className="marquee-item" key={k} aria-hidden={k === 1}>
+              {MARQUEE_ITEMS.map((t) => (
+                <React.Fragment key={t}><span>{t}</span><div className="marquee-dot" /></React.Fragment>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
   <section id="about">
     <div className="container">
       <div className="row g-5 align-items-start">
@@ -724,6 +656,7 @@ const Home = () => {
   {/* Contact Section */}
   <section id="contact" className="contact-section">
     <div className="container" style={{maxWidth: 1280}}>
+      <button type="button" onClick={openChat} className="btn btn-outline-light rounded-pill px-4 mb-4"><i className="fa-solid fa-comments me-2" />Chat with us</button>
       <div className="row g-5 align-items-start">
         <div className="col-lg-7">
           <span className="badge-custom text-white-50 border border-secondary mb-4">CONTACT • EAST &amp; WEST COAST</span>
@@ -782,120 +715,7 @@ const Home = () => {
       </div>
     </div>
   </section>
-      {/* ========== QUOTES SECTION ========== */}
-      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '15px', fontSize: '36px', fontWeight: 'bold' }}>
-          💬 Inspiration from Industry Leaders
-        </h2>
-        <p style={{ textAlign: 'center', color: '#666', marginBottom: '50px', fontSize: '16px' }}>
-          Wisdom and insights from tech visionaries to inspire your journey
-        </p>
-
-        <div style={{
-          backgroundColor: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-          borderRadius: '12px',
-          padding: '40px',
-          textAlign: 'center',
-          marginBottom: '40px',
-          borderLeft: '5px solid #3b82f6'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>💡</div>
-          <blockquote style={{
-            fontSize: '22px',
-            fontStyle: 'italic',
-            color: '#1f2937',
-            marginBottom: '20px',
-            maxWidth: '800px',
-            margin: '0 auto 20px',
-            fontWeight: '500',
-            lineHeight: '1.6'
-          }}>
-            "Innovation distinguishes between a leader and a follower."
-          </blockquote>
-          <p style={{ color: '#374151', fontWeight: 'bold', marginBottom: '5px' }}>
-            — Steve Jobs
-          </p>
-          <p style={{ color: '#666', fontSize: '14px' }}>
-            Apple Co-founder
-          </p>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '40px' }}>
-          {[
-            {
-              icon: '❤️',
-              quote: 'The only way to do great work is to love what you do.',
-              author: 'Steve Jobs',
-              title: 'Apple Co-founder'
-            },
-            {
-              icon: '🚀',
-              quote: 'The only impossible journey is the one you never begin.',
-              author: 'Tony Robbins',
-              title: 'Motivational Speaker'
-            },
-            {
-              icon: '⚙️',
-              quote: 'Ideas are nothing. Execution is everything.',
-              author: 'Mark Zuckerberg',
-              title: 'Facebook Founder'
-            }
-          ].map((item, i) => (
-            <div key={i} style={{
-              backgroundColor: 'white',
-              padding: '25px',
-              borderRadius: '20px',
-              boxShadow: '0 16px 40px rgba(10,34,72,0.08)',
-              borderLeft: '5px solid #3b82f6',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-              <div style={{ fontSize: '32px', marginBottom: '15px' }}>{item.icon}</div>
-              <p style={{
-                fontSize: '15px',
-                fontStyle: 'italic',
-                color: '#374151',
-                marginBottom: '15px',
-                lineHeight: '1.5'
-              }}>
-                "{item.quote}"
-              </p>
-              <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
-                <p style={{ margin: '0 0 3px 0', color: '#1f2937', fontWeight: 'bold', fontSize: '14px' }}>
-                  — {item.author}
-                </p>
-                <p style={{ margin: 0, color: '#666', fontSize: '12px' }}>
-                  {item.title}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={() => navigate('/quotes')}
-            style={{
-              padding: '14px 40px',
-              fontSize: '16px',
-              backgroundColor: '#2F9BFF',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0A2248'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2F9BFF'}
-          >
-            View All Quotes & Categories →
-          </button>
-        </div>
-      </div>
-
-      {/* ========== TEAM ========== */}
+      {!loading && teamMembers.length > 0 && (
       <div id="team" style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', scrollMarginTop: '80px' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '40px', fontSize: '36px', fontWeight: 'bold' }}>
           Our Team
@@ -943,141 +763,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* ========== CTA ========== */}
-      <div id="contact" style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '20px', textAlign: 'center', scrollMarginTop: '80px' }}>
-        <h2 style={{ marginBottom: '12px', fontSize: '24px', fontWeight: 'bold' }}>
-          Ready to Get Started?
-        </h2>
-        <p style={{ color: '#666', marginBottom: '20px', fontSize: '14px' }}>
-          Connect with our team or explore our services.
-        </p>
-
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => navigate('/our-services')}
-            style={{
-              padding: '14px 32px',
-              fontSize: '16px',
-              backgroundColor: '#0A2248',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#0A2248';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#0A2248';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            Book a Free Consultation
-          </button>
-          <button
-            onClick={openChat}
-            style={{
-              padding: '14px 32px',
-              fontSize: '16px',
-              backgroundColor: '#FF7A1A',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#E8650F';
-              e.target.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#FF7A1A';
-              e.target.style.transform = 'translateY(0)';
-            }}
-          >
-            💬 Chat with us
-          </button>
-        </div>
-      </div>
-
-      {/* ========== FOOTER ========== */}
-      <div style={{ backgroundColor: '#0A2248', color: 'white', padding: '40px', marginTop: '60px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginBottom: '40px' }}>
-          {/* Company Info */}
-          <div>
-            <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
-              Ayinde Technologies
-            </h3>
-            <p style={{ opacity: 1, lineHeight: '1.6' }}>
-              Building practical digital solutions for businesses ready to grow.
-            </p>
-          </div>
-
-          {/* Contact Info */}
-          <div>
-            <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#FF7A1A' }}>
-              Sales & Support
-            </h4>
-            <p style={{ marginBottom: '8px' }}>
-              📞 <strong>+1 302-208-4855</strong>
-            </p>
-            <p style={{ marginBottom: '8px' }}>
-              📧 <strong>support@ayindetechnologies.com</strong>
-            </p>
-            <p style={{ marginBottom: '8px', fontSize: '12px', opacity: 1 }}>
-              📍 <strong>East Coast Headquarters:</strong><br/>
-              Delaware, USA
-            </p>
-            <p style={{ marginBottom: '0', fontSize: '12px', opacity: 1 }}>
-              📍 <strong>Westcoast Division:</strong><br/>
-              California, USA
-            </p>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#FF7A1A' }}>
-              Quick Links
-            </h4>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-              <li style={{ marginBottom: '8px' }}>
-                <a href="#services" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
-                  🌐 Services
-                </a>
-              </li>
-              <li style={{ marginBottom: '8px' }}>
-                <a href="#team" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
-                  👥 Our Team
-                </a>
-              </li>
-              <li style={{ marginBottom: '8px' }}>
-                <a href="#contact" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
-                  📝 Contact
-                </a>
-              </li>
-              <li>
-                <a href="/our-courses" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
-                  📖 Courses
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom Footer */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '20px', textAlign: 'center', opacity: 1, fontSize: '13px' }}>
-          <p style={{ margin: 0 }}>
-            © 2026 Ayinde Technologies Limited. All rights reserved.
-          </p>
-          <p style={{ margin: '8px 0 0 0' }}>
-            🔒 Trusted by businesses across the globe to deliver technology that works.
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

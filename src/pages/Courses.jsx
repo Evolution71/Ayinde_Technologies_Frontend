@@ -34,7 +34,7 @@ const Courses = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site courses-page">
         <div>
           {/* Courses Page Specific CSS */}
           {/* === Page Header === */}

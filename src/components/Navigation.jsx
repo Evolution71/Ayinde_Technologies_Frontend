@@ -93,6 +93,10 @@ const Navigation = () => {
                   <span className="item-icon">👑</span>
                   <span className="item-text">Premium Services</span>
                 </Link>
+                <Link to="/start-project" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">🚀</span>
+                  <span className="item-text">Start a Project</span>
+                </Link>
               </div>
             )}
           </div>

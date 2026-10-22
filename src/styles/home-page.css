@@ -611,11 +611,27 @@
             position: relative;
         }
 
-/* Contact form: full-width fields inside the dark contact panel */
+/* Contact form: fields share each Bootstrap row side by side; message and captcha take full width */
 .ayinde-site.home-page .contact-form input:not([type="checkbox"]):not([type="radio"]),
 .ayinde-site.home-page .contact-form select,
 .ayinde-site.home-page .contact-form textarea {
   width: 100%;
   box-sizing: border-box;
 }
-.ayinde-site.home-page .contact-form > * + * { margin-top: 12px; }
+.ayinde-site.home-page .contact-form .row > [class*="col"] {
+  min-width: 0;
+}
+
+/* Contact rows: name and email share a row, service and phone share a row */
+.ayinde-site.home-page .contact-form > .row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin-left: 0;
+  margin-right: 0;
+}
+@media (max-width: 640px) {
+  .ayinde-site.home-page .contact-form > .row {
+    grid-template-columns: 1fr;
+  }
+}

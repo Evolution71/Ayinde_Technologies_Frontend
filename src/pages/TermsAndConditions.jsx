@@ -9,7 +9,7 @@ const TermsAndConditions = () => {
   useSiteStyles();
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site terms-page">
         <div>
           {/* Legal Pages Specific CSS */}
           {/* === Page Header === */}

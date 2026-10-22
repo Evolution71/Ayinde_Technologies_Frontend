@@ -39,7 +39,7 @@ const StartProject = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site start-project-page">
         <div>
           {/* Start Project Specific CSS */}
           {/* === Page Header === */}

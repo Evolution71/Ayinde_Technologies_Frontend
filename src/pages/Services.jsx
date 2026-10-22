@@ -9,7 +9,7 @@ const Services = () => {
   useSiteStyles();
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site services-page">
         <div>
           {/* Services Page Specific CSS */}
           {/* === Page Header === */}

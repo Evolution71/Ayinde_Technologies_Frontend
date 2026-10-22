@@ -37,7 +37,7 @@ const AppDevelopment = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site app-page">
         {/* App Development Specific CSS */}
         {/* === Hero Split Section (Plans + Form) === */}
         <section className="hero-split">

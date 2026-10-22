@@ -39,7 +39,7 @@ const PremiumServices = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site premium-page">
         {/* Premium Services Specific CSS */}
         {/* === Hero Split Section === */}
         <section className="hero-split">
