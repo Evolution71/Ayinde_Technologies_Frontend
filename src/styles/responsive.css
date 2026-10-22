@@ -1,0 +1,25 @@
+/* Phone layout. Applies to every page at 640px and below.
+   Inline-styled grids (repeat(N, 1fr)) stack to one column so text is not squeezed. */
+@media (max-width: 640px) {
+  [style*="grid-template-columns: repeat(2, 1fr)"],
+  [style*="grid-template-columns: repeat(3, 1fr)"],
+  [style*="grid-template-columns: repeat(4, 1fr)"],
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Keep a 16px gutter on both sides and stop wide content from pushing the page sideways */
+  .container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  /* Design pages: keep course badges and titles from overlapping on narrow screens */
+  .courses-page .course-meta { flex-wrap: wrap; gap: 6px; }
+  .courses-page .course-badge { position: static !important; }
+
+  img, video, iframe {
+    max-width: 100%;
+  }
+  h1 { font-size: 2rem !important; line-height: 1.2 !important; }
+  h2 { font-size: 1.6rem !important; line-height: 1.25 !important; }
+}

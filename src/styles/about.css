@@ -1,11 +1,11 @@
-/* Scoped to .ayinde-site (generated from the PHP design CSS) */
-.ayinde-site .page-header{
+/* Scoped to .ayinde-site.about-page (generated from the PHP design CSS) */
+.ayinde-site.about-page .page-header{
         padding: 180px 0 100px;
         background: linear-gradient(135deg, var(--color-navy) 0%, #0c2a5c 100%);
         position: relative;
         overflow: hidden;
     }
-.ayinde-site .page-header::after{
+.ayinde-site.about-page .page-header::after{
         content: '';
         position: absolute;
         bottom: -100px;
@@ -17,20 +17,20 @@
         border-radius: 50%;
         pointer-events: none;
     }
-.ayinde-site .about-image-wrapper{
+.ayinde-site.about-page .about-image-wrapper{
         position: relative;
         border-radius: 24px;
         overflow: hidden;
         box-shadow: var(--shadow-md);
     }
-.ayinde-site .about-image-wrapper::before{
+.ayinde-site.about-page .about-image-wrapper::before{
         content: '';
         position: absolute;
         inset: 0;
         background: linear-gradient(to top, rgba(10,34,72,0.6) 0%, transparent 40%);
         z-index: 1;
     }
-.ayinde-site .team-card{
+.ayinde-site.about-page .team-card{
         background: #fff;
         border-radius: 24px;
         padding: 40px 30px;
@@ -40,11 +40,11 @@
         position: relative;
         overflow: hidden;
     }
-.ayinde-site .team-card:hover{
+.ayinde-site.about-page .team-card:hover{
         transform: translateY(-5px);
         box-shadow: var(--shadow-md);
     }
-.ayinde-site .team-card::before{
+.ayinde-site.about-page .team-card::before{
         content: '';
         position: absolute;
         top: 0;
@@ -53,7 +53,7 @@
         height: 4px;
         background: var(--color-orange);
     }
-.ayinde-site block === -->
+.ayinde-site.about-page block === -->
 <style>
     
 
@@ -72,11 +72,11 @@
         flex-direction: column;
         justify-content: center;
     }
-.ayinde-site .team-card-featured:hover{
+.ayinde-site.about-page .team-card-featured:hover{
         transform: translateY(-5px);
         box-shadow: var(--shadow-md);
     }
-.ayinde-site .team-card-featured::before{
+.ayinde-site.about-page .team-card-featured::before{
         content: '';
         position: absolute;
         top: 0;
@@ -85,7 +85,7 @@
         height: 5px;
         background: var(--color-orange);
     }
-.ayinde-site .team-card-compact{
+.ayinde-site.about-page .team-card-compact{
         background: #fff;
         border-radius: 20px;
         padding: 30px 25px;
@@ -99,12 +99,12 @@
         position: relative;
         overflow: hidden;
     }
-.ayinde-site .team-card-compact:hover{
+.ayinde-site.about-page .team-card-compact:hover{
         transform: translateY(-4px);
         box-shadow: var(--shadow-md);
         border-color: rgba(47,155,255,0.2);
     }
-.ayinde-site .team-card-compact::before{
+.ayinde-site.about-page .team-card-compact::before{
         content: '';
         position: absolute;
         left: 0;
@@ -115,6 +115,6 @@
         opacity: 0;
         transition: var(--transition);
     }
-.ayinde-site .team-card-compact:hover::before{
+.ayinde-site.about-page .team-card-compact:hover::before{
         opacity: 1;
     }

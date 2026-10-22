@@ -41,7 +41,7 @@ const VerusPos = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site verus-pos-page">
         <div>
           {/* Verus-POS Specific CSS */}
           {/* === Page Header === */}

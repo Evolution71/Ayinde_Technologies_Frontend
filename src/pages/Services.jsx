@@ -2,6 +2,7 @@ import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import '../styles/services.css';
+import NewsletterSection from '../components/NewsletterSection';
 
 // Converted from a84c3078-services.php (PHP). Markup and classes are unchanged.
 const Services = () => {
@@ -121,6 +122,7 @@ const Services = () => {
             </div>
           </section>
           {/* === Newsletter Section === */}
+          <NewsletterSection />
         </div>
       </div>
       

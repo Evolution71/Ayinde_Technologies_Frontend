@@ -41,7 +41,7 @@ const Exactus = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site exactus-page">
         <div>
           {/* Exactus Specific CSS */}
           {/* === Page Header === */}

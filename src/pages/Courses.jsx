@@ -4,6 +4,7 @@ import useSiteStyles from '../hooks/useSiteStyles';
 import { api } from '../api';
 import '../styles/site-base.css';
 import '../styles/courses.css';
+import NewsletterSection from '../components/NewsletterSection';
 
 // Converted from 1018357a-courses.php (PHP). Markup and classes are unchanged.
 const asArray = (data, key) => (Array.isArray(data) ? data : data?.[key] || []);
@@ -245,6 +246,7 @@ const Courses = () => {
             </div>
           </section>
           {/* === Newsletter Section === */}
+          <NewsletterSection />
         </div>
       </div>
       

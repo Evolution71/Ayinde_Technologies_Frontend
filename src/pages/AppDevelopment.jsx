@@ -1,15 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
 import '../styles/app.css';
+import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from e8954424-app-development.php (PHP). Markup and classes are unchanged.
 const AppDevelopment = () => {
   useSiteStyles();
-  const handleFormSubmit = (e) => {
-    // Simulated submit, as in the PHP source. Wire to the backend when ready.
+  const [status, setStatus] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const f = e.currentTarget;
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      const res = await submitInquiry('app-development', {
+        first_name: fieldValue(f, 'fName'),
+        last_name: fieldValue(f, 'lName'),
+        email: fieldValue(f, 'emailAdd'),
+        phone: fieldValue(f, 'phoneNum'),
+        plan: fieldValue(f, 'planSelect'),
+        description: fieldValue(f, 'projDesc'),
+        priority_checkout: fieldChecked(f, 'priorityCheckout'),
+      });
+      setStatus({ ok: true, text: successText(res) });
+      f.reset();
+    } catch (err) {
+      setStatus({ ok: false, text: err.message });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -148,12 +171,15 @@ const AppDevelopment = () => {
                           </label>
                         </div>
                         <div className="col-12 mt-4">
-                          <button type="submit" className="btn-primary-custom w-100 justify-content-center py-3" id="submitBtn" style={{fontSize: 16}}>
+                          <button type="submit" disabled={submitting} className="btn-primary-custom w-100 justify-content-center py-3" id="submitBtn" style={{fontSize: 16}}>
                             Submit App Inquiry
                           </button>
                         </div>
                       </div>
-                    </form>
+                  {status && (
+                    <div className={`alert ${status.ok ? 'alert-success' : 'alert-danger'} mt-3 mb-0 small`} role="status">{status.text}</div>
+                  )}
+                                      </form>
                   </div>
                   {/* Payment Loader */}
                   <div className="payment-loader" id="paymentLoader">

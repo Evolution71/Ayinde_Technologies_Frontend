@@ -1,15 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
 import '../styles/premium.css';
+import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from 30f1b5cf-premium-services.php (PHP). Markup and classes are unchanged.
 const PremiumServices = () => {
   useSiteStyles();
-  const handleFormSubmit = (e) => {
-    // Simulated submit, as in the PHP source. Wire to the backend when ready.
+  const [status, setStatus] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const f = e.currentTarget;
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      const res = await submitInquiry('premium-services', {
+        first_name: fieldValue(f, 'fName'),
+        last_name: fieldValue(f, 'lName'),
+        email: fieldValue(f, 'emailAdd'),
+        phone: fieldValue(f, 'phoneNum'),
+        company_name: fieldValue(f, 'companyName'),
+        plan: fieldValue(f, 'planSelect'),
+        description: fieldValue(f, 'projDesc'),
+        priority_checkout: fieldChecked(f, 'priorityCheckout'),
+        terms_accepted: fieldChecked(f, 'termsAccepted'),
+      });
+      setStatus({ ok: true, text: successText(res) });
+      f.reset();
+    } catch (err) {
+      setStatus({ ok: false, text: err.message });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -139,12 +164,19 @@ const PremiumServices = () => {
                         </label>
                       </div>
                       <div className="col-12 mt-4">
-                        <button type="submit" className="btn-primary-custom w-100 justify-content-center py-3" id="submitBtn" style={{fontSize: 16, backgroundColor: 'var(--color-navy)', borderColor: 'var(--color-navy)'}}>
+                        <div className="form-check mb-3">
+                          <input className="form-check-input" type="checkbox" id="termsAccepted" required />
+                          <label className="form-check-label small" htmlFor="termsAccepted">I accept the Terms and Conditions</label>
+                        </div>
+                                                <button type="submit" disabled={submitting} className="btn-primary-custom w-100 justify-content-center py-3" id="submitBtn" style={{fontSize: 16, backgroundColor: 'var(--color-navy)', borderColor: 'var(--color-navy)'}}>
                           Request Premium Onboarding
                         </button>
                       </div>
                     </div>
-                  </form>
+                  {status && (
+                    <div className={`alert ${status.ok ? 'alert-success' : 'alert-danger'} mt-3 mb-0 small`} role="status">{status.text}</div>
+                  )}
+                                    </form>
                 </div>
               </div>
             </div>

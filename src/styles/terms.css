@@ -1,26 +1,26 @@
-/* Scoped to .ayinde-site (generated from the PHP design CSS) */
-.ayinde-site .legal-header{
+/* Scoped to .ayinde-site.terms-page (generated from the PHP design CSS) */
+.ayinde-site.terms-page .legal-header{
         padding: 160px 0 80px;
         background: var(--color-light);
         position: relative;
         overflow: hidden;
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-.ayinde-site .legal-content-wrapper{
+.ayinde-site.terms-page .legal-content-wrapper{
         padding: 40px;
         background: #fff;
         border-radius: 24px;
         box-shadow: var(--shadow-sm);
         border: 1px solid rgba(0,0,0,0.05);
     }
-.ayinde-site .legal-section{
+.ayinde-site.terms-page .legal-section{
         margin-bottom: 60px;
         scroll-margin-top: 140px; 
     }
-.ayinde-site .legal-section:last-child{
+.ayinde-site.terms-page .legal-section:last-child{
         margin-bottom: 0;
     }
-.ayinde-site .legal-section h2{
+.ayinde-site.terms-page .legal-section h2{
         font-family: var(--font-heading);
         color: var(--color-navy);
         font-size: 1.8rem;
@@ -28,23 +28,23 @@
         padding-bottom: 15px;
         border-bottom: 2px solid var(--color-light);
     }
-.ayinde-site .legal-section h3{
+.ayinde-site.terms-page .legal-section h3{
         font-family: var(--font-heading);
         color: var(--color-navy);
         font-size: 1.3rem;
         margin-top: 30px;
         margin-bottom: 15px;
     }
-.ayinde-site .legal-section p, .ayinde-site .legal-section li{
+.ayinde-site.terms-page .legal-section p, .ayinde-site.terms-page .legal-section li{
         color: #4a5568;
         line-height: 1.8;
         margin-bottom: 15px;
     }
-.ayinde-site .legal-section ul{
+.ayinde-site.terms-page .legal-section ul{
         padding-left: 20px;
         margin-bottom: 20px;
     }
-.ayinde-site .sticky-sidebar-container{
+.ayinde-site.terms-page .sticky-sidebar-container{
         position: sticky;
         top: 120px;
         max-height: calc(100vh - 140px);
@@ -52,14 +52,14 @@
         padding-right: 15px;
         z-index: 100;
     }
-.ayinde-site .sticky-sidebar-container::-webkit-scrollbar{
+.ayinde-site.terms-page .sticky-sidebar-container::-webkit-scrollbar{
         width: 4px;
     }
-.ayinde-site .sticky-sidebar-container::-webkit-scrollbar-thumb{
+.ayinde-site.terms-page .sticky-sidebar-container::-webkit-scrollbar-thumb{
         background: rgba(0,0,0,0.1);
         border-radius: 10px;
     }
-.ayinde-site .legal-nav-link{
+.ayinde-site.terms-page .legal-nav-link{
         display: block;
         padding: 12px 20px;
         color: #6c757d;
@@ -69,11 +69,11 @@
         transition: all 0.3s ease;
         margin-bottom: 5px;
     }
-.ayinde-site .legal-nav-link:hover, .ayinde-site .legal-nav-link.active{
+.ayinde-site.terms-page .legal-nav-link:hover, .ayinde-site.terms-page .legal-nav-link.active{
         background-color: #eaf3ff; 
         color: var(--color-blue);
     }
-@media (max-width: 991px){.ayinde-site .sticky-sidebar-container{
+@media (max-width: 991px){.ayinde-site.terms-page .sticky-sidebar-container{
             top: 80px; 
             max-height: auto;
             background: var(--color-light);
@@ -86,13 +86,13 @@
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
         }
-.ayinde-site .legal-nav-link{
+.ayinde-site.terms-page .legal-nav-link{
             display: inline-block;
             margin-bottom: 0;
             margin-right: 10px;
             padding: 10px 15px;
             font-size: 14px;
         }
-.ayinde-site .legal-content-wrapper{
+.ayinde-site.terms-page .legal-content-wrapper{
             padding: 30px 20px;
         }}

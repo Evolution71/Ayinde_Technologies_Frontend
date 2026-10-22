@@ -41,7 +41,7 @@ const Inventro = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site inventro-page">
         <div>
           {/* Inventro Specific CSS */}
           {/* === Page Header === */}

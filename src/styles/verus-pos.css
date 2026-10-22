@@ -1,12 +1,12 @@
-/* Scoped to .ayinde-site (generated from the PHP design CSS) */
-.ayinde-site .product-hero{
+/* Scoped to .ayinde-site.verus-pos-page (generated from the PHP design CSS) */
+.ayinde-site.verus-pos-page .product-hero{
         padding: 160px 0 100px;
         background: linear-gradient(135deg, var(--color-navy) 0%, #081d45 100%);
         position: relative;
         overflow: hidden;
         color: #fff;
     }
-.ayinde-site .product-hero::before{
+.ayinde-site.verus-pos-page .product-hero::before{
         content: '';
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
@@ -14,7 +14,7 @@
         background-size: 30px 30px;
         pointer-events: none;
     }
-.ayinde-site .product-hero::after{
+.ayinde-site.verus-pos-page .product-hero::after{
         content: '';
         position: absolute;
         top: -20%; right: -5%;
@@ -23,7 +23,7 @@
         filter: blur(100px);
         border-radius: 50%;
     }
-.ayinde-site .feature-icon-box{
+.ayinde-site.verus-pos-page .feature-icon-box{
         width: 60px; height: 60px;
         border-radius: 16px;
         background: rgba(47, 155, 255, 0.1);
@@ -34,7 +34,7 @@
         font-size: 24px;
         margin-bottom: 20px;
     }
-.ayinde-site .gallery-item{
+.ayinde-site.verus-pos-page .gallery-item{
         position: relative;
         border-radius: 16px;
         overflow: hidden;
@@ -43,13 +43,13 @@
         transition: var(--transition);
         aspect-ratio: 4/3;
     }
-.ayinde-site .gallery-item img{
+.ayinde-site.verus-pos-page .gallery-item img{
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
     }
-.ayinde-site .gallery-overlay{
+.ayinde-site.verus-pos-page .gallery-overlay{
         position: absolute;
         inset: 0;
         background: rgba(10,34,72,0.6);
@@ -61,17 +61,17 @@
         transition: var(--transition);
         color: #fff;
     }
-.ayinde-site .gallery-item:hover{
+.ayinde-site.verus-pos-page .gallery-item:hover{
         transform: translateY(-5px);
         box-shadow: var(--shadow-md);
     }
-.ayinde-site .gallery-item:hover img{
+.ayinde-site.verus-pos-page .gallery-item:hover img{
         transform: scale(1.05);
     }
-.ayinde-site .gallery-item:hover .gallery-overlay{
+.ayinde-site.verus-pos-page .gallery-item:hover .gallery-overlay{
         opacity: 1;
     }
-.ayinde-site .gallery-icon{
+.ayinde-site.verus-pos-page .gallery-icon{
         width: 50px; height: 50px;
         background: var(--color-blue);
         border-radius: 50%;
@@ -83,10 +83,10 @@
         transform: translateY(20px);
         transition: all 0.4s ease;
     }
-.ayinde-site .gallery-item:hover .gallery-icon{
+.ayinde-site.verus-pos-page .gallery-item:hover .gallery-icon{
         transform: translateY(0);
     }
-.ayinde-site .hero-form-wrapper{
+.ayinde-site.verus-pos-page .hero-form-wrapper{
         background: #fff;
         border-radius: 24px;
         padding: 50px;
@@ -94,31 +94,31 @@
         border: 1px solid rgba(0,0,0,0.05);
         position: relative;
     }
-.ayinde-site .form-floating > .form-control, .ayinde-site .form-floating > .form-select{
+.ayinde-site.verus-pos-page .form-floating > .form-control, .ayinde-site.verus-pos-page .form-floating > .form-select{
         border-radius: 12px;
         border: 2px solid rgba(0,0,0,0.05);
         background: var(--color-light);
         transition: var(--transition);
         height: calc(3.5rem + 2px);
     }
-.ayinde-site .form-floating > .form-control:focus, .ayinde-site .form-floating > .form-select:focus{
+.ayinde-site.verus-pos-page .form-floating > .form-control:focus, .ayinde-site.verus-pos-page .form-floating > .form-select:focus{
         border-color: var(--color-blue);
         background: #fff;
         box-shadow: 0 4px 15px rgba(47,155,255,0.1);
     }
-.ayinde-site .form-floating > label{
+.ayinde-site.verus-pos-page .form-floating > label{
         color: #6c757d;
         font-weight: 500;
         padding-left: 20px;
     }
-.ayinde-site .intent-toggle-wrapper{
+.ayinde-site.verus-pos-page .intent-toggle-wrapper{
         display: flex;
         background: var(--color-light);
         border-radius: 12px;
         padding: 5px;
         margin-bottom: 25px;
     }
-.ayinde-site .intent-btn{
+.ayinde-site.verus-pos-page .intent-btn{
         flex: 1;
         text-align: center;
         padding: 12px 20px;
@@ -129,12 +129,12 @@
         color: #6c757d;
         transition: var(--transition);
     }
-.ayinde-site .intent-btn.active{
+.ayinde-site.verus-pos-page .intent-btn.active{
         background: #fff;
         color: var(--color-navy);
         box-shadow: var(--shadow-sm);
     }
-.ayinde-site .payment-loader{
+.ayinde-site.verus-pos-page .payment-loader{
         display: none;
         text-align: center;
         padding: 40px 20px;

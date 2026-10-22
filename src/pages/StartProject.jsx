@@ -1,14 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import '../styles/start-project.css';
+import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from 37c9808c-start-project.php (PHP). Markup and classes are unchanged.
 const StartProject = () => {
   useSiteStyles();
-  const handleFormSubmit = (e) => {
-    // Simulated submit, as in the PHP source. Wire to the backend when ready.
+  const [status, setStatus] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const f = e.currentTarget;
+    setSubmitting(true);
+    setStatus(null);
+    try {
+      const res = await submitInquiry('project-startup', {
+        first_name: fieldValue(f, 'fName'),
+        last_name: fieldValue(f, 'lName'),
+        email: fieldValue(f, 'emailAdd'),
+        phone: fieldValue(f, 'phoneNum'),
+        company: fieldValue(f, 'company'),
+        service_type: fieldValue(f, 'serviceType'),
+        budget: fieldValue(f, 'budgetRange'),
+        project_details: fieldValue(f, 'projectDetails'),
+        attachments: Array.from(f.elements.namedItem('fileInput')?.files || []).map((x) => x.name),
+        terms_accepted: fieldChecked(f, 'termsAccepted'),
+      });
+      setStatus({ ok: true, text: successText(res) });
+      f.reset();
+    } catch (err) {
+      setStatus({ ok: false, text: err.message });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -160,11 +186,18 @@ const StartProject = () => {
                       <div className="text-muted small" style={{maxWidth: 300}}>
                         <i className="fa-solid fa-lock text-success me-1" /> Your information is securely encrypted and strictly confidential.
                       </div>
-                      <button type="submit" className="btn-primary-custom px-5 py-3" style={{fontSize: 16}}>
+                      <div className="form-check mb-3">
+                        <input className="form-check-input" type="checkbox" id="termsAccepted" required />
+                        <label className="form-check-label small" htmlFor="termsAccepted">I accept the Terms and Conditions</label>
+                      </div>
+                                            <button type="submit" disabled={submitting} className="btn-primary-custom px-5 py-3" style={{fontSize: 16}}>
                         Submit Project Brief <i className="fa-solid fa-paper-plane ms-2" />
                       </button>
                     </div>
-                  </form>
+                  {status && (
+                    <div className={`alert ${status.ok ? 'alert-success' : 'alert-danger'} mt-3 mb-0 small`} role="status">{status.text}</div>
+                  )}
+                                    </form>
                 </div>
               </div>
             </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import '../styles/about.css';
+import NewsletterSection from '../components/NewsletterSection';
 
 // Converted from 3df4fc5f-about.php (PHP). Markup and classes are unchanged.
 const About = () => {
@@ -172,6 +173,7 @@ const About = () => {
             </div>
           </section>
           {/* === Newsletter Section === */}
+          <NewsletterSection />
         </div>
       </div>
       

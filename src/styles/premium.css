@@ -1,5 +1,5 @@
-/* Scoped to .ayinde-site (generated from the PHP design CSS) */
-.ayinde-site .hero-split{
+/* Scoped to .ayinde-site.premium-page (generated from the PHP design CSS) */
+.ayinde-site.premium-page .hero-split{
         padding: 140px 0 80px;
         background: var(--color-navy); 
         position: relative;
@@ -8,7 +8,7 @@
         align-items: center;
         color: #fff;
     }
-.ayinde-site .hero-split::before{
+.ayinde-site.premium-page .hero-split::before{
         content: '';
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
@@ -16,7 +16,7 @@
                     radial-gradient(circle at 20% 80%, rgba(47, 155, 255, 0.15) 0%, transparent 40%);
         pointer-events: none;
     }
-.ayinde-site .premium-feature-card{
+.ayinde-site.premium-page .premium-feature-card{
         background: rgba(255,255,255,0.05);
         border: 1px solid rgba(255,255,255,0.1);
         border-radius: 16px;
@@ -28,12 +28,12 @@
         gap: 20px;
         transition: var(--transition);
     }
-.ayinde-site .premium-feature-card:hover{
+.ayinde-site.premium-page .premium-feature-card:hover{
         background: rgba(255,255,255,0.1);
         transform: translateX(5px);
         border-color: var(--color-orange);
     }
-.ayinde-site .feature-icon-box{
+.ayinde-site.premium-page .feature-icon-box{
         width: 50px;
         height: 50px;
         border-radius: 12px;
@@ -45,13 +45,13 @@
         font-size: 20px;
         flex-shrink: 0;
     }
-.ayinde-site .premium-pricing-grid{
+.ayinde-site.premium-page .premium-pricing-grid{
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
         margin-top: 30px;
     }
-.ayinde-site .savings-card{
+.ayinde-site.premium-page .savings-card{
         background: rgba(0,0,0,0.2);
         border: 1px solid rgba(255,255,255,0.05);
         border-radius: 16px;
@@ -60,7 +60,7 @@
         position: relative;
         overflow: hidden;
     }
-.ayinde-site .savings-badge{
+.ayinde-site.premium-page .savings-badge{
         position: absolute;
         top: 0; right: 0;
         background: var(--color-orange);
@@ -70,7 +70,7 @@
         padding: 4px 12px;
         border-radius: 0 16px 0 12px;
     }
-.ayinde-site .hero-form-wrapper{
+.ayinde-site.premium-page .hero-form-wrapper{
         background: #fff;
         border-radius: 24px;
         padding: 40px;
@@ -78,39 +78,39 @@
         position: relative;
         color: var(--color-navy);
     }
-.ayinde-site .hero-form-wrapper::before{
+.ayinde-site.premium-page .hero-form-wrapper::before{
         content: '';
         position: absolute;
         top: 0; left: 0; width: 100%; height: 6px;
         background: linear-gradient(90deg, var(--color-orange), #ffd700);
         border-radius: 24px 24px 0 0;
     }
-.ayinde-site .form-floating > .form-control, .ayinde-site .form-floating > .form-select{
+.ayinde-site.premium-page .form-floating > .form-control, .ayinde-site.premium-page .form-floating > .form-select{
         border-radius: 12px;
         border: 2px solid rgba(0,0,0,0.05);
         background: var(--color-light);
         transition: var(--transition);
         height: calc(3.5rem + 2px);
     }
-.ayinde-site .form-floating > textarea.form-control{
+.ayinde-site.premium-page .form-floating > textarea.form-control{
         height: 120px;
     }
-.ayinde-site .form-floating > .form-control:focus, .ayinde-site .form-floating > .form-select:focus{
+.ayinde-site.premium-page .form-floating > .form-control:focus, .ayinde-site.premium-page .form-floating > .form-select:focus{
         border-color: var(--color-orange);
         background: #fff;
         box-shadow: 0 4px 15px rgba(255,122,26,0.1);
     }
-.ayinde-site .form-floating > label{
+.ayinde-site.premium-page .form-floating > label{
         color: #6c757d;
         font-weight: 500;
         padding-left: 20px;
     }
-.ayinde-site .form-floating > .form-control:focus ~ label, .ayinde-site .form-floating > .form-control:not(:placeholder-shown) ~ label, .ayinde-site .form-floating > .form-select ~ label{
+.ayinde-site.premium-page .form-floating > .form-control:focus ~ label, .ayinde-site.premium-page .form-floating > .form-control:not(:placeholder-shown) ~ label, .ayinde-site.premium-page .form-floating > .form-select ~ label{
         color: var(--color-orange);
         font-weight: 700;
         transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
     }
-.ayinde-site .payment-toggle-box{
+.ayinde-site.premium-page .payment-toggle-box{
         background: var(--color-light);
         border: 2px solid rgba(0,0,0,0.05);
         border-radius: 16px;
@@ -119,9 +119,9 @@
         transition: var(--transition);
         cursor: pointer;
     }
-.ayinde-site .payment-toggle-box.active{
+.ayinde-site.premium-page .payment-toggle-box.active{
         background: rgba(255,122,26,0.05);
         border-color: var(--color-orange);
     }
-@media (max-width: 991px){.ayinde-site .hero-split{ padding-top: 120px; }
-.ayinde-site .premium-pricing-grid{ grid-template-columns: 1fr; }}
+@media (max-width: 991px){.ayinde-site.premium-page .hero-split{ padding-top: 120px; }
+.ayinde-site.premium-page .premium-pricing-grid{ grid-template-columns: 1fr; }}

@@ -1,12 +1,12 @@
-/* Scoped to .ayinde-site (generated from the PHP design CSS) */
-.ayinde-site .courses-header{
+/* Scoped to .ayinde-site.courses-page (generated from the PHP design CSS) */
+.ayinde-site.courses-page .courses-header{
         padding: 160px 0 80px;
         background: linear-gradient(135deg, var(--color-navy) 0%, #0c2a5c 100%);
         position: relative;
         overflow: hidden;
         text-align: center;
     }
-.ayinde-site .courses-header::before{
+.ayinde-site.courses-page .courses-header::before{
         content: '';
         position: absolute;
         top: -50%;
@@ -18,7 +18,7 @@
         border-radius: 50%;
         pointer-events: none;
     }
-.ayinde-site .courses-header::after{
+.ayinde-site.courses-page .courses-header::after{
         content: '';
         position: absolute;
         bottom: -50%;
@@ -30,7 +30,7 @@
         border-radius: 50%;
         pointer-events: none;
     }
-.ayinde-site .btn-youtube{
+.ayinde-site.courses-page .btn-youtube{
         background-color: #FF0000;
         color: #fff;
         padding: 12px 28px;
@@ -44,12 +44,12 @@
         gap: 8px;
         box-shadow: 0 8px 24px rgba(255, 0, 0, 0.25);
     }
-.ayinde-site .btn-youtube:hover{
+.ayinde-site.courses-page .btn-youtube:hover{
         background-color: #cc0000;
         color: #fff;
         transform: translateY(-2px);
     }
-.ayinde-site .course-card{
+.ayinde-site.courses-page .course-card{
         background: #fff;
         border-radius: 20px;
         overflow: hidden;
@@ -60,37 +60,37 @@
         display: flex;
         flex-direction: column;
     }
-.ayinde-site .course-card:hover{
+.ayinde-site.courses-page .course-card:hover{
         transform: translateY(-6px);
         box-shadow: var(--shadow-md);
         border-color: rgba(47,155,255,0.2);
     }
-.ayinde-site .course-thumbnail{
+.ayinde-site.courses-page .course-thumbnail{
         position: relative;
         height: 220px;
         overflow: hidden;
         display: block;
     }
-.ayinde-site .course-thumbnail img{
+.ayinde-site.courses-page .course-thumbnail img{
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform 0.5s ease;
     }
-.ayinde-site .course-card:hover .course-thumbnail img{
+.ayinde-site.courses-page .course-card:hover .course-thumbnail img{
         transform: scale(1.05);
     }
-.ayinde-site .course-thumbnail::after{
+.ayinde-site.courses-page .course-thumbnail::after{
         content: '';
         position: absolute;
         inset: 0;
         background: rgba(10,34,72,0.3);
         transition: var(--transition);
     }
-.ayinde-site .course-card:hover .course-thumbnail::after{
+.ayinde-site.courses-page .course-card:hover .course-thumbnail::after{
         background: rgba(10,34,72,0.1);
     }
-.ayinde-site .play-btn-overlay{
+.ayinde-site.courses-page .play-btn-overlay{
         position: absolute;
         top: 50%;
         left: 50%;
@@ -109,10 +109,10 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         transition: var(--transition);
     }
-.ayinde-site .course-card:hover .play-btn-overlay{
+.ayinde-site.courses-page .course-card:hover .play-btn-overlay{
         transform: translate(-50%, -50%) scale(1.15);
     }
-.ayinde-site .course-duration{
+.ayinde-site.courses-page .course-duration{
         position: absolute;
         bottom: 12px;
         right: 12px;
@@ -125,19 +125,19 @@
         z-index: 2;
         backdrop-filter: blur(4px);
     }
-.ayinde-site .course-content{
+.ayinde-site.courses-page .course-content{
         padding: 30px;
         display: flex;
         flex-direction: column;
         flex-grow: 1;
     }
-.ayinde-site .course-meta{
+.ayinde-site.courses-page .course-meta{
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
     }
-.ayinde-site .course-badge{
+.ayinde-site.courses-page .course-badge{
         background: rgba(47,155,255,0.1);
         color: var(--color-blue);
         padding: 6px 12px;
@@ -147,27 +147,27 @@
         letter-spacing: 0.5px;
         text-transform: uppercase;
     }
-.ayinde-site .course-title{
+.ayinde-site.courses-page .course-title{
         font-size: 1.25rem;
         color: var(--color-navy);
         margin-bottom: 12px;
         line-height: 1.4;
     }
-.ayinde-site .course-desc{
+.ayinde-site.courses-page .course-desc{
         color: #6c757d;
         font-size: 0.95rem;
         line-height: 1.6;
         margin-bottom: 25px;
         flex-grow: 1;
     }
-.ayinde-site .course-footer{
+.ayinde-site.courses-page .course-footer{
         border-top: 1px solid rgba(0,0,0,0.05);
         padding-top: 20px;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-.ayinde-site .watch-link{
+.ayinde-site.courses-page .watch-link{
         color: var(--color-navy);
         font-weight: 600;
         font-size: 14px;
@@ -177,6 +177,6 @@
         gap: 8px;
         transition: var(--transition);
     }
-.ayinde-site .watch-link:hover{
+.ayinde-site.courses-page .watch-link:hover{
         color: #FF0000;
     }

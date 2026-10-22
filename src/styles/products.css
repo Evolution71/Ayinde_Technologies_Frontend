@@ -1,12 +1,12 @@
-/* Scoped to .ayinde-site (generated from the PHP design CSS) */
-.ayinde-site .products-header{
+/* Scoped to .ayinde-site.products-page (generated from the PHP design CSS) */
+.ayinde-site.products-page .products-header{
         padding: 160px 0 80px;
         background: var(--color-navy);
         position: relative;
         overflow: hidden;
         color: #fff;
     }
-.ayinde-site .products-header::before{
+.ayinde-site.products-page .products-header::before{
         content: '';
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
@@ -16,7 +16,7 @@
         background-size: 30px 30px;
         pointer-events: none;
     }
-.ayinde-site .products-header::after{
+.ayinde-site.products-page .products-header::after{
         content: '';
         position: absolute;
         top: -50%; right: -10%;
@@ -25,7 +25,7 @@
         filter: blur(100px);
         border-radius: 50%;
     }
-.ayinde-site .product-showcase-card{
+.ayinde-site.products-page .product-showcase-card{
         background: #fff;
         border-radius: 24px;
         box-shadow: 0 20px 40px rgba(0,0,0,0.05);
@@ -36,19 +36,19 @@
         flex-direction: column;
         transition: var(--transition);
     }
-@media (min-width: 992px){.ayinde-site .product-showcase-card{
+@media (min-width: 992px){.ayinde-site.products-page .product-showcase-card{
             flex-direction: row;
             min-height: 500px;
         }
-.ayinde-site .product-showcase-card:nth-child(even){
+.ayinde-site.products-page .product-showcase-card:nth-child(even){
             flex-direction: row-reverse;
         }}
-.ayinde-site .product-showcase-card:hover{
+.ayinde-site.products-page .product-showcase-card:hover{
         transform: translateY(-5px);
         box-shadow: 0 30px 60px rgba(10,34,72,0.1);
         border-color: rgba(47,155,255,0.2);
     }
-.ayinde-site .product-image-area{
+.ayinde-site.products-page .product-image-area{
         flex: 1;
         background: var(--color-light);
         position: relative;
@@ -58,7 +58,7 @@
         justify-content: center;
         overflow: hidden;
     }
-.ayinde-site .product-image-area img{
+.ayinde-site.products-page .product-image-area img{
         width: 100%;
         max-width: 500px;
         border-radius: 16px;
@@ -66,24 +66,24 @@
         transition: transform 0.5s ease;
         z-index: 2;
     }
-.ayinde-site .product-showcase-card:hover .product-image-area img{
+.ayinde-site.products-page .product-showcase-card:hover .product-image-area img{
         transform: scale(1.03) translateY(-10px);
     }
-.ayinde-site .product-image-bg-shape{
+.ayinde-site.products-page .product-image-bg-shape{
         position: absolute;
         width: 300px; height: 300px;
         border-radius: 50%;
         background: linear-gradient(135deg, rgba(47,155,255,0.2), rgba(255,122,26,0.1));
         z-index: 1;
     }
-.ayinde-site .product-content-area{
+.ayinde-site.products-page .product-content-area{
         flex: 1.2;
         padding: 50px;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
-.ayinde-site .product-logo-badge{
+.ayinde-site.products-page .product-logo-badge{
         display: inline-block;
         padding: 8px 16px;
         background: rgba(10,34,72,0.05);
@@ -94,19 +94,19 @@
         letter-spacing: 1px;
         margin-bottom: 20px;
     }
-.ayinde-site .product-title{
+.ayinde-site.products-page .product-title{
         font-family: var(--font-heading);
         font-size: 2.2rem;
         color: var(--color-navy);
         margin-bottom: 15px;
     }
-.ayinde-site .product-desc{
+.ayinde-site.products-page .product-desc{
         color: #6c757d;
         font-size: 1.05rem;
         line-height: 1.7;
         margin-bottom: 30px;
     }
-.ayinde-site .product-features-grid{
+.ayinde-site.products-page .product-features-grid{
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 15px;
@@ -114,7 +114,7 @@
         padding-bottom: 30px;
         border-bottom: 1px solid rgba(0,0,0,0.05);
     }
-.ayinde-site .product-feature-item{
+.ayinde-site.products-page .product-feature-item{
         display: flex;
         align-items: flex-start;
         gap: 10px;
@@ -122,17 +122,17 @@
         color: var(--color-navy);
         font-weight: 600;
     }
-.ayinde-site .product-feature-item i{
+.ayinde-site.products-page .product-feature-item i{
         color: var(--color-orange);
         margin-top: 3px;
     }
-.ayinde-site .pricing-tier-wrapper{
+.ayinde-site.products-page .pricing-tier-wrapper{
         background: var(--color-light);
         border-radius: 16px;
         padding: 20px;
         margin-bottom: 30px;
     }
-.ayinde-site .pricing-title{
+.ayinde-site.products-page .pricing-title{
         font-size: 0.85rem;
         font-weight: 700;
         text-transform: uppercase;
@@ -140,43 +140,43 @@
         margin-bottom: 15px;
         letter-spacing: 0.5px;
     }
-.ayinde-site .pricing-options-grid{
+.ayinde-site.products-page .pricing-options-grid{
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 10px;
     }
-.ayinde-site .pricing-box{
+.ayinde-site.products-page .pricing-box{
         background: #fff;
         border: 1px solid rgba(0,0,0,0.05);
         border-radius: 10px;
         padding: 12px 10px;
         text-align: center;
     }
-.ayinde-site .pricing-box .billing-cycle{
+.ayinde-site.products-page .pricing-box .billing-cycle{
         font-size: 0.75rem;
         color: #6c757d;
         font-weight: 600;
         text-transform: uppercase;
         margin-bottom: 5px;
     }
-.ayinde-site .pricing-box .price-amt{
+.ayinde-site.products-page .pricing-box .price-amt{
         font-family: var(--font-heading);
         font-weight: 700;
         color: var(--color-navy);
         font-size: 1.1rem;
     }
-.ayinde-site .pricing-box.annual-box{
+.ayinde-site.products-page .pricing-box.annual-box{
         border-color: var(--color-orange);
         background: rgba(255,122,26,0.05);
     }
-.ayinde-site .pricing-box.annual-box .price-amt{
+.ayinde-site.products-page .pricing-box.annual-box .price-amt{
         color: var(--color-orange);
     }
-.ayinde-site .product-actions{
+.ayinde-site.products-page .product-actions{
         display: flex;
         gap: 15px;
         align-items: center;
     }
-@media (max-width: 768px){.ayinde-site .pricing-options-grid{ grid-template-columns: repeat(2, 1fr); }
-.ayinde-site .product-content-area{ padding: 30px; }
-.ayinde-site .product-image-area{ padding: 30px 20px; }}
+@media (max-width: 768px){.ayinde-site.products-page .pricing-options-grid{ grid-template-columns: repeat(2, 1fr); }
+.ayinde-site.products-page .product-content-area{ padding: 30px; }
+.ayinde-site.products-page .product-image-area{ padding: 30px 20px; }}

@@ -2,6 +2,7 @@ import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import '../styles/terms.css';
+import NewsletterSection from '../components/NewsletterSection';
 
 // Converted from 5ac9d417-terms-and-conditions.php (PHP). Markup and classes are unchanged.
 const TermsAndConditions = () => {
@@ -92,6 +93,7 @@ const TermsAndConditions = () => {
             </div>
           </section>
           {/* === Newsletter Section === */}
+          <NewsletterSection />
         </div>
       </div>
       

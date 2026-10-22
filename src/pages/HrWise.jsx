@@ -41,7 +41,7 @@ const HrWise = () => {
 
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site hr-wise-page">
         <div>
           {/* HR-Wise Specific CSS */}
           {/* === Page Header === */}

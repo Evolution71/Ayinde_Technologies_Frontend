@@ -4,6 +4,7 @@ import '../styles/site-base.css';
 import '../styles/contact.css';
 import Captcha from '../components/Captcha';
 import { api } from '../api';
+import NewsletterSection from '../components/NewsletterSection';
 
 // Converted from 0448e219-contact.php (PHP). Markup and classes are unchanged.
 const Contact = () => {
@@ -182,6 +183,7 @@ const Contact = () => {
             </div>
           </section>
           {/* === Newsletter Section === */}
+          <NewsletterSection />
         </div>
       </div>
       

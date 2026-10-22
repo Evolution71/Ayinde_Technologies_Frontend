@@ -480,22 +480,6 @@ export default function About() {
               📍 <strong>Westcoast Office</strong><br/>
               112 S Market St, Ste. 1008<br/>Inglewood, California 90301<br/>United States
             </address>
-            <div className="about-contact-lines">
-              <p>
-                <strong>Sales Representative (Sophia)</strong><br/>
-                <a href="tel:+13025150227">+1 302 515 0227</a><br/>
-                <a href="mailto:sales@ayindetechnologies.com">Sales@ayindetechnologies.com</a>
-              </p>
-              <p>
-                <strong>Support Representative (Peter)</strong><br/>
-                <a href="tel:+12015342657">+1 201 534 2657</a><br/>
-                <a href="mailto:support@ayindetechnologies.com">support@ayindetechnologies.com</a>
-              </p>
-              <p>
-                For more information, book a call or email:{' '}
-                <a href="mailto:info@ayindetechnologies.com">info@ayindetechnologies.com</a>
-              </p>
-            </div>
           </div>
           <div className="about-cta-card">
             <h3>Have a project in mind?</h3>

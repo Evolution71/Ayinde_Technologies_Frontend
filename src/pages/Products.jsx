@@ -8,7 +8,7 @@ const Products = () => {
   useSiteStyles();
   return (
     <>
-      <div className="ayinde-site">
+      <div className="ayinde-site products-page">
         <div>
           {/* Products Page Specific CSS */}
           {/* === Page Header === */}
