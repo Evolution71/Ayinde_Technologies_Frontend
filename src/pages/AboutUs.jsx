@@ -114,7 +114,7 @@ const About = () => {
                     <p className="text-secondary fw-bold small mb-4" style={{letterSpacing: 1, color: 'var(--color-orange) !important'}}>CEO &amp; FOUNDER</p>
                     <p className="text-muted mb-4" style={{fontStyle: 'italic', lineHeight: '1.7', fontSize: 15}}>"Technology should follow a business plan, not replace one. Our mission is to elevate enterprises through smart, scalable, and secure automation."</p>
                     <div className="d-flex justify-content-center gap-3 mt-auto">
-                      <a href="#" className="social-link" aria-label="LinkedIn"><i className="fa-brands fa-linkedin-in" /></a>
+                      <a href="/contact" className="social-link" aria-label="LinkedIn"><i className="fa-brands fa-linkedin-in" /></a>
                       <a href="mailto:ceo@ayindetech.com" className="social-link" aria-label="Email"><i className="fa-solid fa-envelope" /></a>
                     </div>
                   </div>
@@ -129,7 +129,7 @@ const About = () => {
                         <div>
                           <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>Marcus Chen</h5>
                           <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>CHIEF TECHNOLOGY OFFICER</p>
-                          <a href="#" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
+                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
                         </div>
                       </div>
                     </div>
@@ -140,7 +140,7 @@ const About = () => {
                         <div>
                           <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>Dr. Sarah Al-Fayed</h5>
                           <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>CHIEF AI OFFICER (CAIO)</p>
-                          <a href="#" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
+                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
                         </div>
                       </div>
                     </div>
@@ -151,7 +151,7 @@ const About = () => {
                         <div>
                           <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>James Wilson</h5>
                           <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>HEAD PROJECT MANAGER</p>
-                          <a href="#" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
+                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
                         </div>
                       </div>
                     </div>
@@ -162,7 +162,7 @@ const About = () => {
                         <div>
                           <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>Elena Rodriguez</h5>
                           <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>DIRECTOR OF HR</p>
-                          <a href="#" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
+                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
                         </div>
                       </div>
                     </div>
