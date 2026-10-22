@@ -59,6 +59,9 @@ const Navigation = () => {
           <Link to="/" className="nav-link nav-home" onClick={() => setIsOpen(false)}>
             Home
           </Link>
+          <Link to="/start-project" className="nav-link nav-start-project" onClick={() => setIsOpen(false)}>
+            Start a Project
+          </Link>
 
           {/* Services Dropdown */}
           <div className={`nav-dropdown ${servicesDropdown ? 'active' : ''}`}
