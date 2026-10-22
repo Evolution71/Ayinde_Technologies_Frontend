@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AuthForms from '../components/AuthForms';
 
 /**
@@ -7,10 +7,12 @@ import AuthForms from '../components/AuthForms';
  */
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from;
 
   const handleSuccess = () => {
-    // After successful login, redirect to home
-    navigate('/');
+    // Go back to the page that sent them here (e.g. checkout), otherwise home.
+    navigate(from && from.startsWith('/') ? from : '/', { replace: true });
   };
 
   const handleBackClick = () => {

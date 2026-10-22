@@ -223,7 +223,7 @@ export default function CheckoutPage() {
 
     const init = async () => {
       if (!user) {
-        navigate('/login');
+        navigate('/login', { state: { from: `/checkout/${courseId}` } });
         return;
       }
 
@@ -267,6 +267,11 @@ export default function CheckoutPage() {
         setPaymentId(payData.payment_id);
       } catch (err) {
         console.error('[Checkout] Init error:', err);
+        if (err.status === 401) {
+          // Session expired: send them to log in, then straight back here.
+          navigate('/login', { state: { from: `/checkout/${courseId}` } });
+          return;
+        }
         if (!cancelled) setError(err.message);
       } finally {
         if (!cancelled) setLoading(false);
