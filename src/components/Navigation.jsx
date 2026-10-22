@@ -31,13 +31,39 @@ const Navigation = () => {
     setCoursesDropdown(false);
   }, [location]);
 
+  // True only for devices with a real mouse (desktop). Phones/tablets return false,
+  // so a tap doesn't trigger both "hover open" and "click close" at the same time.
+  const canHover = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  const openOnHover = (dropdownType) => {
+    if (!canHover()) return;
+    if (dropdownType === 'services') {
+      setServicesDropdown(true);
+      setCoursesDropdown(false);
+    } else {
+      setCoursesDropdown(true);
+      setServicesDropdown(false);
+    }
+  };
+
+  const closeOnLeave = (dropdownType) => {
+    if (!canHover()) return;
+    if (dropdownType === 'services') setServicesDropdown(false);
+    else setCoursesDropdown(false);
+  };
+
   const handleDropdownToggle = (e, dropdownType) => {
     e.preventDefault();
+    e.stopPropagation();
     if (dropdownType === 'services') {
-      setServicesDropdown(!servicesDropdown);
+      // On desktop the menu is already open from hover, so a click keeps it open.
+      setServicesDropdown((prev) => (canHover() ? true : !prev));
       setCoursesDropdown(false);
     } else if (dropdownType === 'courses') {
-      setCoursesDropdown(!coursesDropdown);
+      setCoursesDropdown((prev) => (canHover() ? true : !prev));
       setServicesDropdown(false);
     }
   };
@@ -65,38 +91,39 @@ const Navigation = () => {
 
           {/* Services Dropdown */}
           <div className={`nav-dropdown ${servicesDropdown ? 'active' : ''}`}
-            onMouseEnter={() => setServicesDropdown(true)}
-            onMouseLeave={() => setServicesDropdown(false)}>
+            onMouseEnter={() => openOnHover('services')}
+            onMouseLeave={() => closeOnLeave('services')}>
             <button
-              className="nav-link dropdown-toggle"
+              type="button"
+              className="nav-link ayn-dd-toggle"
               onClick={(e) => handleDropdownToggle(e, 'services')}
               aria-expanded={servicesDropdown}
               aria-label="Services submenu">
               🌐 Services ▼
             </button>
             {servicesDropdown && (
-              <div className="dropdown-menu services-menu">
-                <Link to="/our-services" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+              <div className="ayn-dd-menu services-menu">
+                <Link to="/our-services" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">🧭</span>
                   <span className="item-text">All Services</span>
                 </Link>
-                <Link to="/website-development" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/website-development" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">🌐</span>
                   <span className="item-text">Website Development</span>
                 </Link>
-                <Link to="/app-development" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/app-development" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">📱</span>
                   <span className="item-text">App Development</span>
                 </Link>
-                <Link to="/tech-consulting" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/tech-consulting" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">💬</span>
                   <span className="item-text">Tech Consultation</span>
                 </Link>
-                <Link to="/premium-services" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/premium-services" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">👑</span>
                   <span className="item-text">Premium Services</span>
                 </Link>
-                <Link to="/start-project" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/start-project" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">🚀</span>
                   <span className="item-text">Start a Project</span>
                 </Link>
@@ -106,22 +133,23 @@ const Navigation = () => {
 
           {/* Courses Dropdown */}
           <div className={`nav-dropdown ${coursesDropdown ? 'active' : ''}`}
-            onMouseEnter={() => setCoursesDropdown(true)}
-            onMouseLeave={() => setCoursesDropdown(false)}>
+            onMouseEnter={() => openOnHover('courses')}
+            onMouseLeave={() => closeOnLeave('courses')}>
             <button
-              className="nav-link dropdown-toggle"
+              type="button"
+              className="nav-link ayn-dd-toggle"
               onClick={(e) => handleDropdownToggle(e, 'courses')}
               aria-expanded={coursesDropdown}
               aria-label="Courses submenu">
               📖 Courses ▼
             </button>
             {coursesDropdown && (
-              <div className="dropdown-menu courses-menu">
-                <Link to="/our-courses" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+              <div className="ayn-dd-menu courses-menu">
+                <Link to="/our-courses" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">📖</span>
                   <span className="item-text">Browse All Courses</span>
                 </Link>
-                <Link to="/achievements" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/achievements" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">🏆</span>
                   <span className="item-text">Achievements</span>
                 </Link>
@@ -236,7 +264,7 @@ const Navigation = () => {
           display: inline-block;
         }
 
-        .dropdown-toggle {
+        .ayn-dd-toggle {
           background: none;
           border: none;
           padding: 0;
@@ -253,7 +281,13 @@ const Navigation = () => {
           letter-spacing: 0.3px;
         }
 
-        .dropdown-menu {
+        .ayn-dd-toggle::after {
+          display: none !important;
+          content: none !important;
+        }
+
+        .ayn-dd-menu {
+          display: block;
           position: absolute;
           top: 100%;
           left: 0;
@@ -265,11 +299,11 @@ const Navigation = () => {
           z-index: 1000;
           padding: 8px 0;
           margin-top: 10px;
-          animation: slideDownMenu 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          animation: aynSlideDownMenu 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           backdrop-filter: blur(20px);
         }
 
-        @keyframes slideDownMenu {
+        @keyframes aynSlideDownMenu {
           from {
             opacity: 0;
             transform: translateY(-15px);
@@ -280,7 +314,7 @@ const Navigation = () => {
           }
         }
 
-        .dropdown-item {
+        .ayn-dd-item {
           display: flex;
           align-items: center;
           gap: 12px;
@@ -294,7 +328,7 @@ const Navigation = () => {
           overflow: hidden;
         }
 
-        .dropdown-item::before {
+        .ayn-dd-item::before {
           content: '';
           position: absolute;
           left: 0;
@@ -307,12 +341,12 @@ const Navigation = () => {
           transform-origin: center;
         }
 
-        .dropdown-item:hover {
+        .ayn-dd-item:hover {
           background: linear-gradient(90deg, #f3f4f6, #ffffff);
           padding-left: 24px;
         }
 
-        .dropdown-item:hover::before {
+        .ayn-dd-item:hover::before {
           transform: scaleY(1);
         }
 
@@ -322,7 +356,7 @@ const Navigation = () => {
           transition: transform 0.3s ease;
         }
 
-        .dropdown-item:hover .item-icon {
+        .ayn-dd-item:hover .item-icon {
           transform: scale(1.2) rotate(5deg);
         }
 
@@ -332,9 +366,9 @@ const Navigation = () => {
           font-weight: 800;
         }
 
-        .dropdown-item a,
-        .dropdown-item a:visited,
-        .dropdown-item a:hover {
+        .ayn-dd-item a,
+        .ayn-dd-item a:visited,
+        .ayn-dd-item a:hover {
           color: #1e40af !important;
           text-decoration: none;
         }
@@ -358,19 +392,19 @@ const Navigation = () => {
             display: block;
           }
 
-          .dropdown-menu {
+          .ayn-dd-menu {
             position: static;
-            display: none;
+            display: block;
             box-shadow: none;
             border: none;
             border-top: 1px solid #e5e7eb;
             background: #f9fafb;
             margin-top: 0;
             border-radius: 0;
-            animation: slideInMobile 0.3s ease;
+            animation: aynSlideInMobile 0.3s ease;
           }
 
-          @keyframes slideInMobile {
+          @keyframes aynSlideInMobile {
             from {
               opacity: 0;
               max-height: 0;
@@ -381,16 +415,12 @@ const Navigation = () => {
             }
           }
 
-          .nav-dropdown.active .dropdown-menu {
-            display: block;
-          }
-
-          .dropdown-item {
+          .ayn-dd-item {
             padding: 15px 20px;
             font-size: 15px;
           }
 
-          .dropdown-item:hover {
+          .ayn-dd-item:hover {
             padding-left: 20px;
           }
         }
