@@ -14,7 +14,7 @@ const FamousQuotesPage = () => {
       title: "Stability AI Founder",
       category: "tech-ceos",
       icon: "🤖",
-      image: "https://content.fortune.com/wp-content/uploads/2023/05/52547687473_698f4dbe7c_o-e1684073804720.jpg?w=1440&q=75"
+      image: "/img/emad-mostaque.webp"
     },
     {
       id: 102,
@@ -59,7 +59,7 @@ const FamousQuotesPage = () => {
       title: "Founder of Amazon",
       category: "tech-ceos",
       icon: "🎯",
-      image: "https://wallpapers.com/images/hd/jeff-bezos-smiling-bdb8zimqljhfcpu3.jpg"
+      image: "/img/jeff-bezos.jpg"
     },
     {
       id: 107,

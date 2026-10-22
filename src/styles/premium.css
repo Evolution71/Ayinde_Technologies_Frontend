@@ -1,0 +1,127 @@
+/* Scoped to .ayinde-site (generated from the PHP design CSS) */
+.ayinde-site .hero-split{
+        padding: 140px 0 80px;
+        background: var(--color-navy); 
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        color: #fff;
+    }
+.ayinde-site .hero-split::before{
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: radial-gradient(circle at 80% 20%, rgba(255, 122, 26, 0.15) 0%, transparent 40%),
+                    radial-gradient(circle at 20% 80%, rgba(47, 155, 255, 0.15) 0%, transparent 40%);
+        pointer-events: none;
+    }
+.ayinde-site .premium-feature-card{
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 15px;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        transition: var(--transition);
+    }
+.ayinde-site .premium-feature-card:hover{
+        background: rgba(255,255,255,0.1);
+        transform: translateX(5px);
+        border-color: var(--color-orange);
+    }
+.ayinde-site .feature-icon-box{
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(255, 122, 26, 0.1);
+        color: var(--color-orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+.ayinde-site .premium-pricing-grid{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 30px;
+    }
+.ayinde-site .savings-card{
+        background: rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 16px;
+        padding: 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+.ayinde-site .savings-badge{
+        position: absolute;
+        top: 0; right: 0;
+        background: var(--color-orange);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 0 16px 0 12px;
+    }
+.ayinde-site .hero-form-wrapper{
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        position: relative;
+        color: var(--color-navy);
+    }
+.ayinde-site .hero-form-wrapper::before{
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 6px;
+        background: linear-gradient(90deg, var(--color-orange), #ffd700);
+        border-radius: 24px 24px 0 0;
+    }
+.ayinde-site .form-floating > .form-control, .ayinde-site .form-floating > .form-select{
+        border-radius: 12px;
+        border: 2px solid rgba(0,0,0,0.05);
+        background: var(--color-light);
+        transition: var(--transition);
+        height: calc(3.5rem + 2px);
+    }
+.ayinde-site .form-floating > textarea.form-control{
+        height: 120px;
+    }
+.ayinde-site .form-floating > .form-control:focus, .ayinde-site .form-floating > .form-select:focus{
+        border-color: var(--color-orange);
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(255,122,26,0.1);
+    }
+.ayinde-site .form-floating > label{
+        color: #6c757d;
+        font-weight: 500;
+        padding-left: 20px;
+    }
+.ayinde-site .form-floating > .form-control:focus ~ label, .ayinde-site .form-floating > .form-control:not(:placeholder-shown) ~ label, .ayinde-site .form-floating > .form-select ~ label{
+        color: var(--color-orange);
+        font-weight: 700;
+        transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+    }
+.ayinde-site .payment-toggle-box{
+        background: var(--color-light);
+        border: 2px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 25px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+.ayinde-site .payment-toggle-box.active{
+        background: rgba(255,122,26,0.05);
+        border-color: var(--color-orange);
+    }
+@media (max-width: 991px){.ayinde-site .hero-split{ padding-top: 120px; }
+.ayinde-site .premium-pricing-grid{ grid-template-columns: 1fr; }}

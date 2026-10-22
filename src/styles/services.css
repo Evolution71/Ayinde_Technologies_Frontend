@@ -1,0 +1,150 @@
+/* Scoped to .ayinde-site (generated from the PHP design CSS) */
+.ayinde-site .services-header{
+        padding: 160px 0 80px;
+        background: var(--color-light);
+        position: relative;
+        overflow: hidden;
+    }
+.ayinde-site .services-header::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(rgba(10,34,72,0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
+    }
+.ayinde-site .service-block{
+        border-radius: 24px;
+        overflow: hidden;
+        margin-bottom: 40px;
+        transition: var(--transition);
+        border: 1px solid rgba(0,0,0,0.05);
+        background: #fff;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        flex-direction: column;
+    }
+@media (min-width: 992px){.ayinde-site .service-block{
+            flex-direction: row;
+            min-height: 400px;
+        }
+.ayinde-site .service-block:nth-child(even){
+            flex-direction: row-reverse;
+        }}
+.ayinde-site .service-block:hover{
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+        border-color: rgba(47,155,255,0.2);
+    }
+.ayinde-site .service-image-area{
+        position: relative;
+        flex: 1;
+        min-height: 250px;
+        overflow: hidden;
+    }
+.ayinde-site .service-image-area img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.7s ease;
+    }
+.ayinde-site .service-block:hover .service-image-area img{
+        transform: scale(1.05);
+    }
+.ayinde-site .overlay-web{ background: linear-gradient(135deg, rgba(10,34,72,0.8), rgba(47,155,255,0.4)); }
+.ayinde-site .overlay-app{ background: linear-gradient(135deg, rgba(255,122,26,0.8), rgba(10,34,72,0.4)); }
+.ayinde-site .overlay-consult{ background: linear-gradient(135deg, rgba(47,155,255,0.8), rgba(10,34,72,0.4)); }
+.ayinde-site .overlay-premium{ background: linear-gradient(135deg, rgba(10,34,72,0.9), rgba(0,0,0,0.6)); }
+.ayinde-site .service-content-area{
+        flex: 1;
+        padding: 50px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: #fff;
+    }
+.ayinde-site .service-icon-wrapper{
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 25px;
+    }
+.ayinde-site .icon-web{ background: rgba(47,155,255,0.1); color: var(--color-blue); }
+.ayinde-site .icon-app{ background: rgba(255,122,26,0.1); color: var(--color-orange); }
+.ayinde-site .icon-consult{ background: rgba(10,34,72,0.1); color: var(--color-navy); }
+.ayinde-site .icon-premium{ background: var(--color-navy); color: var(--color-orange); }
+.ayinde-site .service-title{
+        font-size: 2rem;
+        color: var(--color-navy);
+        margin-bottom: 15px;
+    }
+.ayinde-site .service-desc{
+        color: #6c757d;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        margin-bottom: 30px;
+    }
+.ayinde-site .service-features{
+        list-style: none;
+        padding: 0;
+        margin: 0 0 35px 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+.ayinde-site .service-features li{
+        font-size: 0.9rem;
+        color: var(--color-navy);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+.ayinde-site .service-features li i{
+        color: var(--color-blue);
+        font-size: 0.8rem;
+    }
+.ayinde-site .btn-service-link{
+        align-self: flex-start;
+        background: transparent;
+        color: var(--color-navy);
+        border: 2px solid rgba(10,34,72,0.1);
+        padding: 10px 24px;
+        border-radius: var(--radius-pill);
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+.ayinde-site .service-block:hover .btn-service-link{
+        background: var(--color-navy);
+        color: #fff;
+        border-color: var(--color-navy);
+    }
+.ayinde-site .service-block.premium-block:hover .btn-service-link{
+        background: var(--color-orange);
+        border-color: var(--color-orange);
+    }
+.ayinde-site .premium-block .service-content-area{
+        background: var(--color-navy);
+    }
+.ayinde-site .premium-block .service-title, .ayinde-site .premium-block .service-features li{
+        color: #fff;
+    }
+.ayinde-site .premium-block .service-desc{
+        color: rgba(255,255,255,0.7);
+    }
+.ayinde-site .premium-block .btn-service-link{
+        border-color: rgba(255,255,255,0.2);
+        color: #fff;
+    }

@@ -1,0 +1,679 @@
+/* Scoped to .ayinde-site (generated from the PHP design CSS) */
+.ayinde-site{
+            --color-navy: #0A2248;
+            --color-blue: #2F9BFF;
+            --color-orange: #FF7A1A;
+            --color-light: #F8FAFF;
+            --font-body: 'Inter', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --radius-lg: 20px;
+            --radius-pill: 50px;
+            --shadow-sm: 0 8px 30px rgba(10,34,72,0.04);
+            --shadow-md: 0 16px 40px rgba(10,34,72,0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+.ayinde-site, .ayinde-site{
+            max-width: 100vw;
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+.ayinde-site{
+            font-family: var(--font-body);
+            color: var(--color-navy);
+            background-color: var(--color-light);
+            -webkit-font-smoothing: antialiased;
+        }
+.ayinde-site h1, .ayinde-site h2, .ayinde-site h3, .ayinde-site h4, .ayinde-site h5, .ayinde-site h6, .ayinde-site .display-font{
+            font-family: var(--font-heading);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+.ayinde-site a{ text-decoration: none; color: inherit; transition: var(--transition); }
+.ayinde-site section{ padding-block: 100px; }
+.ayinde-site .badge-custom{
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: var(--radius-pill);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+.ayinde-site .badge-orange{ background: rgba(255,122,26,0.1); color: var(--color-orange); }
+.ayinde-site .badge-navy{ background: rgba(10,34,72,0.05); color: var(--color-navy); }
+.ayinde-site .badge-blue{ background: rgba(47,155,255,0.1); color: var(--color-blue); }
+.ayinde-site .btn-primary-custom{
+            background-color: var(--color-navy);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+.ayinde-site .btn-primary-custom:hover{
+            background-color: #000;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+.ayinde-site .btn-accent{
+            background-color: var(--color-blue);
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 14px;
+            border: none;
+            transition: var(--transition);
+            box-shadow: 0 8px 24px rgba(47,155,255,0.35);
+        }
+.ayinde-site .btn-accent:hover{
+            background-color: #1a7de0;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+.ayinde-site .navbar{
+            background: #F8FAFF;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+.ayinde-site .navbar.scrolled{
+            background: rgba(248, 250, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 10px 0;
+        }
+.ayinde-site .navbar-brand-wrap{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+.ayinde-site .logo-mark{
+            position: relative;
+            width: 32px;
+            height: 30px;
+        }
+.ayinde-site .pillar-left{
+            position: absolute; width: 9px; height: 26px; background: var(--color-blue); 
+            border-radius: 4px; bottom: 0; left: 3px; transform: rotate(18deg); transform-origin: bottom;
+        }
+.ayinde-site .pillar-right{
+            position: absolute; width: 9px; height: 26px; background: var(--color-blue); 
+            border-radius: 4px; bottom: 0; right: 3px; transform: rotate(-18deg); transform-origin: bottom;
+        }
+.ayinde-site .logo-dot{
+            position: absolute; width: 10px; height: 10px; background: var(--color-orange); 
+            border-radius: 50%; top: -2px; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 0 0 3px rgba(255,122,26,0.15);
+        }
+.ayinde-site .brand-text{
+            line-height: 1;
+            color: var(--color-navy);
+        }
+.ayinde-site .brand-title{ font-family: var(--font-heading); font-weight: 700; font-size: 18px; letter-spacing: 0.02em; }
+.ayinde-site .brand-sub{ font-size: 10px; font-weight: 600; letter-spacing: 0.1em; opacity: 0.6; }
+.ayinde-site .nav-link{
+            color: var(--color-navy) !important;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px !important;
+            opacity: 0.8;
+        }
+.ayinde-site .nav-link:hover{ opacity: 1; color: var(--color-blue) !important; }
+.ayinde-site .badge-locations{
+            background-color: var(--color-navy);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            padding: 6px 12px;
+            border-radius: var(--radius-pill);
+            margin-left: 15px;
+        }
+.ayinde-site .hero-section{
+            padding-top: 120px; 
+            background-color: var(--color-navy);
+            position: relative;
+            min-height: 95vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+.ayinde-site .hero-carousel, .ayinde-site .carousel-inner, .ayinde-site .carousel-item{
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+        }
+.ayinde-site .carousel-inner{
+            overflow: hidden;
+        }
+.ayinde-site .carousel-item{
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s ease !important;
+        }
+.ayinde-site .hero-bg{
+            position: absolute; inset: 0;
+            background-size: cover; background-position: center;
+        }
+.ayinde-site .hero-overlay{
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, rgba(10,34,72,0.95) 0%, rgba(10,34,72,0.7) 50%, rgba(10,34,72,0.2) 100%);
+        }
+.ayinde-site .hero-content{
+            position: relative;
+            z-index: 10;
+            padding-bottom: 80px;
+            padding-top: 100px;
+        }
+.ayinde-site .hero-title{
+            color: #fff;
+            font-size: clamp(2rem, 8vw, 4.5rem); 
+            line-height: 1.05;
+            margin-bottom: 20px;
+            text-wrap: balance;
+            word-wrap: break-word; 
+            overflow-wrap: break-word;
+        }
+.ayinde-site .hero-desc{
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+.ayinde-site .carousel-indicators{
+            position: relative; 
+            margin: 40px 0 0 0; 
+            justify-content: flex-start;
+            padding: 0;
+            gap: 12px; 
+            z-index: 15;
+        }
+.ayinde-site .carousel-indicators [data-bs-target]{
+            width: 10px !important;
+            height: 10px !important;
+            border-radius: 50% !important; 
+            background-color: rgba(255, 255, 255, 0.4) !important;
+            border: none !important;
+            margin: 0 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+.ayinde-site .carousel-indicators .active{
+            background-color: var(--color-orange) !important;
+            transform: scale(1.4); 
+        }
+.ayinde-site .marquee-wrapper{
+            background: #fff;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            white-space: nowrap;
+            width: 100%; 
+        }
+.ayinde-site .marquee-content{
+            display: flex;
+            animation: marquee 30s linear infinite;
+        }
+.ayinde-site .marquee-item{
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: rgba(10,34,72,0.6);
+            margin-right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+.ayinde-site .marquee-dot{ width: 6px; height: 6px; background: var(--color-orange); border-radius: 50%; }
+@keyframes marquee{ 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.ayinde-site .feature-card{
+            background: #fff;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            height: 100%;
+        }
+.ayinde-site .feature-card:hover{
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+.ayinde-site .feature-number{
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--color-light);
+            display: flex; justify-content: center; align-items: center;
+            font-weight: 700; font-size: 14px; margin-bottom: 20px;
+        }
+.ayinde-site .quote-box{
+            background: var(--color-navy);
+            color: #fff;
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            position: relative;
+            overflow: hidden;
+            margin-top: 40px;
+        }
+.ayinde-site .quote-box::after{
+            content: ''; position: absolute; top: -50px; right: -50px;
+            width: 200px; height: 200px; background: rgba(47,155,255,0.2);
+            filter: blur(40px); border-radius: 50%;
+        }
+.ayinde-site .services-section{ background: #fff; }
+.ayinde-site .service-tabs{ display: flex; gap: 10px; background: var(--color-light); padding: 5px; border-radius: var(--radius-pill); border: 1px solid rgba(0,0,0,0.05); display: inline-flex;}
+.ayinde-site .service-tab-btn{
+            background: transparent; border: none; padding: 10px 24px; border-radius: var(--radius-pill);
+            font-size: 14px; font-weight: 600; color: rgba(10,34,72,0.6); transition: var(--transition);
+        }
+.ayinde-site .service-tab-btn.active{ background: var(--color-navy); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.ayinde-site .plan-card{
+            background: var(--color-light);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 24px;
+            padding: 30px;
+            height: 100%;
+            transition: var(--transition);
+        }
+.ayinde-site .plan-card:hover{ border-color: rgba(0,0,0,0.1); }
+.ayinde-site .plan-card.premium-card{
+            background: var(--color-navy);
+            color: #fff;
+            border-color: var(--color-navy);
+            transform: scale(1.02);
+            box-shadow: 0 20px 50px rgba(10,34,72,0.2);
+        }
+.ayinde-site .plan-price{ font-size: 36px; font-weight: 700; font-family: var(--font-heading); margin: 15px 0 5px; }
+.ayinde-site .plan-features li{ margin-bottom: 12px; font-size: 14px; display: flex; gap: 10px; align-items: flex-start;}
+.ayinde-site .plan-features i{ margin-top: 4px; font-size: 12px; color: var(--color-blue); }
+.ayinde-site .premium-card .plan-features i{ color: var(--color-orange); }
+.ayinde-site .enterprise-section{
+            background: var(--color-navy);
+            color: #fff;
+            position: relative;
+        }
+.ayinde-site .glass-panel{
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 28px;
+            padding: 40px;
+        }
+.ayinde-site .product-card{
+            background: #fff;
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+.ayinde-site .product-card:hover{ transform: translateY(-5px); box-shadow: var(--shadow-md); }
+.ayinde-site .product-icon{
+            width: 48px; height: 48px; border-radius: 12px; background: var(--color-navy);
+            color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px;
+            margin-bottom: 20px;
+        }
+.ayinde-site .courses-section{ background: #fff; }
+.ayinde-site .course-card{
+            background: var(--color-light);
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+        }
+.ayinde-site .course-card:hover{ box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.ayinde-site .course-thumbnail{
+            height: 180px;
+            background: linear-gradient(135deg, var(--color-navy), var(--color-blue));
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+.ayinde-site .course-thumbnail::after{
+            content: ''; position: absolute; inset: 0; opacity: 0.2;
+            background-image: radial-gradient(white 1px, transparent 1px); background-size: 15px 15px;
+        }
+.ayinde-site .play-btn{
+            width: 56px; height: 56px; background: #fff; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--color-navy); font-size: 20px; z-index: 2;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: var(--transition);
+        }
+.ayinde-site .course-card:hover .play-btn{ transform: scale(1.1); color: var(--color-blue); }
+.ayinde-site .course-badge{
+            position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px); color: #fff; padding: 4px 10px; border-radius: 20px;
+            font-size: 10px; font-weight: 700; letter-spacing: 1px; z-index: 2; border: 1px solid rgba(255,255,255,0.2);
+        }
+.ayinde-site .contact-section{ background: var(--color-navy); color: #fff; }
+.ayinde-site .contact-form{
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px); padding: 30px; border-radius: 24px;
+        }
+.ayinde-site .form-control, .ayinde-site .form-select{
+            background: #fff; border: none; height: 50px; border-radius: 25px; padding: 0 20px; font-size: 14px;
+        }
+.ayinde-site textarea.form-control{ height: auto; border-radius: 15px; padding: 20px; }
+.ayinde-site .form-control:focus, .ayinde-site .form-select:focus{ box-shadow: 0 0 0 3px rgba(47,155,255,0.3); outline: none; }
+.ayinde-site .contact-card{
+            background: #fff; color: var(--color-navy); padding: 25px; border-radius: 20px;
+        }
+.ayinde-site .contact-card-dark{
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+            color: #fff; padding: 25px; border-radius: 20px; backdrop-filter: blur(10px);
+        }
+.ayinde-site footer{ background: #fff; padding: 80px 0 40px; border-top: 1px solid rgba(0,0,0,0.05); }
+.ayinde-site .footer-heading{ font-size: 11px; font-weight: 700; letter-spacing: 0.15em; color: rgba(10,34,72,0.4); margin-bottom: 20px; }
+.ayinde-site .footer-link{ display: block; color: rgba(10,34,72,0.7); font-size: 14px; margin-bottom: 10px; }
+.ayinde-site .footer-link:hover{ color: var(--color-blue); }
+@keyframes bgZoom{
+            0% { transform: scale(1); }
+            100% { transform: scale(1.15); }
+        }
+.ayinde-site .carousel-item.active .hero-bg{
+            animation: bgZoom 15s linear forwards;
+        }
+.ayinde-site .hero-content{
+            opacity: 0; 
+        }
+@keyframes contentReveal{
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+.ayinde-site .carousel-item.active .hero-content{
+            animation: contentReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
+        }
+.ayinde-site #heroCarousel .carousel-item{
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1), opacity 1.2s ease, filter 1.2s ease !important;
+        }
+.ayinde-site .fx-zoom .carousel-item{ opacity: 0; }
+.ayinde-site .fx-zoom .carousel-item.active{ opacity: 1; }
+.ayinde-site .fx-zoom .carousel-item-next:not(.carousel-item-start), .ayinde-site .fx-zoom .carousel-item-prev:not(.carousel-item-end){
+            transform: scale(1.1) translateX(0) !important;
+        }
+.ayinde-site .fx-zoom .carousel-item-next.carousel-item-start, .ayinde-site .fx-zoom .carousel-item-prev.carousel-item-end{
+            transform: scale(1) translateX(0) !important;
+        }
+.ayinde-site .fx-zoom .active.carousel-item-start, .ayinde-site .fx-zoom .active.carousel-item-end{
+            transform: scale(0.9) translateX(0) !important; opacity: 0;
+        }
+.ayinde-site .fx-slide-up .carousel-item-next:not(.carousel-item-start){
+            transform: translateY(100%) translateX(0) !important;
+        }
+.ayinde-site .fx-slide-up .carousel-item-prev:not(.carousel-item-end){
+            transform: translateY(-100%) translateX(0) !important;
+        }
+.ayinde-site .fx-slide-up .carousel-item-next.carousel-item-start, .ayinde-site .fx-slide-up .carousel-item-prev.carousel-item-end{
+            transform: translateY(0) translateX(0) !important;
+        }
+.ayinde-site .fx-slide-up .active.carousel-item-start{
+            transform: translateY(-100%) translateX(0) !important;
+        }
+.ayinde-site .fx-slide-up .active.carousel-item-end{
+            transform: translateY(100%) translateX(0) !important;
+        }
+.ayinde-site .fx-blur .carousel-item{ opacity: 0; filter: blur(20px); transform: translateX(0) !important; }
+.ayinde-site .fx-blur .carousel-item.active{ opacity: 1; filter: blur(0); }
+.ayinde-site .fx-blur .carousel-item-next.carousel-item-start, .ayinde-site .fx-blur .carousel-item-prev.carousel-item-end{ opacity: 1; filter: blur(0); }
+.ayinde-site .fx-blur .active.carousel-item-start, .ayinde-site .fx-blur .active.carousel-item-end{ opacity: 0; filter: blur(20px); }
+.ayinde-site .newsletter-section{
+            background-color: #fff;
+            padding-bottom: 80px; 
+        }
+.ayinde-site .newsletter-card{
+            background: var(--color-navy);
+            border-radius: 24px;
+            padding: 50px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(10,34,72,0.15);
+        }
+.ayinde-site .newsletter-card::before{
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -5%;
+            width: 300px;
+            height: 300px;
+            background: rgba(47,155,255,0.25);
+            filter: blur(60px);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+.ayinde-site .newsletter-form .input-group{
+            background: #fff;
+            border-radius: var(--radius-pill);
+            padding: 6px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+.ayinde-site .newsletter-form .form-control{
+            border: none;
+            background: transparent;
+            padding-left: 20px;
+            font-size: 15px;
+            box-shadow: none !important;
+        }
+.ayinde-site .newsletter-form .btn-accent{
+            margin: 0;
+        }
+.ayinde-site footer{ 
+            background: #fff; 
+            padding: 80px 0 0 0; 
+            border-top: 1px solid rgba(0,0,0,0.05); 
+            position: relative;
+        }
+.ayinde-site .footer-heading{ font-size: 12px; font-weight: 700; letter-spacing: 0.15em; color: var(--color-navy); margin-bottom: 20px; text-transform: uppercase; }
+.ayinde-site .footer-link{ display: block; color: rgba(10,34,72,0.7); font-size: 15px; margin-bottom: 12px; transition: var(--transition); }
+.ayinde-site .footer-link:hover{ color: var(--color-blue); transform: translateX(5px); }
+.ayinde-site .footer-bottom{
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 25px 0;
+            margin-top: 50px;
+            background: var(--color-light);
+        }
+.ayinde-site .social-link{
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-navy);
+            transition: var(--transition);
+        }
+.ayinde-site .social-link:hover{
+            background: var(--color-blue);
+            color: #fff;
+            border-color: var(--color-blue);
+            transform: translateY(-3px);
+        }
+.ayinde-site .floating-actions{
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+.ayinde-site .fab-btn{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+.ayinde-site .fab-btn:hover{
+            transform: scale(1.1);
+        }
+.ayinde-site .back-to-top{
+            background-color: var(--color-navy);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+.ayinde-site .back-to-top.show{
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+.ayinde-site .chat-btn{
+            background-color: var(--color-blue);
+        }
+.ayinde-site .chat-window{
+            position: fixed;
+            bottom: 90px;
+            right: 30px;
+            width: 320px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom right;
+        }
+.ayinde-site .chat-window.active{
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+.ayinde-site .chat-header{
+            background: var(--color-navy);
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+.ayinde-site .chat-body{
+            padding: 20px;
+            height: 250px;
+            overflow-y: auto;
+            background: var(--color-light);
+        }
+.ayinde-site .chat-footer{
+            padding: 15px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+        }
+.ayinde-site .chat-input{
+            flex: 1;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 20px;
+            padding: 8px 15px;
+            outline: none;
+            font-size: 13px;
+        }
+.ayinde-site .chat-send{
+            background: var(--color-blue);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+.ayinde-site .custom-quote-slide{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+.ayinde-site .custom-quote-slide:first-child{
+            position: relative;
+        }
+.ayinde-site .quote-control{
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-navy);
+            cursor: pointer;
+            
+            z-index: 100 !important; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: var(--transition);
+        }
+.ayinde-site .quote-control:hover{
+            background: var(--color-navy);
+            color: #fff;
+        }
+.ayinde-site .prev-quote{ left: 10px; }
+.ayinde-site .next-quote{ right: 10px; }
+@media (max-width: 768px){.ayinde-site .prev-quote{ left: 5px; }
+.ayinde-site .next-quote{ right: 5px; }}
+@media all and (min-width: 992px){.ayinde-site .navbar .nav-item.dropdown:hover .dropdown-menu{
+            display: block;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+.ayinde-site .navbar .dropdown-menu{
+            display: block;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 0;
+        }
+.ayinde-site .dropdown-item{
+            border-radius: 8px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+.ayinde-site .dropdown-item:hover{
+            background-color: var(--color-light);
+            color: var(--color-blue);
+        }}
+.ayinde-site .btn-login-custom{
+            background-color: #FF7900; 
+            color: #fff !important; 
+            padding: 8px 24px; 
+            border-radius: var(--radius-pill);
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid transparent; 
+        }
+.ayinde-site .btn-login-custom:hover{
+            background-color: transparent;
+            color: #FF7900 !important;
+            border-color: #FF7900;
+            transform: translateY(-2px);
+        }

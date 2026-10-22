@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import '../styles/site-base.css';
 import { api } from '../api';
 import VideoBackground from '../components/VideoBackground';
 
@@ -19,6 +20,20 @@ const Home = () => {
       }
     }
   }, [location]);
+
+  // PHP design fonts, loaded only while the Home page is open
+  useEffect(() => {
+    const id = 'ayinde-home-fonts';
+    let link = document.getElementById(id);
+    if (!link) {
+      link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap';
+      document.head.appendChild(link);
+    }
+    return () => link.remove();
+  }, []);
 
   // Fetch interspersed team members from backend
   useEffect(() => {
@@ -91,9 +106,9 @@ const Home = () => {
   }, [heroImages.length]);
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
+    <div className="ayinde-site" style={{ minHeight: '100vh', backgroundColor: '#F8FAFF' }}>
       {/* ========== HERO SECTION WITH VIDEO BACKGROUND ========== */}
-      <VideoBackground minHeight="600px">
+      <VideoBackground minHeight="600px" overlayOpacity={0.8} gradientColor1="rgba(10, 34, 72, " gradientColor2="rgba(20, 60, 120, ">
         {/* Floating Icon */}
         <div
           className="video-bg-accent"
@@ -129,7 +144,7 @@ const Home = () => {
                 height: '14px',
                 borderRadius: '50%',
                 border: 'none',
-                backgroundColor: index === currentImageIndex ? '#fbbf24' : 'rgba(255, 255, 255, 0.5)',
+                backgroundColor: index === currentImageIndex ? '#FF7A1A' : 'rgba(255, 255, 255, 0.5)',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
@@ -169,17 +184,17 @@ const Home = () => {
             animation: 'slideInUp 0.8s ease-out 0.4s both'
           }}>
             <button
-              onClick={() => navigate('/book')}
+              onClick={() => navigate('/services')}
               style={{
                 padding: '16px 36px',
                 fontSize: '16px',
                 backgroundColor: 'white',
-                color: '#1e40af',
+                color: '#0A2248',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 cursor: 'pointer',
                 fontWeight: '600',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 8px 24px rgba(10,34,72,0.2)',
                 transition: 'all 0.3s ease',
                 transform: 'translateY(0)'
               }}
@@ -199,13 +214,13 @@ const Home = () => {
               style={{
                 padding: '16px 36px',
                 fontSize: '16px',
-                backgroundColor: '#fbbf24',
-                color: '#1e40af',
+                backgroundColor: '#FF7A1A',
+                color: '#0A2248',
                 border: 'none',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 cursor: 'pointer',
                 fontWeight: '600',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 8px 24px rgba(10,34,72,0.2)',
                 transition: 'all 0.3s ease',
                 transform: 'translateY(0)'
               }}
@@ -263,9 +278,9 @@ const Home = () => {
               style={{
                 backgroundColor: 'white',
                 padding: '30px',
-                borderRadius: '8px',
+                borderRadius: '20px',
                 textAlign: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                boxShadow: '0 16px 40px rgba(10,34,72,0.08)'
               }}
             >
               <div style={{ fontSize: '48px', marginBottom: '15px' }}>{value.icon}</div>
@@ -319,8 +334,8 @@ const Home = () => {
               style={{
                 backgroundColor: 'white',
                 padding: '30px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                borderRadius: '20px',
+                boxShadow: '0 16px 40px rgba(10,34,72,0.08)',
                 transition: 'transform 0.3s ease'
               }}
               onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
@@ -343,10 +358,10 @@ const Home = () => {
                 style={{
                   width: '100%',
                   padding: '10px',
-                  backgroundColor: '#1e40af',
+                  backgroundColor: '#0A2248',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '6px',
+                  borderRadius: '50px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
                   fontSize: '14px'
@@ -384,12 +399,12 @@ const Home = () => {
               style={{
                 backgroundColor: 'white',
                 padding: '25px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                borderRadius: '20px',
+                boxShadow: '0 16px 40px rgba(10,34,72,0.08)',
                 textAlign: 'center'
               }}
             >
-              <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e40af', marginBottom: '10px' }}>
+              <div style={{ fontSize: '32px', fontWeight: 'bold', color: '#0A2248', marginBottom: '10px' }}>
                 {step.number}
               </div>
               <h3 style={{ marginBottom: '10px', fontSize: '16px', fontWeight: 'bold' }}>{step.title}</h3>
@@ -417,8 +432,8 @@ const Home = () => {
               style={{
                 backgroundColor: 'white',
                 padding: '30px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                borderRadius: '20px',
+                boxShadow: '0 16px 40px rgba(10,34,72,0.08)'
               }}
             >
               <h3 style={{ marginBottom: '10px', fontSize: '18px', fontWeight: 'bold' }}>{reason.title}</h3>
@@ -490,8 +505,8 @@ const Home = () => {
             <div key={i} style={{
               backgroundColor: 'white',
               padding: '25px',
-              borderRadius: '8px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+              borderRadius: '20px',
+              boxShadow: '0 16px 40px rgba(10,34,72,0.08)',
               borderLeft: '5px solid #3b82f6',
               transition: 'all 0.3s ease'
             }}
@@ -525,16 +540,16 @@ const Home = () => {
             style={{
               padding: '14px 40px',
               fontSize: '16px',
-              backgroundColor: '#3b82f6',
+              backgroundColor: '#2F9BFF',
               color: 'white',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '50px',
               cursor: 'pointer',
               fontWeight: 'bold',
               transition: 'all 0.3s ease'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1e40af'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3b82f6'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#0A2248'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#2F9BFF'}
           >
             View All Quotes & Categories →
           </button>
@@ -554,16 +569,16 @@ const Home = () => {
                 style={{
                   backgroundColor: 'white',
                   padding: '30px',
-                  borderRadius: '8px',
+                  borderRadius: '20px',
                   textAlign: 'center',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                  boxShadow: '0 16px 40px rgba(10,34,72,0.08)'
                 }}
               >
                 <div style={{ fontSize: '50px', marginBottom: '15px' }}>{member.image || '👤'}</div>
                 <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
                   {member.name}
                 </h3>
-                <p style={{ color: '#1e40af', marginBottom: '10px', fontWeight: '500' }}>
+                <p style={{ color: '#0A2248', marginBottom: '10px', fontWeight: '500' }}>
                   {member.title}
                 </p>
                 {member.quote && (
@@ -590,7 +605,7 @@ const Home = () => {
       </div>
 
       {/* ========== CTA ========== */}
-      <div id="contact" style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '8px', textAlign: 'center', scrollMarginTop: '80px' }}>
+      <div id="contact" style={{ maxWidth: '900px', margin: '50px auto', padding: '30px', backgroundColor: '#f0f9ff', borderRadius: '20px', textAlign: 'center', scrollMarginTop: '80px' }}>
         <h2 style={{ marginBottom: '12px', fontSize: '24px', fontWeight: 'bold' }}>
           Ready to Get Started?
         </h2>
@@ -600,24 +615,24 @@ const Home = () => {
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={() => navigate('/book')}
+            onClick={() => navigate('/services')}
             style={{
               padding: '14px 32px',
               fontSize: '16px',
-              backgroundColor: '#1e40af',
+              backgroundColor: '#0A2248',
               color: 'white',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '50px',
               cursor: 'pointer',
               fontWeight: 'bold',
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#1e3a8a';
+              e.target.style.backgroundColor = '#0A2248';
               e.target.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#1e40af';
+              e.target.style.backgroundColor = '#0A2248';
               e.target.style.transform = 'translateY(0)';
             }}
           >
@@ -628,20 +643,20 @@ const Home = () => {
             style={{
               padding: '14px 32px',
               fontSize: '16px',
-              backgroundColor: '#ff6b35',
+              backgroundColor: '#FF7A1A',
               color: 'white',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '50px',
               cursor: 'pointer',
               fontWeight: 'bold',
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#ff5722';
+              e.target.style.backgroundColor = '#E8650F';
               e.target.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#ff6b35';
+              e.target.style.backgroundColor = '#FF7A1A';
               e.target.style.transform = 'translateY(0)';
             }}
           >
@@ -650,6 +665,80 @@ const Home = () => {
         </div>
       </div>
 
+      {/* ========== FOOTER ========== */}
+      <div style={{ backgroundColor: '#0A2248', color: 'white', padding: '40px', marginTop: '60px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px', marginBottom: '40px' }}>
+          {/* Company Info */}
+          <div>
+            <h3 style={{ marginBottom: '15px', fontSize: '20px', fontWeight: 'bold' }}>
+              Ayinde Technologies
+            </h3>
+            <p style={{ opacity: 1, lineHeight: '1.6' }}>
+              Building practical digital solutions for businesses ready to grow.
+            </p>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#FF7A1A' }}>
+              Sales & Support
+            </h4>
+            <p style={{ marginBottom: '8px' }}>
+              📞 <strong>+1 302-208-4855</strong>
+            </p>
+            <p style={{ marginBottom: '8px' }}>
+              📧 <strong>support@ayindetechnologies.com</strong>
+            </p>
+            <p style={{ marginBottom: '8px', fontSize: '12px', opacity: 1 }}>
+              📍 <strong>East Coast Headquarters:</strong><br/>
+              Delaware, USA
+            </p>
+            <p style={{ marginBottom: '0', fontSize: '12px', opacity: 1 }}>
+              📍 <strong>Westcoast Division:</strong><br/>
+              California, USA
+            </p>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold', color: '#FF7A1A' }}>
+              Quick Links
+            </h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#services" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  🌐 Services
+                </a>
+              </li>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#team" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  👥 Our Team
+                </a>
+              </li>
+              <li style={{ marginBottom: '8px' }}>
+                <a href="#contact" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  📝 Contact
+                </a>
+              </li>
+              <li>
+                <a href="/courses" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                  📖 Courses
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Footer */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '20px', textAlign: 'center', opacity: 1, fontSize: '13px' }}>
+          <p style={{ margin: 0 }}>
+            © 2026 Ayinde Technologies Limited. All rights reserved.
+          </p>
+          <p style={{ margin: '8px 0 0 0' }}>
+            🔒 Trusted by businesses across the globe to deliver technology that works.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

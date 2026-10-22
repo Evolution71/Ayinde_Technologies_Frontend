@@ -1,0 +1,130 @@
+/* Scoped to .ayinde-site (generated from the PHP design CSS) */
+.ayinde-site .hero-split{
+        padding: 140px 0 80px;
+        background: var(--color-light);
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+.ayinde-site .pricing-stack{
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 30px;
+    }
+.ayinde-site .price-card-row{
+        background: #fff;
+        border-radius: 20px;
+        padding: 25px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+    }
+@media (min-width: 768px){.ayinde-site .price-card-row{
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+        }
+.ayinde-site .price-card-left{ flex: 0 0 200px; border-right: 1px solid rgba(0,0,0,0.05); padding-right: 20px; }
+.ayinde-site .price-card-right{ flex: 1; }}
+.ayinde-site .price-card-row:hover{
+        transform: translateX(5px);
+        box-shadow: var(--shadow-md);
+        border-color: rgba(47,155,255,0.3);
+    }
+.ayinde-site .price-card-row.highlight{
+        background: var(--color-navy);
+        color: #fff;
+    }
+.ayinde-site .price-card-row.highlight .text-muted{ color: rgba(255,255,255,0.7) !important; }
+.ayinde-site .price-card-row.highlight .price-card-left{ border-right-color: rgba(255,255,255,0.1); }
+.ayinde-site .plan-title-mini{ font-family: var(--font-heading); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
+.ayinde-site .plan-desc-mini{ font-size: 0.85rem; margin-bottom: 15px; }
+.ayinde-site .plan-price-mini{ font-family: var(--font-heading); font-size: 2rem; font-weight: 700; color: var(--color-blue); line-height: 1; }
+.ayinde-site .plan-price-sub{ font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.ayinde-site .price-card-row.highlight .plan-price-mini{ color: var(--color-orange); }
+.ayinde-site .popular-badge{
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: var(--color-orange);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 6px 15px;
+        border-radius: 0 0 0 15px;
+        letter-spacing: 1px;
+    }
+.ayinde-site .hero-form-wrapper{
+        background: #fff;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 20px 50px rgba(10,34,72,0.1);
+        border: 1px solid rgba(0,0,0,0.05);
+        position: relative;
+    }
+.ayinde-site .hero-form-wrapper::before{
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 6px;
+        background: linear-gradient(90deg, var(--color-blue), var(--color-navy));
+        border-radius: 24px 24px 0 0;
+    }
+.ayinde-site .form-floating > .form-control, .ayinde-site .form-floating > .form-select{
+        border-radius: 12px;
+        border: 2px solid rgba(0,0,0,0.05);
+        background: var(--color-light);
+        transition: var(--transition);
+        height: calc(3.5rem + 2px);
+    }
+.ayinde-site .form-floating > textarea.form-control{
+        height: 120px;
+    }
+.ayinde-site .form-floating > .form-control:focus, .ayinde-site .form-floating > .form-select:focus{
+        border-color: var(--color-blue);
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(47,155,255,0.1);
+    }
+.ayinde-site .form-floating > label{
+        color: #6c757d;
+        font-weight: 500;
+        padding-left: 20px;
+    }
+.ayinde-site .form-floating > .form-control:focus ~ label, .ayinde-site .form-floating > .form-control:not(:placeholder-shown) ~ label, .ayinde-site .form-floating > .form-select ~ label{
+        color: var(--color-blue);
+        font-weight: 700;
+        transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+    }
+.ayinde-site .payment-toggle-box{
+        background: var(--color-light);
+        border: 2px solid rgba(0,0,0,0.05);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 25px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+.ayinde-site .payment-toggle-box.active{
+        background: rgba(47,155,255,0.05);
+        border-color: var(--color-blue);
+    }
+.ayinde-site .feature-list{
+        column-count: 2;
+        column-gap: 20px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+.ayinde-site .feature-list li{
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+        break-inside: avoid;
+    }
+@media (max-width: 991px){.ayinde-site .hero-split{ padding-top: 120px; }
+.ayinde-site .feature-list{ column-count: 1; }}

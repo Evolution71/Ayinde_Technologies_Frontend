@@ -1,0 +1,158 @@
+import React from 'react';
+import useSiteStyles from '../hooks/useSiteStyles';
+import '../styles/site-base.css';
+import '../styles/premium.css';
+
+// Converted from 30f1b5cf-premium-services.php (PHP). Markup and classes are unchanged.
+const PremiumServices = () => {
+  useSiteStyles();
+  const handleFormSubmit = (e) => {
+    // Simulated submit, as in the PHP source. Wire to the backend when ready.
+    e.preventDefault();
+  };
+
+  return (
+    <>
+      <div className="ayinde-site">
+        {/* Premium Services Specific CSS */}
+        {/* === Hero Split Section === */}
+        <section className="hero-split">
+          <div className="container z-3">
+            <div className="row g-5 align-items-center">
+              {/* Left Side: Copy & Value Proposition */}
+              <div className="col-lg-6">
+                <span className="badge-custom bg-white text-navy border border-light shadow-sm mb-3">
+                  <i className="fa-solid fa-crown text-warning me-2" /> <span className="text-dark">PREMIUM ENTERPRISE SUITE</span>
+                </span>
+                <h1 className="display-font mb-3" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>
+                  The Ultimate Digital Ecosystem.
+                </h1>
+                <p className="text-white-50 mb-4" style={{fontSize: '1.1rem', maxWidth: 500}}>
+                  Get a fully synchronized Mobile App, Web Platform, and Desktop Application built exclusively for your business. Subscribe and save with our long-term partnership plans.
+                </p>
+                {/* Features */}
+                <div className="premium-feature-card">
+                  <div className="feature-icon-box"><i className="fa-solid fa-cubes" /></div>
+                  <div>
+                    <h6 className="fw-bold mb-1">The Complete 3-in-1 Suite</h6>
+                    <div className="small text-white-50">Web + Mobile (iOS/Android) + Desktop Applications.</div>
+                  </div>
+                </div>
+                <div className="premium-feature-card">
+                  <div className="feature-icon-box" style={{background: 'rgba(47, 155, 255, 0.1)', color: 'var(--color-blue)'}}><i className="fa-solid fa-user-tie" /></div>
+                  <div>
+                    <h6 className="fw-bold mb-1">Dedicated Account Management</h6>
+                    <div className="small text-white-50">Direct access to your lead engineer and project manager.</div>
+                  </div>
+                </div>
+                {/* Pricing Summary */}
+                <div className="premium-pricing-grid">
+                  <div className="savings-card">
+                    <div className="small text-white-50 text-uppercase mb-1">Monthly</div>
+                    <h4 className="fw-bold text-white mb-0">$2,394<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                  </div>
+                  <div className="savings-card" style={{borderColor: 'rgba(255,122,26,0.3)'}}>
+                    <div className="savings-badge">SAVE 10%</div>
+                    <div className="small text-white-50 text-uppercase mb-1">Quarterly</div>
+                    <h4 className="fw-bold text-white mb-0">$2,154<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                  </div>
+                  <div className="savings-card" style={{borderColor: 'rgba(255,122,26,0.5)'}}>
+                    <div className="savings-badge">SAVE 15%</div>
+                    <div className="small text-white-50 text-uppercase mb-1">Bi-Annually</div>
+                    <h4 className="fw-bold text-white mb-0">$2,034<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                  </div>
+                  <div className="savings-card" style={{borderColor: 'var(--color-orange)'}}>
+                    <div className="savings-badge">SAVE 20%</div>
+                    <div className="small text-white-50 text-uppercase mb-1">Annually</div>
+                    <h4 className="fw-bold text-white mb-0">$1,915<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                  </div>
+                </div>
+              </div>
+              {/* Right Side: Floating Label Form */}
+              <div className="col-lg-6">
+                <div className="hero-form-wrapper">
+                  <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>Start Your Subscription</h3>
+                  <p className="text-muted small mb-4">Select your billing cycle to initialize your premium suite.</p>
+                  <form onSubmit={handleFormSubmit} id="projectForm">
+                    <div className="row g-3">
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input type="text" className="form-control" id="fName" placeholder="First Name" required />
+                          <label htmlFor="fName">First Name</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input type="text" className="form-control" id="lName" placeholder="Last Name" required />
+                          <label htmlFor="lName">Last Name</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input type="email" className="form-control" id="emailAdd" placeholder="name@example.com" required />
+                          <label htmlFor="emailAdd">Email Address</label>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-floating">
+                          <input type="text" className="form-control" id="companyName" placeholder="Company" required />
+                          <label htmlFor="companyName">Company Name</label>
+                        </div>
+                      </div>
+                      <div className="col-12">
+                        <div className="form-floating">
+                          <select className="form-select" id="planSelect" required>
+                            <option value disabled selected>Choose Billing Cycle...</option>
+                            <option value="Monthly">Monthly Billing ($2,394/mo)</option>
+                            <option value="Quarterly">Quarterly Billing (Save 10% - $6,462 total)</option>
+                            <option value="BiAnnually">Bi-Annual Billing (Save 15% - $12,204 total)</option>
+                            <option value="Annually">Annual Billing (Save 20% - $22,980 total)</option>
+                          </select>
+                          <label htmlFor="planSelect">Subscription Plan</label>
+                        </div>
+                      </div>
+                      <div className="col-12">
+                        <div className="form-floating">
+                          <textarea className="form-control" id="projDesc" placeholder="Describe the solution you need" required defaultValue={""} />
+                          <label htmlFor="projDesc">What solution are we building for you?</label>
+                        </div>
+                      </div>
+                      {/* Dynamic Priority Payment Box */}
+                      <div className="col-12">
+                        <label className="payment-toggle-box d-flex align-items-start gap-3 w-100" id="paymentBox">
+                          <div className="form-check mt-1">
+                            <input className="form-check-input" type="checkbox" id="priorityCheckout" style={{transform: 'scale(1.3)'}} />
+                          </div>
+                          <div>
+                            <div className="fw-bold" style={{color: 'var(--color-navy)', fontSize: 16}}>
+                              Initialize Subscription &amp; Project Kickoff
+                            </div>
+                            <div className="text-muted small mt-1 mb-2">
+                              Processing your initial subscription cycle immediately alerts your dedicated project manager to begin onboarding.
+                            </div>
+                            <div className="badge bg-navy text-white px-3 py-2 rounded-pill" style={{fontSize: 13}}>
+                              <i className="fa-solid fa-credit-card me-2" /> Initial Payment: <span id="dynamicPriceDisplay">$0.00</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                      <div className="col-12 mt-4">
+                        <button type="submit" className="btn-primary-custom w-100 justify-content-center py-3" id="submitBtn" style={{fontSize: 16, backgroundColor: 'var(--color-navy)', borderColor: 'var(--color-navy)'}}>
+                          Request Premium Onboarding
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        {/* === Footer === */}
+      </div>
+      
+    </>
+  );
+};
+
+export default PremiumServices;

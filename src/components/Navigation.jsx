@@ -126,13 +126,15 @@ const Navigation = () => {
             💬 Quotes
           </Link>
 
+          <Link to="/all-pages" className="nav-link" onClick={() => setIsOpen(false)}>
+
+            Pages
+
+          </Link>
+
           <a href={sectionHref('#team')} className="nav-link" onClick={() => setIsOpen(false)}>
             Team
           </a>
-
-          <Link to="/book" className="nav-link" onClick={() => setIsOpen(false)}>
-            Book a call
-          </Link>
 
           <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>
             Contact
