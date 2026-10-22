@@ -1,6 +1,7 @@
 import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
+import ServicePlanPanel from '../components/ServicePlanPanel';
 import '../styles/app.css';
 
 // Converted from e8954424-app-development.php (PHP). Markup and classes are unchanged.
@@ -78,6 +79,7 @@ const AppDevelopment = () => {
               {/* Right Side: Floating Label Form */}
               <div className="col-lg-6">
                 <div className="hero-form-wrapper">
+                  <ServicePlanPanel serviceKey="application" />
                   <div id="formContainer">
                     <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>App Requirements</h3>
                     <p className="text-muted small mb-4">Secure your spot in our app development queue.</p>

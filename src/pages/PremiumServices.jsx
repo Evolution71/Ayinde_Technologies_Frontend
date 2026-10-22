@@ -1,6 +1,7 @@
 import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
+import ServicePlanPanel from '../components/ServicePlanPanel';
 import '../styles/premium.css';
 
 // Converted from 30f1b5cf-premium-services.php (PHP). Markup and classes are unchanged.
@@ -71,6 +72,7 @@ const PremiumServices = () => {
               {/* Right Side: Floating Label Form */}
               <div className="col-lg-6">
                 <div className="hero-form-wrapper">
+                  <ServicePlanPanel serviceKey="premium" />
                   <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>Start Your Subscription</h3>
                   <p className="text-muted small mb-4">Select your billing cycle to initialize your premium suite.</p>
                   <form onSubmit={handleFormSubmit} id="projectForm">

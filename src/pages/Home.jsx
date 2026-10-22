@@ -184,7 +184,7 @@ const Home = () => {
             animation: 'slideInUp 0.8s ease-out 0.4s both'
           }}>
             <button
-              onClick={() => navigate('/services')}
+              onClick={() => navigate('/our-services')}
               style={{
                 padding: '16px 36px',
                 fontSize: '16px',
@@ -210,7 +210,7 @@ const Home = () => {
               Book a Free Consultation
             </button>
             <button
-              onClick={() => navigate('/courses')}
+              onClick={() => navigate('/our-courses')}
               style={{
                 padding: '16px 36px',
                 fontSize: '16px',
@@ -615,7 +615,7 @@ const Home = () => {
 
         <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={() => navigate('/services')}
+            onClick={() => navigate('/our-services')}
             style={{
               padding: '14px 32px',
               fontSize: '16px',
@@ -721,7 +721,7 @@ const Home = () => {
                 </a>
               </li>
               <li>
-                <a href="/courses" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
+                <a href="/our-courses" style={{ color: '#fff', textDecoration: 'none', opacity: 1, transition: 'opacity 0.3s' }} onMouseEnter={(e) => e.target.style.opacity = '0.8'} onMouseLeave={(e) => e.target.style.opacity = '1'}>
                   📖 Courses
                 </a>
               </li>

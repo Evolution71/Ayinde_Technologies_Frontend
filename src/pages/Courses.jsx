@@ -1,11 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import useSiteStyles from '../hooks/useSiteStyles';
+import { api } from '../api';
 import '../styles/site-base.css';
 import '../styles/courses.css';
 
 // Converted from 1018357a-courses.php (PHP). Markup and classes are unchanged.
+const asArray = (data, key) => (Array.isArray(data) ? data : data?.[key] || []);
+
 const Courses = () => {
   useSiteStyles();
+
+  // Paid courses from the backend. Enroll uses the existing course page,
+  // which handles the trial and checkout flow.
+  const [paidCourses, setPaidCourses] = useState([]);
+  const [coursesLoaded, setCoursesLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await api.getCourses();
+        if (!cancelled) setPaidCourses(asArray(data, 'courses'));
+      } catch (err) {
+        console.error('Could not load courses:', err);
+      } finally {
+        if (!cancelled) setCoursesLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   return (
     <>
       <div className="ayinde-site">
@@ -26,6 +51,37 @@ const Courses = () => {
               </a>
             </div>
           </header>
+          {/* === Paid Courses (from the backend) === */}
+          {coursesLoaded && paidCourses.length > 0 && (
+            <section className="py-5">
+              <div className="container py-4">
+                <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 pb-2 border-bottom">
+                  <h3 className="display-font mb-3 mb-md-0" style={{color: 'var(--color-navy)'}}>Enroll in Our Courses</h3>
+                  <div className="text-muted small fw-bold"><i className="fa-solid fa-graduation-cap me-2" /> Structured, paid programs</div>
+                </div>
+                <div className="row g-4">
+                  {paidCourses.map((course) => (
+                    <div className="col-lg-4 col-md-6" key={course.id}>
+                      <div className="course-card">
+                        <div className="course-content">
+                          <h4 className="display-font course-title">{course.title}</h4>
+                          {course.description && <p className="course-desc">{course.description}</p>}
+                          <div className="course-footer">
+                            <span className="fw-bold" style={{color: 'var(--color-navy)'}}>
+                              {course.currency || 'USD'} {Number(course.price || 0).toFixed(2)}
+                            </span>
+                            <Link to={`/courses/${course.id}`} className="watch-link">
+                              Enroll now <i className="fa-solid fa-arrow-right ms-1" />
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
           {/* === Courses Grid Section === */}
           <section className="py-5 bg-light">
             <div className="container py-4">

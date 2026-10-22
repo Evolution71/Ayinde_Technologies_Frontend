@@ -1,6 +1,7 @@
 import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
+import ServicePlanPanel from '../components/ServicePlanPanel';
 import '../styles/consulting.css';
 
 // Converted from 89646044-tech-consulting.php (PHP). Markup and classes are unchanged.
@@ -99,6 +100,7 @@ const TechConsulting = () => {
               {/* Right Side: Floating Label Form */}
               <div className="col-lg-6">
                 <div className="hero-form-wrapper">
+                  <ServicePlanPanel serviceKey="consultation" />
                   <div id="formContainer">
                     <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>Book a Consultation</h3>
                     <p className="text-muted small mb-4">Select your tier to secure time with our engineers.</p>

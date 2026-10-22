@@ -1,6 +1,7 @@
 import React from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
+import ServicePlanPanel from '../components/ServicePlanPanel';
 import '../styles/website.css';
 
 // Converted from 84d7bf77-website-development.php (PHP). Markup and classes are unchanged.
@@ -78,6 +79,7 @@ const WebsiteDevelopment = () => {
               {/* Right Side: Floating Label Form */}
               <div className="col-lg-6">
                 <div className="hero-form-wrapper">
+                  <ServicePlanPanel serviceKey="website" />
                   <div id="formContainer">
                     <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>Project Inquiry</h3>
                     <p className="text-muted small mb-4">Secure your spot in our development queue today.</p>

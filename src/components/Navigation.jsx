@@ -73,19 +73,23 @@ const Navigation = () => {
             </button>
             {servicesDropdown && (
               <div className="dropdown-menu services-menu">
-                <Link to="/services/website" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/our-services" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                  <span className="item-icon">🧭</span>
+                  <span className="item-text">All Services</span>
+                </Link>
+                <Link to="/website-development" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">🌐</span>
                   <span className="item-text">Website Development</span>
                 </Link>
-                <Link to="/services/applications" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/app-development" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">📱</span>
                   <span className="item-text">App Development</span>
                 </Link>
-                <Link to="/services/consultation" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/tech-consulting" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">💬</span>
                   <span className="item-text">Tech Consultation</span>
                 </Link>
-                <Link to="/services/premium" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/premium-services" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">👑</span>
                   <span className="item-text">Premium Services</span>
                 </Link>
@@ -106,7 +110,7 @@ const Navigation = () => {
             </button>
             {coursesDropdown && (
               <div className="dropdown-menu courses-menu">
-                <Link to="/courses" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
+                <Link to="/our-courses" className="dropdown-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
                   <span className="item-icon">📖</span>
                   <span className="item-text">Browse All Courses</span>
                 </Link>
