@@ -610,28 +610,39 @@
 .ayinde-site.home-page .custom-quote-slide:first-child{
             position: relative;
         }
+.ayinde-site.home-page .quote-control{
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-navy);
+            cursor: pointer;
+            
+            z-index: 100 !important; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: var(--transition);
+        }
+.ayinde-site.home-page .quote-control:hover{
+            background: var(--color-navy);
+            color: #fff;
+        }
+.ayinde-site.home-page .prev-quote{ left: 10px; }
+.ayinde-site.home-page .next-quote{ right: 10px; }
+@media (max-width: 768px){.ayinde-site.home-page .prev-quote{ left: 5px; }
+.ayinde-site.home-page .next-quote{ right: 5px; }}
 
-/* Contact form: fields share each Bootstrap row side by side; message and captcha take full width */
-.ayinde-site.home-page .contact-form input:not([type="checkbox"]):not([type="radio"]),
-.ayinde-site.home-page .contact-form select,
-.ayinde-site.home-page .contact-form textarea {
-  width: 100%;
-  box-sizing: border-box;
-}
-.ayinde-site.home-page .contact-form .row > [class*="col"] {
-  min-width: 0;
-}
+/* Course cards: keep text left-aligned as in the PHP design */
+.ayinde-site.home-page .course-card { text-align: left; }
 
-/* Contact rows: name and email share a row, service and phone share a row */
-.ayinde-site.home-page .contact-form > .row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 16px;
-  margin-left: 0;
-  margin-right: 0;
-}
-@media (max-width: 640px) {
-  .ayinde-site.home-page .contact-form > .row {
-    grid-template-columns: 1fr;
-  }
-}
+/* Button text colours: scoped link colour must not override button variants */
+.ayinde-site.home-page .btn-dark { color: #fff; }
+.ayinde-site.home-page .btn-accent { color: #fff; }
+.ayinde-site.home-page .btn-light { color: #0A2248; }
+.ayinde-site.home-page .btn-outline-light { color: #fff; }
