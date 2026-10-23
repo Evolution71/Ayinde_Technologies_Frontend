@@ -163,6 +163,13 @@ export const api = {
 
   // ========== COURSE ENDPOINTS ==========
 
+  async getYoutubeCourses() {
+    const res = await fetch(`${API_URL}/api/courses/youtube/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
+
   async getCourses() {
     const res = await fetch(`${API_URL}/api/courses/`, {
       headers: { 'Content-Type': 'application/json' }

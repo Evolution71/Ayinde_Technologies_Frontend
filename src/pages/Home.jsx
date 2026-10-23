@@ -9,12 +9,48 @@ import useSiteStyles from '../hooks/useSiteStyles';
 
 const MAX_HERO_SLIDES = 3;
 
+// Pull the 11-character video id out of a YouTube watch, youtu.be, shorts or embed link.
+const youtubeVideoId = (url) => {
+  if (!url) return null;
+  const m = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+};
+
+// Exact course price in the course's own currency, as stored in the database.
+const formatCoursePrice = (price, currency = 'USD') => {
+  const n = Number(price);
+  if (!Number.isFinite(n)) return '';
+  if (n === 0) return 'Free';
+  try {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD' }).format(n);
+  } catch {
+    return `$${n.toFixed(2)}`;
+  }
+};
+
 const Home = () => {
   useSiteStyles();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [ytCourses, setYtCourses] = useState([]);
+  // YouTube lessons linked to paid courses. If the request fails the section is hidden, never faked.
+  useEffect(() => {
+    let alive = true;
+    api
+      .getYoutubeCourses()
+      .then((data) => {
+        if (alive) setYtCourses(Array.isArray(data?.courses) ? data.courses : []);
+      })
+      .catch(() => {
+        if (alive) setYtCourses([]);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const [error, setError] = useState(null);
 
   // Hero carousel: advances every 5 seconds, like the PHP design
@@ -503,7 +539,8 @@ const Home = () => {
               </div>
           </section>
 
-          {/* Courses Section (Fixed: Static HTML implementation for guaranteed rendering) */}
+                    {/* Courses Section: YouTube lessons linked to paid courses. Data comes from the API. */}
+          {ytCourses.length > 0 && (
           <section id="courses" className="courses-section">
               <div className="container">
                   <div className="d-flex flex-wrap justify-content-between align-items-center mb-5 gap-4">
@@ -513,97 +550,67 @@ const Home = () => {
                           </div>
                           <h2 className="display-font fs-2 mb-0">Free courses — YouTube tutorials</h2>
                       </div>
-                      <span className="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">6 lessons &bull; Free forever</span>
+                      <span className="badge bg-light text-dark border px-3 py-2 rounded-pill fw-normal">{ytCourses.length} lessons • Free forever</span>
                   </div>
 
                   <div className="row g-4">
-                      {/* Course 1 */}
-                      <div className="col-md-6 col-lg-4">
-                          <div className="course-card">
-                              <div className="course-thumbnail">
-                                  <div className="course-badge">BEGINNER &bull; 42 MIN</div>
-                                  <div className="play-btn"><i className="fa-solid fa-play ms-1"></i></div>
+                      {ytCourses.map((c) => {
+                          const videoId = youtubeVideoId(c.youtube_url);
+                          const thumbStyle = videoId
+                              ? { backgroundImage: `url(https://img.youtube.com/vi/${videoId}/hqdefault.jpg), linear-gradient(135deg, #0A2248, #2F9BFF)` }
+                              : undefined;
+                          const badge = [c.level, c.duration].filter(Boolean).join(' • ').toUpperCase();
+                          return (
+                              <div className="col-md-6 col-lg-4" key={c.id}>
+                                  <article className="course-card h-100 d-flex flex-column">
+                                      <div className="course-thumbnail" style={thumbStyle}>
+                                          {badge && <div className="course-badge">{badge}</div>}
+                                          {c.youtube_url && (
+                                              <a href={c.youtube_url} target="_blank" rel="noopener noreferrer"
+                                                 className="play-btn" aria-label={`Watch ${c.title} on YouTube`}>
+                                                  <i className="fa-solid fa-play ms-1"></i>
+                                              </a>
+                                          )}
+                                      </div>
+                                      <div className="p-4 d-flex flex-column flex-grow-1">
+                                          <h5 className="fw-bold mb-2">{c.title}</h5>
+                                          {c.instructor && <p className="text-muted small mb-2">with {c.instructor}</p>}
+                                          {c.description && <p className="text-secondary small mb-3">{c.description}</p>}
+                                          {c.notes.length > 0 && (
+                                              <ul className="yt-notes">
+                                                  {c.notes.slice(0, 4).map((note) => <li key={note}>{note}</li>)}
+                                              </ul>
+                                          )}
+                                          <div className="d-flex flex-wrap gap-2 mt-auto pt-3">
+                                              {c.youtube_url && (
+                                                  <a href={c.youtube_url} target="_blank" rel="noopener noreferrer" className="btn btn-dark btn-sm rounded-pill px-4">
+                                                      Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+                                                  </a>
+                                              )}
+                                              {c.youtube_live_url && (
+                                                  <a href={c.youtube_live_url} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                                      Join live <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+                                                  </a>
+                                              )}
+                                              {c.practical_code_url && (
+                                                  <a href={c.practical_code_url} target="_blank" rel="noopener noreferrer" className="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                                      Practical code <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+                                                  </a>
+                                              )}
+                                          </div>
+                                          <div className="d-flex justify-content-between align-items-center gap-3 mt-4 pt-3 border-top">
+                                              <span className="yt-price">{formatCoursePrice(c.price, c.currency)}</span>
+                                              <Link to={c.checkout_url || `/checkout/${c.id}`} className="btn-accent">Enrol now →</Link>
+                                          </div>
+                                      </div>
+                                  </article>
                               </div>
-                              <div className="p-4">
-                                  <h5 className="fw-bold mb-2">Intro to AI Apps</h5>
-                                  <p className="text-secondary small mb-4">How we scope an AI feature that actually gets used. Prompts, evals, and rollout checklist.</p>
-                                  <Link to="/our-courses" className="btn btn-dark btn-sm rounded-pill px-4">Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></Link>
-                              </div>
-                          </div>
-                      </div>
-                      {/* Course 2 */}
-                      <div className="col-md-6 col-lg-4">
-                          <div className="course-card">
-                              <div className="course-thumbnail">
-                                  <div className="course-badge">BEGINNER &bull; 1H 18M</div>
-                                  <div className="play-btn"><i className="fa-solid fa-play ms-1"></i></div>
-                              </div>
-                              <div className="p-4">
-                                  <h5 className="fw-bold mb-2">Website Dev Fundamentals</h5>
-                                  <p className="text-secondary small mb-4">From Figma to production Next.js. Performance, SEO, and CMS patterns we use at Ayinde.</p>
-                                  <Link to="/our-courses" className="btn btn-dark btn-sm rounded-pill px-4">Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></Link>
-                              </div>
-                          </div>
-                      </div>
-                      {/* Course 3 */}
-                      <div className="col-md-6 col-lg-4">
-                          <div className="course-card">
-                              <div className="course-thumbnail">
-                                  <div className="course-badge">INTERMEDIATE &bull; 58 MIN</div>
-                                  <div className="play-btn"><i className="fa-solid fa-play ms-1"></i></div>
-                              </div>
-                              <div className="p-4">
-                                  <h5 className="fw-bold mb-2">Business Automation</h5>
-                                  <p className="text-secondary small mb-4">Automate proposals, invoicing, and client onboarding without writing a full backend.</p>
-                                  <Link to="/our-courses" className="btn btn-dark btn-sm rounded-pill px-4">Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></Link>
-                              </div>
-                          </div>
-                      </div>
-                      {/* Course 4 */}
-                      <div className="col-md-6 col-lg-4">
-                          <div className="course-card">
-                              <div className="course-thumbnail">
-                                  <div className="course-badge">INTERMEDIATE &bull; 2H 04M</div>
-                                  <div className="play-btn"><i className="fa-solid fa-play ms-1"></i></div>
-                              </div>
-                              <div className="p-4">
-                                  <h5 className="fw-bold mb-2">Mobile App with Flutter</h5>
-                                  <p className="text-secondary small mb-4">Build iOS + Android from one codebase, ship to stores, and monitor crashes.</p>
-                                  <Link to="/our-courses" className="btn btn-dark btn-sm rounded-pill px-4">Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></Link>
-                              </div>
-                          </div>
-                      </div>
-                      {/* Course 5 */}
-                      <div className="col-md-6 col-lg-4">
-                          <div className="course-card">
-                              <div className="course-thumbnail">
-                                  <div className="course-badge">ADVANCED &bull; 1H 32M</div>
-                                  <div className="play-btn"><i className="fa-solid fa-play ms-1"></i></div>
-                              </div>
-                              <div className="p-4">
-                                  <h5 className="fw-bold mb-2">Desktop Apps with Electron</h5>
-                                  <p className="text-secondary small mb-4">Packaging, auto-updates, code-signing, and handling offline data for enterprise.</p>
-                                  <Link to="/our-courses" className="btn btn-dark btn-sm rounded-pill px-4">Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></Link>
-                              </div>
-                          </div>
-                      </div>
-                      {/* Course 6 */}
-                      <div className="col-md-6 col-lg-4">
-                          <div className="course-card">
-                              <div className="course-thumbnail">
-                                  <div className="course-badge">ALL LEVELS &bull; 37 MIN</div>
-                                  <div className="play-btn"><i className="fa-solid fa-play ms-1"></i></div>
-                              </div>
-                              <div className="p-4">
-                                  <h5 className="fw-bold mb-2">Tech Consulting Framework</h5>
-                                  <p className="text-secondary small mb-4">Our Strategy &bull; Build &bull; Implement framework. How to write proposals clients actually sign.</p>
-                                  <Link to="/our-courses" className="btn btn-dark btn-sm rounded-pill px-4">Watch on YouTube <i className="fa-solid fa-arrow-up-right-from-square ms-1 small"></i></Link>
-                              </div>
-                          </div>
-                      </div>
+                          );
+                      })}
                   </div>
               </div>
           </section>
+          )}
 
           {/* === Custom Quotes Section (No Bootstrap Carousel) === */}
           <section className="bg-light text-center border-top border-bottom py-5">

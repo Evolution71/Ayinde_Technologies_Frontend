@@ -683,3 +683,17 @@
   .ayinde-site.home-page .help-table th, .ayinde-site.home-page .help-table td { padding: 12px 12px; font-size: 14px; }
   .ayinde-site.home-page .help-actions { flex-direction: column; align-items: stretch; }
 }
+
+/* YouTube lessons linked to paid courses */
+.ayinde-site.home-page .btn-outline-dark { color: #0A2248; border: 1px solid #0A2248; background: #fff; }
+.ayinde-site.home-page .btn-outline-dark:hover { background: #0A2248; color: #fff; }
+.ayinde-site.home-page .course-thumbnail { background-size: cover; background-position: center; }
+.ayinde-site.home-page .play-btn { text-decoration: none; }
+.ayinde-site.home-page .yt-notes { list-style: none; padding: 0; margin: 0 0 4px; font-size: 14px; color: #4b5870; }
+.ayinde-site.home-page .yt-notes li { position: relative; padding-left: 18px; margin-bottom: 6px; line-height: 1.5; }
+.ayinde-site.home-page .yt-notes li::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 7px; height: 7px; border-radius: 50%; background: #FF7A1A; }
+.ayinde-site.home-page .yt-price { font-size: 1.35rem; font-weight: 800; color: #0A2248; }
+
+/* PHP format for course cards: thumbnail runs edge to edge, buttons keep sentence case */
+.ayinde-site.home-page .course-card { padding: 0; overflow: hidden; border-radius: 20px; }
+.ayinde-site.home-page .btn { text-transform: none; letter-spacing: normal; }
