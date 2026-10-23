@@ -162,7 +162,7 @@ const Home = () => {
                                       <h1 className="hero-title display-font">Technology Partner,<br />Not Just a Vendor</h1>
                                       <p className="hero-desc">Ayinde Technologies helps businesses automate operations with a clear plan before code, and support after launch. East + West Coast coverage.</p>
                                       <div className="d-flex align-items-center gap-3 flex-wrap mt-4">
-                                          <Link to="/contact" className="btn-accent">Book Strategy Call &nearr;</Link>
+                                          <Link to="/contact" className="btn-accent">Book Strategy Call ↗</Link>
                                           <span className="text-white-50 small">With Albert A.D. Cabrera, CEO</span>
                                       </div>
 
@@ -189,7 +189,7 @@ const Home = () => {
                                       <h1 className="hero-title display-font">Plan Before<br />You Build</h1>
                                       <p className="hero-desc">We guide sitting down with a business plan before touching a keyboard. From first working MVP to production-ready AI apps & websites.</p>
                                       <div className="d-flex align-items-center gap-3 flex-wrap mt-4">
-                                          <Link to="/our-services" className="btn-accent">View Services &nearr;</Link>
+                                          <Link to="/our-services" className="btn-accent">View Services ↗</Link>
                                           <span className="text-white-50 small">Website • Mobile • Desktop</span>
                                       </div>
 
@@ -216,7 +216,7 @@ const Home = () => {
                                       <h1 className="hero-title display-font">Support After<br />Launch</h1>
                                       <p className="hero-desc">All-in-one enterprise solutions with advanced AI integration, dedicated account manager, and flexible payments. We stay through rollout.</p>
                                       <div className="d-flex align-items-center gap-3 flex-wrap mt-4">
-                                          <Link to="/premium-services" className="btn-accent">Explore Premium &nearr;</Link>
+                                          <Link to="/premium-services" className="btn-accent">Explore Premium ↗</Link>
                                           <span className="text-white-50 small">Dedicated Support • Flexible Terms</span>
                                       </div>
 
@@ -389,7 +389,7 @@ const Home = () => {
                           </ul>
 
                           <div className="d-flex flex-wrap gap-3">
-                              <Link to="/premium-services" className="btn btn-light rounded-pill px-4 py-3 fw-bold">Request Enterprise Demo &rarr;</Link>
+                              <Link to="/premium-services" className="btn btn-light rounded-pill px-4 py-3 fw-bold">Request Enterprise Demo →</Link>
                           </div>
                       </div>
                 
@@ -456,7 +456,7 @@ const Home = () => {
                               <h4 className="h5 fw-bold mb-3">HR-Wise</h4>
                               <p className="text-secondary small mb-4 flex-grow-1">Streamline applicant tracking, automated onboarding, compliance, and employee performance seamlessly.</p>
                               <div className="d-flex gap-2 mt-auto">
-                                  <Link to="/hr-wise" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request &nearr;</Link>
+                                  <Link to="/hr-wise" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request ↗</Link>
                               </div>
                           </div>
                       </div>
@@ -469,7 +469,7 @@ const Home = () => {
                               <h4 className="h5 fw-bold mb-3">Verus-POS</h4>
                               <p className="text-secondary small mb-4 flex-grow-1">Blazing-fast POS software. Sync inventory across locations, process payments securely, and view live sales analytics.</p>
                               <div className="d-flex gap-2 mt-auto">
-                                  <Link to="/verus-pos" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request &nearr;</Link>
+                                  <Link to="/verus-pos" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request ↗</Link>
                               </div>
                           </div>
                       </div>
@@ -482,7 +482,7 @@ const Home = () => {
                               <h4 className="h5 fw-bold mb-3">Exactus</h4>
                               <p className="text-secondary small mb-4 flex-grow-1">IRS-compliant payroll. Automate tax calculations, manage direct deposits, and track overtime flawlessly.</p>
                               <div className="d-flex gap-2 mt-auto">
-                                  <Link to="/exactus" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request &nearr;</Link>
+                                  <Link to="/exactus" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request ↗</Link>
                               </div>
                           </div>
                       </div>
@@ -495,7 +495,7 @@ const Home = () => {
                               <h4 className="h5 fw-bold mb-3">Inventro</h4>
                               <p className="text-secondary small mb-4 flex-grow-1">Master your supply chain. Track stock in real-time, automate low-stock alerts, and forecast demand.</p>
                               <div className="d-flex gap-2 mt-auto">
-                                  <Link to="/inventro" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request &nearr;</Link>
+                                  <Link to="/inventro" className="btn btn-dark btn-sm rounded-pill flex-grow-1">Request ↗</Link>
                               </div>
                           </div>
                       </div>
@@ -718,6 +718,88 @@ const Home = () => {
           </section>
 
       {/* ========== CONTACT (PHP design) ========== */}
+      <section id="how-we-help" className="help-section">
+        <div className="container">
+          <div className="help-head">
+            <span className="help-eyebrow">How we work with you</span>
+            <h2 className="help-title">We build the site you need, then solve the problem behind it</h2>
+            <p className="help-lead">
+              A website only earns its place when it moves your business. Before we write a line of code we learn
+              your customers, your goals and the problem to solve. We build it properly, launch it, and stay with you
+              after launch.
+            </p>
+          </div>
+
+          <div className="help-grid">
+            <article className="help-card">
+              <span className="help-num">01</span>
+              <h3>Plan before code</h3>
+              <p>We map your users, goals and processes into a written scope and a fixed price, so you know exactly what you are getting.</p>
+            </article>
+            <article className="help-card">
+              <span className="help-num">02</span>
+              <h3>Built around your business</h3>
+              <p>Payments, bookings, dashboards, CRM and admin tools are designed around how you work, not forced into a template.</p>
+            </article>
+            <article className="help-card">
+              <span className="help-num">03</span>
+              <h3>Engineers who stay</h3>
+              <p>Your product is built by our engineers and supported after launch, with 24/7 support, updates and monitoring.</p>
+            </article>
+            <article className="help-card">
+              <span className="help-num">04</span>
+              <h3>Solve the real problem</h3>
+              <p>We track results such as leads, sales and hours saved, and keep improving until the product works for your customers.</p>
+            </article>
+          </div>
+
+          <div className="help-compare">
+            <h3 className="help-compare__title">Engineer-built or a basic AI-made site?</h3>
+            <div className="table-responsive">
+              <table className="table help-table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th scope="col">What matters</th>
+                    <th scope="col">Ayinde engineering team</th>
+                    <th scope="col">Basic AI-generated site</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Planned around your business</th>
+                    <td>Yes, scoped before the build</td>
+                    <td>Generic layout and copy</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Custom features and integrations</th>
+                    <td>Yes, including payments and CRM</td>
+                    <td>Limited to what the tool offers</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Security and data handling</th>
+                    <td>Designed in and reviewed by an engineer</td>
+                    <td>Usually not reviewed by anyone</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Support after launch</th>
+                    <td>24/7 support and updates</td>
+                    <td>Self-service only</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Ownership of the code</th>
+                    <td>Handed over to you</td>
+                    <td>Depends on the platform</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="help-actions">
+              <Link to="/start-project" className="btn-accent">Start your project ↗</Link>
+              <Link to="/contact" className="help-link">Book a strategy call →</Link>
+            </div>
+          </div>
+        </div>
+      </section>
       <section id="contact" className="contact-section">
         <div className="container" style={{ maxWidth: 1280 }}>
           <div className="row g-5 align-items-start">
@@ -761,7 +843,7 @@ const Home = () => {
                 <button type="submit" className="btn btn-light rounded-pill px-4 py-3 fw-bold w-100" id="submitBtn" disabled={contactStatus === 'sending'}>
                   {contactStatus === 'sending' ? 'Sending...' : 'Send Message →'}
                 </button>
-                <p className="text-white-50 small mt-3 text-center mb-0">CEO Albert A.D. Cabrera • info@ayindetechnologies.com • 949-662-7869</p>
+                <p className="text-white-50 small mt-3 text-center mb-0">Sales +1-302-515-0227 • Support +1-201-534-2657 • info@ayindetechnologies.com</p>
               </form>
             </div>
 

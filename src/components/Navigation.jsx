@@ -1,431 +1,457 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo.svg';
+
+const SERVICE_LINKS = [
+  { to: '/website-development', label: 'Website Development' },
+  { to: '/app-development', label: 'App Development' },
+  { to: '/tech-consulting', label: 'Tech Consulting' },
+  { to: '/premium-services', label: 'Premium Services' },
+];
+
+// Hover opens the Services menu only on devices with a real mouse.
+const canHover = () =>
+  typeof window !== 'undefined' &&
+  !!window.matchMedia &&
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [coursesDropdown, setCoursesDropdown] = useState(false);
-  const [servicesDropdown, setServicesDropdown] = useState(false);
-  const { user, logout } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const dropdownRef = useRef(null);
   const location = useLocation();
-  const onHome = location.pathname === '/';
+  const { user, logout } = useAuth();
 
-  const sectionHref = (hash) => (onHome ? hash : `/${hash}`);
+  // Close everything whenever the route changes.
+  useEffect(() => {
+    setMenuOpen(false);
+    setServicesOpen(false);
+  }, [location.pathname]);
 
-  // Close dropdowns when clicking outside
-  React.useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.nav-dropdown')) {
-        setServicesDropdown(false);
-        setCoursesDropdown(false);
+  // Click outside or Escape closes the open menus.
+  useEffect(() => {
+    const onPointerDown = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setServicesOpen(false);
       }
     };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setServicesOpen(false);
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
   }, []);
 
-  // Close dropdowns when navigating
-  React.useEffect(() => {
-    setServicesDropdown(false);
-    setCoursesDropdown(false);
-  }, [location]);
+  // Subtle shadow once the page has scrolled.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  // True only for devices with a real mouse (desktop). Phones/tablets return false,
-  // so a tap doesn't trigger both "hover open" and "click close" at the same time.
-  const canHover = () =>
-    typeof window !== 'undefined' &&
-    window.matchMedia &&
-    window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-  const openOnHover = (dropdownType) => {
-    if (!canHover()) return;
-    if (dropdownType === 'services') {
-      setServicesDropdown(true);
-      setCoursesDropdown(false);
-    } else {
-      setCoursesDropdown(true);
-      setServicesDropdown(false);
-    }
+  const handleServicesEnter = () => {
+    if (canHover()) setServicesOpen(true);
   };
-
-  const closeOnLeave = (dropdownType) => {
-    if (!canHover()) return;
-    if (dropdownType === 'services') setServicesDropdown(false);
-    else setCoursesDropdown(false);
-  };
-
-  const handleDropdownToggle = (e, dropdownType) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (dropdownType === 'services') {
-      // On desktop the menu is already open from hover, so a click keeps it open.
-      setServicesDropdown((prev) => (canHover() ? true : !prev));
-      setCoursesDropdown(false);
-    } else if (dropdownType === 'courses') {
-      setCoursesDropdown((prev) => (canHover() ? true : !prev));
-      setServicesDropdown(false);
-    }
-  };
-
-  const handleDropdownSelect = (callback) => {
-    callback();
-    setServicesDropdown(false);
-    setCoursesDropdown(false);
-    setIsOpen(false);
+  const handleServicesLeave = () => {
+    if (canHover()) setServicesOpen(false);
   };
 
   return (
-    <nav className="navbar">
-      <div className="nav-container">
-        <Link to="/" className="nav-logo">
-          <img src={logo} alt="Ayinde Technologies" className="nav-logo-img" />
+    <header className={`ayn-nav${scrolled ? ' is-scrolled' : ''}`}>
+      <div className="ayn-nav__inner">
+        <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies Corporation, home">
+          <span className="ayn-mark" aria-hidden="true">
+            <span className="ayn-mark__left" />
+            <span className="ayn-mark__right" />
+            <span className="ayn-mark__dot" />
+          </span>
+          <span className="ayn-brand__text">
+            <span className="ayn-brand__name">AYINDE</span>
+            <span className="ayn-brand__sub">Technologies Corporation</span>
+          </span>
         </Link>
-        <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
-          <Link to="/" className="nav-link nav-home" onClick={() => setIsOpen(false)}>
-            Home
-          </Link>
-          <Link to="/start-project" className="nav-link nav-start-project" onClick={() => setIsOpen(false)}>
-            Start a Project
-          </Link>
-
-          {/* Services Dropdown */}
-          <div className={`nav-dropdown ${servicesDropdown ? 'active' : ''}`}
-            onMouseEnter={() => openOnHover('services')}
-            onMouseLeave={() => closeOnLeave('services')}>
-            <button
-              type="button"
-              className="nav-link ayn-dd-toggle"
-              onClick={(e) => handleDropdownToggle(e, 'services')}
-              aria-expanded={servicesDropdown}
-              aria-label="Services submenu">
-              🌐 Services ▼
-            </button>
-            {servicesDropdown && (
-              <div className="ayn-dd-menu services-menu">
-                <Link to="/our-services" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">🧭</span>
-                  <span className="item-text">All Services</span>
-                </Link>
-                <Link to="/website-development" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">🌐</span>
-                  <span className="item-text">Website Development</span>
-                </Link>
-                <Link to="/app-development" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">📱</span>
-                  <span className="item-text">App Development</span>
-                </Link>
-                <Link to="/tech-consulting" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">💬</span>
-                  <span className="item-text">Tech Consultation</span>
-                </Link>
-                <Link to="/premium-services" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">👑</span>
-                  <span className="item-text">Premium Services</span>
-                </Link>
-                <Link to="/start-project" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">🚀</span>
-                  <span className="item-text">Start a Project</span>
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Courses Dropdown */}
-          <div className={`nav-dropdown ${coursesDropdown ? 'active' : ''}`}
-            onMouseEnter={() => openOnHover('courses')}
-            onMouseLeave={() => closeOnLeave('courses')}>
-            <button
-              type="button"
-              className="nav-link ayn-dd-toggle"
-              onClick={(e) => handleDropdownToggle(e, 'courses')}
-              aria-expanded={coursesDropdown}
-              aria-label="Courses submenu">
-              📖 Courses ▼
-            </button>
-            {coursesDropdown && (
-              <div className="ayn-dd-menu courses-menu">
-                <Link to="/our-courses" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">📖</span>
-                  <span className="item-text">Browse All Courses</span>
-                </Link>
-                <Link to="/achievements" className="ayn-dd-item" onClick={() => handleDropdownSelect(() => setIsOpen(false))}>
-                  <span className="item-icon">🏆</span>
-                  <span className="item-text">Achievements</span>
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <Link to="/about" className="nav-link" onClick={() => setIsOpen(false)}>
-            About Us
-          </Link>
-
-          <Link to="/quotes" className="nav-link" onClick={() => setIsOpen(false)}>
-            💬 Quotes
-          </Link>
-
-          <Link to="/all-pages" className="nav-link" onClick={() => setIsOpen(false)}>
-
-            Pages
-
-          </Link>
-
-          <a href={sectionHref('#team')} className="nav-link" onClick={() => setIsOpen(false)}>
-            Team
-          </a>
-
-          <a href={sectionHref('#contact')} className="nav-link contact-btn" onClick={() => setIsOpen(false)}>
-            Contact
-          </a>
-
-          {user ? (
-            <span className="nav-user">
-              Hi, {user.first_name} · <button className="link-btn" onClick={logout}>Log out</button>
-            </span>
-          ) : (
-            <Link to="/login" className="nav-link" onClick={() => setIsOpen(false)}>
-              Log in
-            </Link>
-          )}
-        </div>
 
         <button
-          className="hamburger"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
+          type="button"
+          className="ayn-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="ayn-menu"
+          aria-label="Toggle navigation"
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          ☰
+          <span />
+          <span />
+          <span />
         </button>
+
+        <nav id="ayn-menu" className={`ayn-menu${menuOpen ? ' is-open' : ''}`} aria-label="Main navigation">
+          <ul className="ayn-links">
+            <li>
+              <NavLink to="/about-us" className="ayn-link">About</NavLink>
+            </li>
+
+            <li
+              className={`ayn-dropdown${servicesOpen ? ' is-open' : ''}`}
+              ref={dropdownRef}
+              onMouseEnter={handleServicesEnter}
+              onMouseLeave={handleServicesLeave}
+            >
+              <button
+                type="button"
+                className="ayn-link ayn-link--button"
+                aria-expanded={servicesOpen}
+                aria-haspopup="true"
+                onClick={() => setServicesOpen((open) => !open)}
+              >
+                Services <span className="ayn-caret" aria-hidden="true">▾</span>
+              </button>
+              <div className="ayn-dd" role="menu">
+                {SERVICE_LINKS.map((item) => (
+                  <Link key={item.to} to={item.to} className="ayn-dd__item" role="menuitem">
+                    {item.label}
+                  </Link>
+                ))}
+                <Link to="/our-services" className="ayn-dd__item ayn-dd__all" role="menuitem">
+                  View All Services →
+                </Link>
+              </div>
+            </li>
+
+            <li>
+              <NavLink to="/products" className="ayn-link">Products</NavLink>
+            </li>
+            <li>
+              <NavLink to="/our-courses" className="ayn-link">Courses</NavLink>
+            </li>
+            <li>
+              <NavLink to="/contact" className="ayn-link">Contact</NavLink>
+            </li>
+          </ul>
+
+          <div className="ayn-actions">
+            {user ? (
+              <span className="ayn-user">
+                Hi, {user.first_name}{' '}
+                <button type="button" className="ayn-logout" onClick={logout}>
+                  Log out
+                </button>
+              </span>
+            ) : (
+              <Link to="/login" className="ayn-btn ayn-btn--login">Login</Link>
+            )}
+            <Link to="/start-project" className="ayn-btn ayn-btn--cta">Start Project →</Link>
+          </div>
+        </nav>
       </div>
 
       <style>{`
-        .navbar {
-          background: linear-gradient(135deg, rgba(90, 140, 230, 0.98) 0%, rgba(70, 120, 210, 0.98) 100%);
-          backdrop-filter: blur(10px);
-          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        .ayn-nav {
           position: sticky;
           top: 0;
-          z-index: 999;
-          transition: all 0.3s ease;
+          z-index: 1000;
+          background: #ffffff;
+          border-bottom: 1px solid #e6eaf2;
+          transition: box-shadow 0.3s ease;
+          font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
+        .ayn-nav.is-scrolled { box-shadow: 0 6px 24px rgba(10, 34, 72, 0.08); }
 
-        .nav-logo-img {
-          transition: transform 0.3s ease;
-        }
-
-        .nav-logo:hover .nav-logo-img {
-          transform: scale(1.05);
-        }
-
-        .nav-link {
-          transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        .ayn-nav__inner {
           position: relative;
-          color: white;
-          font-weight: 700;
-        }
-
-        .nav-link:hover {
-          color: #fbbf24;
-          transform: translateY(-2px);
-        }
-
-        .nav-link::after {
-          content: '';
-          position: absolute;
-          width: 0;
-          height: 2px;
-          bottom: -5px;
-          left: 0;
-          background: linear-gradient(90deg, #fbbf24, #f59e0b);
-          transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .nav-link:hover::after {
-          width: 100%;
-        }
-
-        .contact-btn {
-          background: linear-gradient(135deg, #ff6b35, #ff8c42);
-          padding: 8px 20px !important;
-          border-radius: 20px;
-          color: white !important;
-          box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
-          transition: all 0.3s ease;
-        }
-
-        .contact-btn:hover {
-          box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
-          transform: translateY(-3px);
-        }
-
-        .nav-dropdown {
-          position: relative;
-          display: inline-block;
-        }
-
-        .ayn-dd-toggle {
-          background: none;
-          border: none;
-          padding: 0;
-          cursor: pointer;
-          font-size: inherit;
-          font-family: inherit;
-          color: white;
-          font-weight: 700;
-          margin: 0;
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 20px;
+          min-height: 76px;
           display: flex;
           align-items: center;
-          gap: 5px;
-          text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-          letter-spacing: 0.3px;
+          justify-content: space-between;
+          gap: 16px;
         }
 
-        .ayn-dd-toggle::after {
-          display: none !important;
-          content: none !important;
-        }
-
-        .ayn-dd-menu {
-          display: block;
-          position: absolute;
-          top: 100%;
-          left: 0;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-          min-width: 220px;
-          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-          z-index: 1000;
-          padding: 8px 0;
-          margin-top: 10px;
-          animation: aynSlideDownMenu 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          backdrop-filter: blur(20px);
-        }
-
-        @keyframes aynSlideDownMenu {
-          from {
-            opacity: 0;
-            transform: translateY(-15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .ayn-dd-item {
+        /* Brand */
+        .ayn-brand {
           display: flex;
           align-items: center;
           gap: 12px;
-          padding: 12px 20px;
-          color: #1e40af;
           text-decoration: none;
-          font-size: 15px;
-          font-weight: 800;
-          transition: all 0.2s ease;
+          color: #0A2248;
+          min-width: 0;
+        }
+        .ayn-mark {
           position: relative;
+          width: 40px;
+          height: 40px;
+          border-radius: 11px;
+          background: #0A2248;
+          flex: 0 0 auto;
           overflow: hidden;
         }
+        .ayn-mark__left,
+        .ayn-mark__right {
+          position: absolute;
+          bottom: 9px;
+          width: 4px;
+          height: 20px;
+          border-radius: 2px;
+          background: #2F9BFF;
+        }
+        .ayn-mark__left { left: 11px; transform: rotate(-22deg); transform-origin: bottom center; }
+        .ayn-mark__right { right: 11px; transform: rotate(22deg); transform-origin: bottom center; background: #FF7A1A; }
+        .ayn-mark__dot {
+          position: absolute;
+          top: 8px;
+          left: 50%;
+          width: 5px;
+          height: 5px;
+          margin-left: -2.5px;
+          border-radius: 50%;
+          background: #FF7A1A;
+        }
+        .ayn-brand__text { display: block; min-width: 0; }
+        .ayn-brand__name {
+          display: block;
+          font-weight: 800;
+          font-size: 18px;
+          letter-spacing: 0.1em;
+          line-height: 1;
+        }
+        .ayn-brand__sub {
+          display: block;
+          margin-top: 5px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #2F9BFF;
+          white-space: nowrap;
+        }
 
-        .ayn-dd-item::before {
+        /* Desktop menu */
+        .ayn-menu {
+          display: flex;
+          align-items: center;
+          gap: 28px;
+          margin-left: auto;
+        }
+        .ayn-links {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          gap: 28px;
+        }
+        .ayn-link {
+          position: relative;
+          display: inline-block;
+          padding: 6px 0;
+          background: none;
+          border: 0;
+          font: inherit;
+          font-size: 15px;
+          font-weight: 600;
+          color: #0A2248;
+          text-decoration: none;
+          cursor: pointer;
+          transition: color 0.2s ease;
+        }
+        .ayn-link::after {
           content: '';
           position: absolute;
           left: 0;
-          top: 0;
-          height: 100%;
-          width: 4px;
-          background: linear-gradient(180deg, #fbbf24, #ff6b35);
-          transform: scaleY(0);
-          transition: transform 0.3s ease;
-          transform-origin: center;
+          right: 0;
+          bottom: 0;
+          height: 2px;
+          background: #FF7A1A;
+          transform: scaleX(0);
+          transform-origin: left;
+          transition: transform 0.25s ease;
         }
+        .ayn-link:hover,
+        .ayn-link.active,
+        .ayn-dropdown.is-open > .ayn-link { color: #2F9BFF; }
+        .ayn-link:hover::after,
+        .ayn-link.active::after { transform: scaleX(1); }
+        .ayn-caret { font-size: 12px; margin-left: 2px; }
 
-        .ayn-dd-item:hover {
-          background: linear-gradient(90deg, #f3f4f6, #ffffff);
-          padding-left: 24px;
-        }
-
-        .ayn-dd-item:hover::before {
-          transform: scaleY(1);
-        }
-
-        .item-icon {
-          font-size: 18px;
-          display: inline-block;
-          transition: transform 0.3s ease;
-        }
-
-        .ayn-dd-item:hover .item-icon {
-          transform: scale(1.2) rotate(5deg);
-        }
-
-        .item-text {
-          flex: 1;
-          color: #1e40af !important;
-          font-weight: 800;
-        }
-
-        .ayn-dd-item a,
-        .ayn-dd-item a:visited,
-        .ayn-dd-item a:hover {
-          color: #1e40af !important;
-          text-decoration: none;
-        }
-
-        .hamburger {
-          background: none;
-          border: none;
-          color: white;
-          font-size: 28px;
-          cursor: pointer;
-          transition: all 0.3s ease;
+        /* Services dropdown */
+        .ayn-dropdown { position: relative; }
+        .ayn-dd {
           display: none;
+          position: absolute;
+          top: 100%;
+          left: -14px;
+          min-width: 260px;
+          margin-top: 14px;
+          padding: 8px;
+          background: #ffffff;
+          border: 1px solid #e6eaf2;
+          border-radius: 14px;
+          box-shadow: 0 18px 40px rgba(10, 34, 72, 0.14);
+        }
+        .ayn-dropdown.is-open .ayn-dd { display: block; }
+        .ayn-dd__item {
+          display: block;
+          padding: 11px 14px;
+          border-radius: 10px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #0A2248;
+          text-decoration: none;
+          transition: background 0.2s ease, color 0.2s ease;
+        }
+        .ayn-dd__item:hover { background: #EEF5FF; color: #2F9BFF; }
+        .ayn-dd__all {
+          margin-top: 6px;
+          border-top: 1px solid #e6eaf2;
+          border-radius: 0 0 10px 10px;
+          color: #2F9BFF;
         }
 
-        .hamburger:hover {
-          transform: rotate(90deg);
+        /* Actions */
+        .ayn-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .ayn-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 44px;
+          padding: 0 22px;
+          border-radius: 999px;
+          border: 2px solid transparent;
+          font-size: 14px;
+          font-weight: 700;
+          text-decoration: none;
+          white-space: nowrap;
+          transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+        .ayn-btn:hover { transform: translateY(-2px); }
+        .ayn-btn--login { background: #FF7A1A; color: #ffffff; }
+        .ayn-btn--login:hover { background: #E96A10; color: #ffffff; }
+        .ayn-btn--cta { background: #0A2248; color: #ffffff; }
+        .ayn-btn--cta:hover { background: #16386F; color: #ffffff; }
+        .ayn-user { font-size: 14px; font-weight: 600; color: #0A2248; }
+        .ayn-logout {
+          background: none;
+          border: 0;
+          padding: 0;
+          font: inherit;
+          font-weight: 700;
+          color: #2F9BFF;
+          cursor: pointer;
         }
 
-        @media (max-width: 768px) {
-          .hamburger {
-            display: block;
+        /* Mobile toggle (hidden on desktop) */
+        .ayn-toggle {
+          display: none;
+          width: 44px;
+          height: 44px;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          background: #ffffff;
+          border: 1px solid #e6eaf2;
+          border-radius: 12px;
+          cursor: pointer;
+          flex: 0 0 auto;
+        }
+        .ayn-toggle span {
+          display: block;
+          width: 20px;
+          height: 2px;
+          border-radius: 2px;
+          background: #0A2248;
+        }
+        .ayn-toggle:focus-visible,
+        .ayn-link:focus-visible,
+        .ayn-dd__item:focus-visible,
+        .ayn-btn:focus-visible,
+        .ayn-brand:focus-visible {
+          outline: 3px solid #2F9BFF;
+          outline-offset: 3px;
+          border-radius: 8px;
+        }
+
+        /* Tablet and phone */
+        @media (max-width: 991.98px) {
+          .ayn-nav__inner { min-height: 68px; }
+          .ayn-toggle { display: inline-flex; }
+          .ayn-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            max-height: calc(100vh - 68px);
+            overflow-y: auto;
+            margin: 0;
+            padding: 8px 20px 24px;
+            background: #ffffff;
+            border-bottom: 1px solid #e6eaf2;
+            box-shadow: 0 18px 40px rgba(10, 34, 72, 0.12);
           }
-
-          .ayn-dd-menu {
+          .ayn-menu.is-open { display: flex; }
+          .ayn-links {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+          }
+          .ayn-links > li { border-bottom: 1px solid #eef1f6; }
+          .ayn-link {
+            display: block;
+            width: 100%;
+            padding: 14px 0;
+            text-align: left;
+          }
+          .ayn-link::after { display: none; }
+          .ayn-dd {
             position: static;
-            display: block;
-            box-shadow: none;
-            border: none;
-            border-top: 1px solid #e5e7eb;
-            background: #f9fafb;
-            margin-top: 0;
+            display: none;
+            min-width: 0;
+            margin: 0 0 8px;
+            padding: 0 0 0 12px;
+            border: 0;
             border-radius: 0;
-            animation: aynSlideInMobile 0.3s ease;
+            box-shadow: none;
           }
+          .ayn-dropdown.is-open .ayn-dd { display: block; }
+          .ayn-dd__all { border-top: 0; margin-top: 0; }
+          .ayn-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            padding-top: 18px;
+          }
+          .ayn-btn { width: 100%; }
+          .ayn-user { text-align: center; }
+        }
 
-          @keyframes aynSlideInMobile {
-            from {
-              opacity: 0;
-              max-height: 0;
-            }
-            to {
-              opacity: 1;
-              max-height: 500px;
-            }
-          }
+        @media (min-width: 992px) {
+          .ayn-menu { display: flex !important; }
+        }
 
-          .ayn-dd-item {
-            padding: 15px 20px;
-            font-size: 15px;
-          }
-
-          .ayn-dd-item:hover {
-            padding-left: 20px;
-          }
+        @media (max-width: 380px) {
+          .ayn-brand__name { font-size: 16px; }
+          .ayn-brand__sub { font-size: 10px; letter-spacing: 0.1em; }
         }
       `}</style>
-    </nav>
+    </header>
   );
 };
 
