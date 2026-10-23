@@ -1,7 +1,112 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';  // ✅ FIXED: Named import
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { stripePromise } from '../lib/stripe';
+
+// Card entry for saving a card on a trial course (Stripe Elements + SetupIntent)
+const SaveCardForm = ({ courseId, onSaved, onCancel }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [cardComplete, setCardComplete] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSave = async () => {
+    if (!stripe || !elements) return;
+    setSaving(true);
+    setError('');
+    try {
+      // 1. Ask the backend for a SetupIntent tied to this user's Stripe customer
+      const setup = await api.createSetupIntent(courseId);
+
+      // 2. Confirm the card with Stripe. Card details go straight to Stripe.
+      const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(setup.client_secret, {
+        payment_method: { card: elements.getElement(CardElement) }
+      });
+      if (stripeError) {
+        setError(stripeError.message || 'Card could not be saved');
+        return;
+      }
+      if (!setupIntent || setupIntent.status !== 'succeeded') {
+        setError('Card setup was not completed. Please try again.');
+        return;
+      }
+
+      // 3. Store the saved card on the enrollment
+      const saved = await api.savePaymentMethod(courseId, setupIntent.id);
+      if (!saved.success) {
+        setError(saved.message || 'Failed to save card');
+        return;
+      }
+      await onSaved(saved);
+    } catch (err) {
+      setError(err.message || 'Payment error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <div style={{
+        border: '1px solid #ddd',
+        padding: '14px',
+        borderRadius: '6px',
+        marginBottom: '20px'
+      }}>
+        <CardElement onChange={(e) => setCardComplete(e.complete)} />
+      </div>
+
+      {error && (
+        <div style={{
+          padding: '10px',
+          backgroundColor: '#fee2e2',
+          borderRadius: '6px',
+          marginBottom: '15px',
+          color: '#991b1b'
+        }}>
+          ❌ {error}
+        </div>
+      )}
+
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !stripe || !cardComplete}
+          style={{
+            flex: 1,
+            padding: '12px',
+            backgroundColor: saving || !stripe || !cardComplete ? '#ccc' : '#1e40af',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: saving || !stripe || !cardComplete ? 'not-allowed' : 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          {saving ? 'Saving...' : '✅ Save Card'}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={saving}
+          style={{
+            padding: '12px 18px',
+            backgroundColor: '#f3f4f6',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </>
+  );
+};
 
 const CourseDetailPage = () => {
   const { courseId } = useParams();
@@ -16,10 +121,6 @@ const CourseDetailPage = () => {
 
   // Save card modal state
   const [showSaveCardModal, setShowSaveCardModal] = useState(false);
-  const [cardReady, setCardReady] = useState(false);
-  const [savingCard, setSavingCard] = useState(false);
-  const cardRef = useRef(null);
-  const paymentsRef = useRef(null);
 
   // Load course and enrollment status
   useEffect(() => {
@@ -58,91 +159,13 @@ const CourseDetailPage = () => {
     init();
   }, [courseId, user, navigate]);
 
-  // Initialize card form when modal opens
-  useEffect(() => {
-    if (!showSaveCardModal || cardReady) return;
 
-    const initCard = async () => {
-      try {
-        // Wait for Square SDK to load
-        if (!window.Square) {
-          const script = document.createElement('script');
-          script.src = 'https://web.squarecdn.com/v1/square.js';
-          script.async = true;
-          script.onload = async () => {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            initializeSquareCard();
-          };
-          document.head.appendChild(script);
-        } else {
-          initializeSquareCard();
-        }
-      } catch (err) {
-        setError('Failed to initialize card form');
-      }
-    };
-
-    const initializeSquareCard = async () => {
-      try {
-        const appId = process.env.REACT_APP_SQUARE_APP_ID?.trim();
-        if (!appId) throw new Error('Square App ID not configured');
-
-        const payments = window.Square.payments(appId);
-        paymentsRef.current = payments;
-
-        const card = await payments.card();
-        cardRef.current = card;
-
-        await card.attach('#sq-card-container-modal');
-        setCardReady(true);
-      } catch (err) {
-        setError('Card initialization failed: ' + err.message);
-      }
-    };
-
-    initCard();
-  }, [showSaveCardModal, cardReady]);
-
-  // Handle save card
-  const handleSaveCard = async () => {
-    if (!cardRef.current) {
-      setError('Card not initialized');
-      return;
-    }
-
-    try {
-      setSavingCard(true);
-
-      // ✅ Tokenize card
-      const tokenResult = await cardRef.current.tokenize();
-
-      if (tokenResult.status !== 'OK') {
-        setError('Card error: ' + tokenResult.errors?.[0]?.message);
-        setSavingCard(false);
-        return;
-      }
-
-      const token = tokenResult.token;
-
-      // Save to backend
-      const saveResult = await api.savePaymentMethod(courseId, token);
-
-      if (saveResult.success) {
-        alert('✅ ' + saveResult.message);
-        setShowSaveCardModal(false);
-        
-        // Refresh enrollment status
-        const updatedStatus = await api.getEnrollmentStatus(courseId);
-        setEnrollment(updatedStatus);
-      } else {
-        setError(saveResult.message || 'Failed to save card');
-      }
-
-      setSavingCard(false);
-    } catch (err) {
-      setError('Payment error: ' + err.message);
-      setSavingCard(false);
-    }
+  // Called by SaveCardForm after the card is saved
+  const handleCardSaved = async (saveResult) => {
+    alert('✅ ' + saveResult.message);
+    setShowSaveCardModal(false);
+    const updatedStatus = await api.getEnrollmentStatus(courseId);
+    setEnrollment(updatedStatus);
   };
 
   // Handle complete lesson
@@ -173,6 +196,11 @@ const CourseDetailPage = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5', padding: '20px' }}>
+      {error && (
+        <div role="alert" style={{ padding: '12px 16px', marginBottom: '16px', borderRadius: '8px', backgroundColor: '#fee2e2', color: '#991b1b' }}>
+          {error}
+        </div>
+      )}
       {/* Save Card Modal */}
       {showSaveCardModal && (
         <div style={{
@@ -196,58 +224,13 @@ const CourseDetailPage = () => {
             <p style={{ color: '#666', marginBottom: '20px' }}>
               Save your card now and we'll automatically continue your subscription. No charges today!
             </p>
-
-            <div id="sq-card-container-modal" style={{
-              border: '1px solid #ddd',
-              padding: '12px',
-              borderRadius: '6px',
-              marginBottom: '20px',
-              minHeight: '50px'
-            }} />
-
-            {error && (
-              <div style={{
-                padding: '10px',
-                backgroundColor: '#fee2e2',
-                borderRadius: '6px',
-                marginBottom: '15px',
-                color: '#991b1b'
-              }}>
-                ❌ {error}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button
-                onClick={handleSaveCard}
-                disabled={savingCard || !cardReady}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: savingCard || !cardReady ? '#ccc' : '#1e40af',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold'
-                }}
-              >
-                {savingCard ? 'Saving...' : '✅ Save Card'}
-              </button>
-              <button
-                onClick={() => setShowSaveCardModal(false)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: '#e5e7eb',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                Skip for Now
-              </button>
-            </div>
+            <Elements stripe={stripePromise}>
+              <SaveCardForm
+                courseId={courseId}
+                onSaved={handleCardSaved}
+                onCancel={() => setShowSaveCardModal(false)}
+              />
+            </Elements>
           </div>
         </div>
       )}

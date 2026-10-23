@@ -128,7 +128,7 @@ const PricingPage = () => {
         serviceType: tierKey, // Map tier key to service type (website, application, supreme)
         tier: tierKey,
         tierName: tier.name,
-        amount: Math.round(priceInfo.price * 100), // Convert to cents for Square
+        amount: Math.round(priceInfo.price * 100), // Convert to cents for Stripe
         currency: 'USD',
         paymentOption: paymentOption,
         discountPercent: discountPercent,

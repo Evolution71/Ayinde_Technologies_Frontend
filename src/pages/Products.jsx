@@ -82,7 +82,7 @@ const Products = () => {
                     <h2 className="product-title">Verus-POS</h2>
                     <p className="product-desc">A blazing-fast point of sale software tailored for retail and hospitality SMEs. Sync inventory across multiple store locations in real-time, process payments securely, and generate actionable sales reports.</p>
                     <div className="product-features-grid">
-                      <div className="product-feature-item"><i className="fa-solid fa-check" /> Stripe &amp; Square Integration</div>
+                      <div className="product-feature-item"><i className="fa-solid fa-check" /> Stripe Integration</div>
                       <div className="product-feature-item"><i className="fa-solid fa-check" /> Multi-Location Sync</div>
                       <div className="product-feature-item"><i className="fa-solid fa-check" /> Live Sales Analytics</div>
                       <div className="product-feature-item"><i className="fa-solid fa-check" /> Offline Mode Ready</div>

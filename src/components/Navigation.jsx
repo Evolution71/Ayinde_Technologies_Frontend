@@ -412,12 +412,15 @@ const Navigation = () => {
             align-items: stretch;
             gap: 0;
           }
-          .ayn-links > li { border-bottom: 1px solid #eef1f6; }
+          .ayn-links > li { border-bottom: 0; }
           .ayn-link {
             display: block;
             width: 100%;
-            padding: 14px 0;
+            padding: 11px 0;
             text-align: left;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1f2a44;
           }
           .ayn-link::after { display: none; }
           .ayn-dd {
@@ -433,13 +436,14 @@ const Navigation = () => {
           .ayn-dropdown.is-open .ayn-dd { display: block; }
           .ayn-dd__all { border-top: 0; margin-top: 0; }
           .ayn-actions {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
-            padding-top: 18px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            padding-top: 14px;
           }
-          .ayn-btn { width: 100%; }
-          .ayn-user { text-align: center; }
+          .ayn-btn { width: auto; min-width: 96px; height: 46px; padding: 0 20px; }
+          .ayn-user { width: 100%; text-align: left; }
         }
 
         @media (min-width: 992px) {
