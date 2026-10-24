@@ -68,8 +68,8 @@ const Navigation = () => {
   return (
     <header className={`ayn-nav${scrolled ? ' is-scrolled' : ''}`}>
       <div className="ayn-nav__inner">
-        <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies, home">
-          <img src="/ayinde-logo.png" alt="Ayinde Technologies" className="ayn-brand__logo" width="200" height="52" />
+        <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies Corporation, home">
+          <img src="/ayinde-logo.png" alt="Ayinde Technologies Corporation" className="ayn-brand__logo" width="146" height="52" />
         </Link>
 
         <button

@@ -1,5 +1,5 @@
 /**
- * API Client for Ayinde Technologies
+ * API Client for Ayinde Technologies Corporation
  * Updated with new Service endpoints for 12-page website structure
  *
  * Usage:

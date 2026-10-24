@@ -33,8 +33,8 @@ const Footer = () => {
       <div className="ayn-footer__inner">
         <div className="ayn-footer__grid">
           <div className="ayn-footer__col ayn-footer__brand">
-            <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies, home">
-              <img src="/ayinde-logo-light.png" alt="Ayinde Technologies" className="ayn-brand__logo" width="220" height="58" />
+            <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies Corporation, home">
+              <img src="/ayinde-logo-light.png" alt="Ayinde Technologies Corporation" className="ayn-brand__logo" width="162" height="58" />
             </Link>
             <p className="ayn-footer__tagline">Guide, Build &amp; Implement AI Technologies</p>
             <ul className="ayn-footer__offices">

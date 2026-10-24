@@ -40,7 +40,7 @@ const AllPages = () => (
   <div className="ayinde-site" style={{ minHeight: '100vh', padding: '120px 20px 80px' }}>
     <div style={{ maxWidth: 1200, margin: '0 auto' }}>
       <h1 className="fw-bold text-center mb-2" style={{ color: '#0A2248', fontSize: 'clamp(28px, 4vw, 40px)' }}>All Pages</h1>
-      <p className="text-center mb-5" style={{ color: '#666' }}>Explore every page of the Ayinde Technologies site.</p>
+      <p className="text-center mb-5" style={{ color: '#666' }}>Explore every page of the Ayinde Technologies Corporation site.</p>
       {GROUPS.map((group) => (
         <section key={group.title} className="mb-5">
           <h2 className="fw-bold mb-4" style={{ color: '#0A2248', fontSize: 22 }}>{group.title}</h2>
@@ -60,7 +60,7 @@ const AllPages = () => (
                   borderLeft: '5px solid #2F9BFF',
                 }}
               >
-                <div className="fw-bold mb-2" style={{ fontSize: 18 }}>{p.name} &rarr;</div>
+                <div className="fw-bold mb-2" style={{ fontSize: 18 }}>{p.name} →</div>
                 <div style={{ color: '#666', fontSize: 14 }}>{p.text}</div>
               </Link>
             ))}

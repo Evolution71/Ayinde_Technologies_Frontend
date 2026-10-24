@@ -528,7 +528,7 @@ const FamousQuotesPage = () => {
             Ready to Transform Your Vision into Reality?
           </h2>
           <p style={{ fontSize: '16px', marginBottom: '25px', opacity: 0.9 }}>
-            Let the wisdom of industry leaders inspire your journey. Partner with Ayinde Technologies to turn inspiration into innovation.
+            Let the wisdom of industry leaders inspire your journey. Partner with Ayinde Technologies Corporation to turn inspiration into innovation.
           </p>
           <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/services" style={{

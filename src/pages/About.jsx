@@ -396,7 +396,7 @@ export default function About() {
 
       <section className="page-header">
         <div className="container">
-          <p className="page-eyebrow">About Ayinde Technologies</p>
+          <p className="page-eyebrow">About Ayinde Technologies Corporation</p>
           <h1>We guide, build, and stay hands-on until it's actually running.</h1>
           <p className="page-header-sub">
             A technology partner for businesses that want more than a delivered product —
@@ -411,7 +411,7 @@ export default function About() {
             <p className="section-eyebrow">Our story</p>
             <h2>Built around one idea: technology should follow a plan, not replace one.</h2>
             <p>
-              Ayinde Technologies started from a simple observation: most businesses don't fail
+              Ayinde Technologies Corporation started from a simple observation: most businesses don't fail
               at technology because the code is bad they fail because the app, website, or AI
               feature they paid for was never the right thing to build in the first place.
             </p>

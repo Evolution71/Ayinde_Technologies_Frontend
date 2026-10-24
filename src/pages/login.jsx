@@ -45,7 +45,7 @@ const Login = () => {
         }}>
           <h1 style={{ margin: '0 0 10px 0', fontSize: '28px' }}>Welcome Back</h1>
           <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>
-            Log in to your Ayinde Technologies account
+            Log in to your Ayinde Technologies Corporation account
           </p>
         </div>
 

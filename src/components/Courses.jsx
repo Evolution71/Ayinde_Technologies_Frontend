@@ -34,7 +34,6 @@ const Courses = () => {
               enrollmentsData.enrollments.map(e => e.course_id)
             );
             setEnrolledCourseIds(enrolledIds);
-            console.log('[Courses] Enrolled:', Array.from(enrolledIds));
           } catch (err) {
             console.warn('[Courses] Enrollments unavailable:', err);
           }

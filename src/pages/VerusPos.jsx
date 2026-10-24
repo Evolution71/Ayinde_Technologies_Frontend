@@ -64,7 +64,7 @@ const VerusPos = () => {
                 <div className="col-md-3">
                   <div className="feature-icon-box"><i className="fa-brands fa-stripe" /></div>
                   <h5 className="fw-bold text-navy">Seamless Payments</h5>
-                  <p className="text-muted small">Native integrations with Stripe, Square, and standard US payment gateways for frictionless checkout experiences.</p>
+                  <p className="text-muted small">Native integrations with Stripe and standard US payment gateways for frictionless checkout experiences.</p>
                 </div>
                 <div className="col-md-3">
                   <div className="feature-icon-box"><i className="fa-solid fa-store" /></div>

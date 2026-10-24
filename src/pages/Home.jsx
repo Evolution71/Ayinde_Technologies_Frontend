@@ -196,7 +196,7 @@ const Home = () => {
                                           <span className="rounded-circle bg-warning d-inline-block me-2" style={{ width: "8px", height: "8px" }}></span> Business Automation • EST 2026
                                       </span>
                                       <h1 className="hero-title display-font">Technology Partner,<br />Not Just a Vendor</h1>
-                                      <p className="hero-desc">Ayinde Technologies helps businesses automate operations with a clear plan before code, and support after launch. East + West Coast coverage.</p>
+                                      <p className="hero-desc">Ayinde Technologies Corporation helps businesses automate operations with a clear plan before code, and support after launch. East + West Coast coverage.</p>
                                       <div className="d-flex align-items-center gap-3 flex-wrap mt-4">
                                           <Link to="/contact" className="btn-accent">Book Strategy Call ↗</Link>
                                           <span className="text-white-50 small">With Albert A.D. Cabrera, CEO</span>
@@ -299,7 +299,7 @@ const Home = () => {
                           <h2 className="display-font fs-1 mb-4">A technology partner for businesses that want more than a delivered product.</h2>
                           <div className="text-secondary lh-lg mb-5" style={{ fontSize: "16px" }}>
                               <p><strong className="text-dark">Built around one idea: technology should follow a plan, not replace one.</strong></p>
-                              <p>Ayinde Technologies started from a simple observation: most businesses don't fail at technology because the code is bad — they fail because the app, website, or AI feature they paid for was never the right thing to build in the first place.</p>
+                              <p>Ayinde Technologies Corporation started from a simple observation: most businesses don't fail at technology because the code is bad — they fail because the app, website, or AI feature they paid for was never the right thing to build in the first place.</p>
                               <p>So we work in three stages instead of one. We <b>guide</b> sitting down with a business, marketing, or proposal plan before touching a keyboard. We <b>build</b> AI applications and websites, from a first working version through to something production-ready. And we <b>implement</b> — staying involved through rollout, so the team that has to run the thing we built actually can.</p>
                               <p>We're also a straightforward consulting practice for teams that need the strategy conversation on its own, without a build attached to it.</p>
                           </div>

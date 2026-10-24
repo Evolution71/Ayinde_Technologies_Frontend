@@ -95,7 +95,7 @@ const Courses = () => {
                 {/* Course 1 */}
                 <div className="col-lg-4 col-md-6">
                   <div className="course-card">
-                    <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
+                    <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
                       <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Data Analytics" />
                       <div className="play-btn-overlay"><i className="fa-solid fa-play" /></div>
                       <div className="course-duration">45:20</div>
@@ -108,7 +108,7 @@ const Courses = () => {
                       <h4 className="display-font course-title">Implementing AI Agents in Legacy Systems</h4>
                       <p className="course-desc">Learn the step-by-step framework we use to deploy predictive AI and automated customer service agents without breaking existing enterprise architecture.</p>
                       <div className="course-footer">
-                        <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="watch-link">
+                        <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="watch-link">
                           <i className="fa-brands fa-youtube" style={{color: '#FF0000', fontSize: 18}} /> Watch on YouTube
                         </a>
                         <span className="text-muted small">1.2K Views</span>
@@ -119,7 +119,7 @@ const Courses = () => {
                 {/* Course 2 */}
                 <div className="col-lg-4 col-md-6">
                   <div className="course-card">
-                    <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
+                    <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
                       <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80" alt="Business Planning" />
                       <div className="play-btn-overlay"><i className="fa-solid fa-play" /></div>
                       <div className="course-duration">32:15</div>
@@ -132,7 +132,7 @@ const Courses = () => {
                       <h4 className="display-font course-title">Plan Before You Build: The Blueprint Phase</h4>
                       <p className="course-desc">CEO Albert A.D. Cabrera breaks down the exact documentation and scoping strategies required to prevent scope creep and budget overruns.</p>
                       <div className="course-footer">
-                        <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="watch-link">
+                        <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="watch-link">
                           <i className="fa-brands fa-youtube" style={{color: '#FF0000', fontSize: 18}} /> Watch on YouTube
                         </a>
                         <span className="text-muted small">3.4K Views</span>
@@ -143,7 +143,7 @@ const Courses = () => {
                 {/* Course 3 */}
                 <div className="col-lg-4 col-md-6">
                   <div className="course-card">
-                    <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
+                    <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
                       <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Coding" />
                       <div className="play-btn-overlay"><i className="fa-solid fa-play" /></div>
                       <div className="course-duration">58:40</div>
@@ -156,7 +156,7 @@ const Courses = () => {
                       <h4 className="display-font course-title">Scaling Web Applications to 1M Users</h4>
                       <p className="course-desc">A deep dive into cloud architecture, load balancing, and database optimization techniques for enterprise-grade SaaS products.</p>
                       <div className="course-footer">
-                        <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="watch-link">
+                        <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="watch-link">
                           <i className="fa-brands fa-youtube" style={{color: '#FF0000', fontSize: 18}} /> Watch on YouTube
                         </a>
                         <span className="text-muted small">5.1K Views</span>
@@ -167,7 +167,7 @@ const Courses = () => {
                 {/* Course 4 */}
                 <div className="col-lg-4 col-md-6">
                   <div className="course-card">
-                    <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
+                    <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
                       <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80" alt="Project Management" />
                       <div className="play-btn-overlay"><i className="fa-solid fa-play" /></div>
                       <div className="course-duration">22:10</div>
@@ -180,7 +180,7 @@ const Courses = () => {
                       <h4 className="display-font course-title">Agile Project Management for Startups</h4>
                       <p className="course-desc">Discover how to manage complex tech builds with hybrid agile methodologies, ensuring on-time delivery without burning out your team.</p>
                       <div className="course-footer">
-                        <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="watch-link">
+                        <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="watch-link">
                           <i className="fa-brands fa-youtube" style={{color: '#FF0000', fontSize: 18}} /> Watch on YouTube
                         </a>
                         <span className="text-muted small">890 Views</span>
@@ -191,7 +191,7 @@ const Courses = () => {
                 {/* Course 5 */}
                 <div className="col-lg-4 col-md-6">
                   <div className="course-card">
-                    <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
+                    <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
                       <img src="https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=600&q=80" alt="Automation" />
                       <div className="play-btn-overlay"><i className="fa-solid fa-play" /></div>
                       <div className="course-duration">38:55</div>
@@ -204,7 +204,7 @@ const Courses = () => {
                       <h4 className="display-font course-title">Automating Financial Reporting Pipelines</h4>
                       <p className="course-desc">Stop doing manual data entry. We show you how to securely pipe financial data across APIs to generate automated end-of-month reports.</p>
                       <div className="course-footer">
-                        <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="watch-link">
+                        <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="watch-link">
                           <i className="fa-brands fa-youtube" style={{color: '#FF0000', fontSize: 18}} /> Watch on YouTube
                         </a>
                         <span className="text-muted small">2.2K Views</span>
@@ -215,7 +215,7 @@ const Courses = () => {
                 {/* Course 6 */}
                 <div className="col-lg-4 col-md-6">
                   <div className="course-card">
-                    <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
+                    <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="course-thumbnail">
                       <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=600&q=80" alt="Consulting" />
                       <div className="play-btn-overlay"><i className="fa-solid fa-play" /></div>
                       <div className="course-duration">41:30</div>
@@ -228,7 +228,7 @@ const Courses = () => {
                       <h4 className="display-font course-title">Choosing the Right Tech Stack in 2026</h4>
                       <p className="course-desc">React, Vue, Node, Python? A comprehensive breakdown of modern frameworks to help stakeholders make informed, cost-effective infrastructure decisions.</p>
                       <div className="course-footer">
-                        <a href="https://youtube.com/watch?v=YOUR_VIDEO_ID" target="_blank" rel="noopener noreferrer" className="watch-link">
+                        <a href="https://youtube.com/@AyindeTechnologies" target="_blank" rel="noopener noreferrer" className="watch-link">
                           <i className="fa-brands fa-youtube" style={{color: '#FF0000', fontSize: 18}} /> Watch on YouTube
                         </a>
                         <span className="text-muted small">4.8K Views</span>

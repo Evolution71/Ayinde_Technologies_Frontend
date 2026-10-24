@@ -250,7 +250,7 @@ const ServiceFlyers = () => {
           {/* Footer */}
           <div style={{ backgroundColor: '#f3f4f6', padding: '20px 40px', textAlign: 'center', fontSize: '12px', color: '#666' }}>
             <p style={{ margin: 0 }}>
-              📞 +1 302-208-4855 | 📧 support@ayindetechnologies.com<br/>
+              📞 +1-302-515-0227 | 📧 support@ayindetechnologies.com<br/>
               East Coast: Delaware, USA | Westcoast: California, USA
             </p>
           </div>

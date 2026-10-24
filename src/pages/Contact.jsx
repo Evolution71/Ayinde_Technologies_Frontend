@@ -97,7 +97,7 @@ const Contact = () => {
                         </div>
                         <div className="col-12 mt-4">
                           <Captcha ref={captchaRef} />
-                          <button type="submit" className="btn-accent w-100 py-3" style={{fontSize: 16}}>Send Message <i className="fa-solid fa-paper-plane ms-2" /></button>
+                          <button type="submit" className="btn-accent w-100 py-3" style={{fontSize: 16, marginTop: 24}}>Send Message <i className="fa-solid fa-paper-plane ms-2" /></button>
                         </div>
                       </div>
                     </form>

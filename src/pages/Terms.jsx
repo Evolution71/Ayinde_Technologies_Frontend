@@ -51,7 +51,7 @@ export default function Terms() {
 
             <h2>Intellectual property</h2>
             <p>
-              The Ayinde Technologies name, logo, and the design of this site belong to Ayinde
+              The Ayinde Technologies Corporation name, logo, and the design of this site belong to Ayinde
               Technologies. Content you submit (contact messages, account details) remains yours;
               you give us permission to use it to provide the service and respond to you.
             </p>
@@ -59,7 +59,7 @@ export default function Terms() {
             <h2>Limitation of liability</h2>
             <p>
               This website and its services are provided "as is." To the extent permitted by law,
-              Ayinde Technologies isn't liable for indirect or consequential loss arising from your
+              Ayinde Technologies Corporation isn't liable for indirect or consequential loss arising from your
               use of the site. This doesn't limit liability that can't be excluded by law.
             </p>
 

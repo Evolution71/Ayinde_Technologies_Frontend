@@ -22,7 +22,7 @@ const About = () => {
                   </span>
                   <h1 className="display-font text-white mb-4" style={{fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: '1.1'}}>We Build The Automated Enterprise.</h1>
                   <p className="lead text-white-50 mb-0" style={{maxWidth: 600, fontSize: '1.1rem', lineHeight: '1.6'}}>
-                    Ayinde Technologies is more than a development agency. We are your strategic technology partner, helping you plan, build, and implement solutions that scale.
+                    Ayinde Technologies Corporation is more than a development agency. We are your strategic technology partner, helping you plan, build, and implement solutions that scale.
                   </p>
                 </div>
               </div>
@@ -36,7 +36,7 @@ const About = () => {
                   <span className="badge-custom badge-blue mb-3">OUR PHILOSOPHY</span>
                   <h2 className="display-font mb-4" style={{color: 'var(--color-navy)', fontSize: '2.5rem'}}>Plan Before You Build.</h2>
                   <p className="text-muted mb-4" style={{fontSize: '1.05rem', lineHeight: '1.7'}}>
-                    Ayinde Technologies started from a simple observation: most software projects fail not because of bad code, but because of bad planning. We'd rather spend a week on the right business plan than a month building the wrong product.
+                    Ayinde Technologies Corporation started from a simple observation: most software projects fail not because of bad code, but because of bad planning. We'd rather spend a week on the right business plan than a month building the wrong product.
                   </p>
                   <p className="text-muted mb-5" style={{fontSize: '1.05rem', lineHeight: '1.7'}}>
                     With our dual-coast presence, we provide all-in-one enterprise solutions featuring advanced AI integration, robust architecture, and dedicated account management. We don't just hand over a product and disappear; we stay through the rollout.
@@ -102,7 +102,7 @@ const About = () => {
                 <div className="col-lg-8 text-center">
                   <span className="badge-custom badge-navy mb-3">LEADERSHIP</span>
                   <h2 className="display-font" style={{color: 'var(--color-navy)', fontSize: '2.5rem'}}>Driven by Innovation</h2>
-                  <p className="text-muted">Meet the visionary minds steering Ayinde Technologies into the future of enterprise automation.</p>
+                  <p className="text-muted">Meet the visionary minds steering Ayinde Technologies Corporation into the future of enterprise automation.</p>
                 </div>
               </div>
               {/* Team Grid */}
@@ -116,7 +116,7 @@ const About = () => {
                     <p className="text-muted mb-4" style={{fontStyle: 'italic', lineHeight: '1.7', fontSize: 15}}>"Technology should follow a business plan, not replace one. Our mission is to elevate enterprises through smart, scalable, and secure automation."</p>
                     <div className="d-flex justify-content-center gap-3 mt-auto">
                       <a href="/contact" className="social-link" aria-label="LinkedIn"><i className="fa-brands fa-linkedin-in" /></a>
-                      <a href="mailto:ceo@ayindetech.com" className="social-link" aria-label="Email"><i className="fa-solid fa-envelope" /></a>
+                      <a href="mailto:info@ayindetechnologies.com" className="social-link" aria-label="Email"><i className="fa-solid fa-envelope" /></a>
                     </div>
                   </div>
                 </div>

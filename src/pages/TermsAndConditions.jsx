@@ -17,7 +17,7 @@ const TermsAndConditions = () => {
             <div className="container text-center">
               <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2.5rem, 4vw, 3.5rem)'}}>Legal &amp; Privacy</h1>
               <p className="text-muted mx-auto mb-0" style={{maxWidth: 600, fontSize: '1.1rem'}}>
-                Terms of Use, Privacy Policy, and Agreements for Ayinde Technologies' products, services, and educational resources.
+                Terms of Use, Privacy Policy, and Agreements for Ayinde Technologies Corporation' products, services, and educational resources.
               </p>
               <div className="mt-3 text-secondary small">Last Updated: October 2026</div>
             </div>
@@ -45,14 +45,14 @@ const TermsAndConditions = () => {
                       <h2>1. General Terms of Use</h2>
                       <p>Welcome to Ayinde Technologies Corporation. By accessing our website (www.ayindetechnologies.com) and using our services, products, or educational materials, you agree to be bound by these Terms of Use. If you do not agree to these terms, please do not use our Site or services.</p>
                       <h3>1.1 Intellectual Property</h3>
-                      <p>All content on this Site, including but not limited to text, graphics, logos, software, and proprietary architecture, is the property of Ayinde Technologies and is protected by United States and international copyright laws. You may not reproduce, distribute, or create derivative works without express written consent.</p>
+                      <p>All content on this Site, including but not limited to text, graphics, logos, software, and proprietary architecture, is the property of Ayinde Technologies Corporation and is protected by United States and international copyright laws. You may not reproduce, distribute, or create derivative works without express written consent.</p>
                       <h3>1.2 User Conduct</h3>
                       <p>You agree to use our Site and services only for lawful purposes. You are prohibited from attempting to breach our security systems, introducing malicious code, or utilizing our platforms to conduct fraudulent activities.</p>
                     </div>
                     {/* 2. Privacy Policy */}
                     <div id="privacy-policy" className="legal-section">
                       <h2>2. Privacy Policy</h2>
-                      <p>Ayinde Technologies is committed to protecting your privacy. This policy outlines how we collect, use, and safeguard your data.</p>
+                      <p>Ayinde Technologies Corporation is committed to protecting your privacy. This policy outlines how we collect, use, and safeguard your data.</p>
                       <h3>2.1 Information We Collect</h3>
                       <ul>
                         <li><strong>Personal Information:</strong> Names, corporate emails, phone numbers, and company details provided via our contact, project initiation, and subscription forms.</li>
@@ -69,7 +69,7 @@ const TermsAndConditions = () => {
                       <h3>3.1 Subscriptions and Billing</h3>
                       <p>Services are billed on a recurring basis (Monthly, Quarterly, Bi-Annually, or Annually) as selected during checkout. Payments are non-refundable unless expressly stated in a specific Service Level Agreement (SLA). Cancellations must be made at least 14 days prior to the next billing cycle.</p>
                       <h3>3.2 Data Ownership and Security</h3>
-                      <p>You retain full ownership of all business data inputted into our SaaS products. Ayinde Technologies employs AES-256 encryption and industry-standard security protocols to ensure your data remains secure. In the event of subscription termination, you have 30 days to export your data before it is permanently deleted from our servers.</p>
+                      <p>You retain full ownership of all business data inputted into our SaaS products. Ayinde Technologies Corporation employs AES-256 encryption and industry-standard security protocols to ensure your data remains secure. In the event of subscription termination, you have 30 days to export your data before it is permanently deleted from our servers.</p>
                     </div>
                     {/* 4. Service Agreements */}
                     <div id="service-terms" className="legal-section">
@@ -83,9 +83,9 @@ const TermsAndConditions = () => {
                     {/* 5. Educational Courses */}
                     <div id="course-terms" className="legal-section">
                       <h2>5. Educational Courses &amp; Masterclasses</h2>
-                      <p>Ayinde Technologies provides free, open-source educational content via our YouTube channel and website.</p>
+                      <p>Ayinde Technologies Corporation provides free, open-source educational content via our YouTube channel and website.</p>
                       <h3>5.1 Usage of Educational Content</h3>
-                      <p>Our courses are provided for educational and informational purposes only. While we strive for accuracy, Ayinde Technologies makes no guarantees regarding the outcome of implementing strategies discussed in these videos. You may share and link to our public videos, but you may not re-upload, monetize, or package our free courses as paid material.</p>
+                      <p>Our courses are provided for educational and informational purposes only. While we strive for accuracy, Ayinde Technologies Corporation makes no guarantees regarding the outcome of implementing strategies discussed in these videos. You may share and link to our public videos, but you may not re-upload, monetize, or package our free courses as paid material.</p>
                     </div>
                   </div>
                 </div>

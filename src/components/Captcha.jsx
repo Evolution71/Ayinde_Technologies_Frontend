@@ -38,13 +38,9 @@ const Captcha = forwardRef(function Captcha(_props, ref) {
       setCaptchaId(data.captcha_id);
       setChallenge(data.captcha_image); // This is the text to display
       
-      console.log('[Captcha] Loaded:', {
-        id: data.captcha_id,
-        challenge: data.captcha_image
-      });
     } catch (e) {
       console.error('[Captcha] Load error:', e);
-      setError("Failed to load captcha — backend issue?");
+      setError("We could not load the security check. Please refresh the page and try again.");
     } finally {
       setLoading(false);
     }
@@ -84,10 +80,8 @@ const Captcha = forwardRef(function Captcha(_props, ref) {
       
       if (result.success) {
         setVerified(true);
-        console.log('[Captcha] Verified successfully');
       } else {
         setError(result.message || 'Verification failed');
-        console.log('[Captcha] Verification failed:', result.message);
       }
     } catch (err) {
       console.error('[Captcha] Verify error:', err);

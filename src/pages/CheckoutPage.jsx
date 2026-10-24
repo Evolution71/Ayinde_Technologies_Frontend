@@ -236,7 +236,6 @@ export default function CheckoutPage() {
           const allCourses = asArray(await api.getCourses(), 'courses');
           foundCourse = allCourses.find((c) => c.id === numericId) || null;
         } catch (err) {
-          console.log('[Checkout] Could not fetch courses:', err);
         }
 
         // If it isn't in the public list, show the user's enrolled courses instead.
@@ -249,7 +248,6 @@ export default function CheckoutPage() {
             if (!cancelled) setEnrolledCourses(enrolled);
             foundCourse = enrolled.find((c) => c.id === numericId) || null;
           } catch (err) {
-            console.log('[Checkout] Could not get enrollments:', err);
           }
         }
 

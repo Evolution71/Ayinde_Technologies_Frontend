@@ -17,7 +17,6 @@ const AchievementsPage = () => {
 
         // ✅ FIXED: Fetch achievements with flexible response handling
         const achievementsResponse = await api.getAchievements();
-        console.log('[AchievementsPage] Achievements response:', achievementsResponse);
 
         let achievementsData = [];
         if (Array.isArray(achievementsResponse)) {
@@ -31,7 +30,6 @@ const AchievementsPage = () => {
 
         // ✅ FIXED: Fetch male team members by gender with flexible response handling
         const maleResponse = await api.getTeamMembersByGender('male');
-        console.log('[AchievementsPage] Male team response:', maleResponse);
 
         let maleData = [];
         if (Array.isArray(maleResponse)) {
@@ -49,7 +47,6 @@ const AchievementsPage = () => {
 
         // ✅ FIXED: Fetch female team members by gender with flexible response handling
         const femaleResponse = await api.getTeamMembersByGender('female');
-        console.log('[AchievementsPage] Female team response:', femaleResponse);
 
         let femaleData = [];
         if (Array.isArray(femaleResponse)) {
@@ -65,7 +62,6 @@ const AchievementsPage = () => {
         }
         setFemaleTeamMembers(femaleData);
 
-        console.log('[AchievementsPage] Loaded - achievements:', achievementsData.length, 'male:', maleData.length, 'female:', femaleData.length);
       } catch (err) {
         console.error('[AchievementsPage] Error fetching data:', err);
         setError(err.message || 'Failed to load achievements and team data');

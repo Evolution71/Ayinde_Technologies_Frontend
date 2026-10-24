@@ -91,7 +91,7 @@ const StartProject = () => {
                   </div>
                   <div className="mt-5 p-4 rounded-4" style={{background: 'rgba(10,34,72,0.05)', border: '1px solid rgba(0,0,0,0.05)'}}>
                     <div className="fw-bold mb-2 text-navy" style={{fontSize: '0.9rem'}}>Need immediate assistance?</div>
-                    <a href="mailto:hello@ayindetechnologies.com" className="text-decoration-none d-block small mb-1 hover-primary" style={{color: 'var(--color-blue)'}}><i className="fa-solid fa-envelope me-2" />hello@ayindetechnologies.com</a>
+                    <a href="mailto:support@ayindetechnologies.com" className="text-decoration-none d-block small mb-1 hover-primary" style={{color: 'var(--color-blue)'}}><i className="fa-solid fa-envelope me-2" />support@ayindetechnologies.com</a>
                     <a href="tel:+13025150227" className="text-decoration-none d-block small text-muted"><i className="fa-solid fa-phone me-2" />1-302-515-0227</a>
                   </div>
                 </div>
@@ -181,16 +181,16 @@ const StartProject = () => {
                         <div className="file-name-display" id="fileList" />
                       </div>
                     </div>
-                    {/* Submit Action */}
-                    <div className="mt-5 pt-3 border-top d-flex align-items-center justify-content-between">
-                      <div className="text-muted small" style={{maxWidth: 300}}>
+                    {/* Submit Action: terms checkbox above a full-width button */}
+                    <div className="mt-5 pt-3 border-top">
+                      <div className="text-muted small mb-3">
                         <i className="fa-solid fa-lock text-success me-1" /> Your information is securely encrypted and strictly confidential.
                       </div>
                       <div className="form-check mb-3">
                         <input className="form-check-input" type="checkbox" id="termsAccepted" required />
                         <label className="form-check-label small" htmlFor="termsAccepted">I accept the Terms and Conditions</label>
                       </div>
-                                            <button type="submit" disabled={submitting} className="btn-primary-custom px-5 py-3" style={{fontSize: 16}}>
+                      <button type="submit" disabled={submitting} className="btn-primary-custom w-100 py-3" style={{fontSize: 16}}>
                         Submit Project Brief <i className="fa-solid fa-paper-plane ms-2" />
                       </button>
                     </div>

@@ -17,7 +17,7 @@ export default function Privacy() {
             <p className="updated">Last updated: September 2026</p>
 
             <p>
-              Ayinde Technologies ("Ayinde," "we," "us") operates this website and the account
+              Ayinde Technologies Corporation ("Ayinde," "we," "us") operates this website and the account
               system, course platform, and contact tools on it. This policy covers what we collect
               through the site itself — it doesn't cover data handled inside a separate application
               we've built for a client.

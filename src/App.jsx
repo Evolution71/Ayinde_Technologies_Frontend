@@ -62,7 +62,7 @@ const withWhy = (page) => (
 const App = () => {
   useEffect(() => {
     // Set page title
-    document.title = 'Ayinde Technologies - Premium Tech Solutions';
+    document.title = 'Ayinde Technologies Corporation - Premium Tech Solutions';
   }, []);
 
   return (

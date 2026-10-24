@@ -82,7 +82,7 @@ const Register = () => {
           ✨ Create Account
         </h1>
         <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px', fontSize: '14px' }}>
-          Join Ayinde Technologies today
+          Join Ayinde Technologies Corporation today
         </p>
 
         {error && (

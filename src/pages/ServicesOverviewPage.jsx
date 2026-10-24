@@ -202,7 +202,7 @@ const ServicesOverviewPage = () => {
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
         }}>
           <h2 style={{ marginBottom: '30px', fontSize: '28px', fontWeight: 'bold', color: '#1f2937', textAlign: 'center' }}>
-            Why Choose Ayinde Technologies?
+            Why Choose Ayinde Technologies Corporation?
           </h2>
           <div style={{
             display: 'grid',

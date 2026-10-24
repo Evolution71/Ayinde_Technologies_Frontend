@@ -23,7 +23,7 @@ const POINTS = [
 const WhyAyinde = () => (
   <section className="ayn-why" aria-labelledby="ayn-why-title">
     <div className="ayn-why__inner">
-      <p className="ayn-why__eyebrow">Why Ayinde Technologies</p>
+      <p className="ayn-why__eyebrow">Why Ayinde Technologies Corporation</p>
       <h2 id="ayn-why-title" className="ayn-why__title">
         AI can generate a page. It cannot read your mind.
       </h2>

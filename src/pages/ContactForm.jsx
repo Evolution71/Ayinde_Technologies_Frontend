@@ -40,7 +40,6 @@ const ContactForm = () => {
       }
 
       // Log form data for now (you can replace this with an API call later)
-      console.log('Form submitted:', formData);
 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
