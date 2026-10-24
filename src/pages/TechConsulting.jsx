@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
+import useServiceTiers from '../lib/useServiceTiers';
 import '../styles/consulting.css';
 import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from 89646044-tech-consulting.php (PHP). Markup and classes are unchanged.
 const TechConsulting = () => {
+  // Hourly rates come from the database (service_tiers)
+  const { tiers: cons } = useServiceTiers('consultation');
+
   useSiteStyles();
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -61,7 +65,7 @@ const TechConsulting = () => {
                     <div className="price-card-left">
                       <h4 className="plan-title-mini" style={{color: '#00c853'}}>Starter</h4>
                       <p className="text-muted plan-desc-mini">Perfect for initial discovery &amp; quick advice</p>
-                      <div className="plan-price-mini">$50</div>
+                      <div className="plan-price-mini">${cons.starter.hourlyRate}</div>
                       <div className="plan-price-sub text-muted">Per Hour <br /> <span className="small">(Minimum: 1 Hour)</span></div>
                     </div>
                     <div className="price-card-right">
@@ -81,7 +85,7 @@ const TechConsulting = () => {
                     <div className="price-card-left">
                       <h4 className="plan-title-mini" style={{color: 'var(--color-blue)'}}>Standard</h4>
                       <p className="text-muted plan-desc-mini">Ideal for small projects &amp; quick advice</p>
-                      <div className="plan-price-mini">$100</div>
+                      <div className="plan-price-mini">${cons.standard.hourlyRate}</div>
                       <div className="plan-price-sub text-muted">Per Hour <br /> <span className="small">(Minimum: 3 Hours)</span></div>
                     </div>
                     <div className="price-card-right">
@@ -102,7 +106,7 @@ const TechConsulting = () => {
                     <div className="price-card-left">
                       <h4 className="plan-title-mini" style={{color: 'var(--color-orange)'}}>Enterprise</h4>
                       <p className="plan-desc-mini text-white-50">For comprehensive projects &amp; in-depth analysis</p>
-                      <div className="plan-price-mini text-orange">$300</div>
+                      <div className="plan-price-mini text-orange">${cons.enterprise.hourlyRate}</div>
                       <div className="plan-price-sub text-white-50">Per Hour <br /> <span className="small">(Minimum: 10 Hours)</span></div>
                     </div>
                     <div className="price-card-right">
@@ -157,9 +161,9 @@ const TechConsulting = () => {
                           <div className="form-floating">
                             <select className="form-select" id="planSelect" required>
                               <option value disabled selected>Select your consulting tier...</option>
-                              <option value="Starter">Starter Consultation ($50/hr - 1 hr min)</option>
-                              <option value="Standard">Standard Consultation ($100/hr - 3 hrs min)</option>
-                              <option value="Enterprise">Enterprise Consultation ($300/hr - 10 hrs min)</option>
+                              <option value="Starter">{`Starter Consultation ($${cons.starter.hourlyRate}/hr - ${cons.starter.minHours} hr min)`}</option>
+                              <option value="Standard">{`Standard Consultation ($${cons.standard.hourlyRate}/hr - ${cons.standard.minHours} hrs min)`}</option>
+                              <option value="Enterprise">{`Enterprise Consultation ($${cons.enterprise.hourlyRate}/hr - ${cons.enterprise.minHours} hrs min)`}</option>
                             </select>
                             <label htmlFor="planSelect">Consultation Tier</label>
                           </div>
@@ -184,9 +188,7 @@ const TechConsulting = () => {
                                 Processing your retainer guarantees your spot on our calendar. The total due reflects the required minimum hours for your selected tier.
                               </div>
                               {/* This span dynamically changes based on select dropdown */}
-                              <div className="badge bg-navy text-white px-3 py-2 rounded-pill" style={{fontSize: 13}}>
-                                <i className="fa-solid fa-credit-card me-2" /> Retainer Due: <span id="dynamicPriceDisplay">$0.00</span>
-                              </div>
+                              
                             </div>
                           </label>
                         </div>

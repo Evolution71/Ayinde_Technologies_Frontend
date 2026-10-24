@@ -251,25 +251,46 @@ export const SERVICE_CATALOG = {
   },
 };
 
-// Kept for components that import the older name.
+// Plan list used by the plan panel. Prices are filled in from the database
+// by useServiceTiers; these catalog values are only a fallback.
 export const SERVICE_PLANS = Object.fromEntries(
   Object.entries(SERVICE_CATALOG).map(([key, svc]) => [
     key,
-    { serviceType: svc.serviceType, title: svc.title, plans: svc.tiers },
+    {
+      serviceType: svc.serviceType,
+      title: svc.title,
+      options: key === 'consultation' ? undefined : PAYMENT_OPTIONS,
+      plans: svc.tiers,
+    },
   ])
 );
 
-export function getTier(serviceKey, tierKey) {
-  return SERVICE_CATALOG[serviceKey]?.tiers?.[tierKey] || null;
+// Copy the database prices into the catalog shape. Each row's monthly_price is
+// the base price (hourly rate for consultation). Packages with no row keep the
+// fallback value and are flagged so the UI can show it.
+export function applyDbPrices(serviceKey, rows) {
+  const catalog = SERVICE_CATALOG[serviceKey]?.tiers || {};
+  const out = {};
+  for (const [key, tier] of Object.entries(catalog)) {
+    const row = (rows || []).find((r) => r.tier === key);
+    const value = row && row.monthly_price != null ? Number(row.monthly_price) : null;
+    if (serviceKey === 'consultation') {
+      out[key] = { ...tier, hourlyRate: value ?? tier.hourlyRate, fromDatabase: value != null };
+    } else {
+      out[key] = { ...tier, basePrice: value ?? tier.basePrice, fromDatabase: value != null };
+    }
+  }
+  return out;
 }
 
-// Dollar amounts. Same formulas the backend uses in service_pricing.py.
-export function priceFor(serviceKey, tierKey, option = 'monthly', hours) {
-  const tier = getTier(serviceKey, tierKey);
+// Dollar amounts for a tier object (from the database or the fallback).
+// Same rules as service_pricing.py on the server.
+export function priceForTier(tier, option = 'monthly', hours) {
   if (!tier) return null;
 
-  if (serviceKey === 'consultation') {
-    const h = Math.max(Number(hours) || tier.minHours, tier.minHours);
+  if ('hourlyRate' in tier) {
+    const min = tier.minHours || 1;
+    const h = Math.max(Math.ceil(Number(hours) || min), min);
     return { basePrice: h * tier.hourlyRate, total: h * tier.hourlyRate, period: `${h} hour${h > 1 ? 's' : ''}`, hours: h };
   }
 
@@ -289,21 +310,28 @@ export function priceFor(serviceKey, tierKey, option = 'monthly', hours) {
   return { basePrice: base, total, period };
 }
 
-export function optionLabel(serviceKey, tierKey, option) {
-  const p = priceFor(serviceKey, tierKey, option);
-  const base = getTier(serviceKey, tierKey)?.basePrice;
-  if (!p || !base) return '';
+// Convenience wrapper: look up a tier by key (uses the fallback catalog unless tiers are given).
+export function priceFor(serviceKey, tierKey, option = 'monthly', hours, tiers) {
+  const tier = (tiers || SERVICE_CATALOG[serviceKey]?.tiers || {})[tierKey];
+  return priceForTier(tier, option, hours);
+}
+
+export function optionLabel(serviceKey, tierKey, option, tiers) {
+  const tier = (tiers || SERVICE_CATALOG[serviceKey]?.tiers || {})[tierKey];
+  const p = priceForTier(tier, option);
+  if (!p || !tier) return '';
   const money = (n) => `$${Math.round(n).toLocaleString('en-US')}`;
-  if (option === 'monthly') return `Monthly - ${money(base)}/month`;
+  if (option === 'monthly') return `Monthly - ${money(tier.basePrice)}/month`;
   if (option === 'quarterly') return `Quarterly - ${money(p.total)} (5% savings)`;
   if (option === 'annual') return `Annual - ${money(p.total)} (10% savings)`;
-  return `50% down - ${money(p.total)} now, then ${money(base / 2)}/month for 6 months`;
+  return `50% down - ${money(p.total)} now, then ${money(tier.basePrice / 2)}/month for 6 months`;
 }
 
 // Builds the paymentData object that /services/checkout reads.
-export function buildPaymentData(serviceKey, tierKey, option = 'monthly', hours) {
-  const tier = getTier(serviceKey, tierKey);
-  const p = priceFor(serviceKey, tierKey, option, hours);
+export function buildPaymentData(serviceKey, tierKey, option = 'monthly', hours, tiers) {
+  const svc = SERVICE_CATALOG[serviceKey];
+  const tier = (tiers || svc?.tiers || {})[tierKey];
+  const p = priceForTier(tier, option, hours);
   if (!tier || !p) return null;
   const cents = Math.round(p.total * 100);
 
@@ -325,8 +353,8 @@ export function buildPaymentData(serviceKey, tierKey, option = 'monthly', hours)
   }
 
   return {
-    serviceType: SERVICE_CATALOG[serviceKey].serviceType,
-    service: SERVICE_CATALOG[serviceKey].serviceType,
+    serviceType: svc.serviceType,
+    service: svc.serviceType,
     tier: tierKey,
     tierName: tier.name,
     amount: cents,
@@ -350,8 +378,9 @@ export function startServiceCheckout(navigate, paymentData) {
   navigate('/services/checkout', { state: { paymentData } });
 }
 
-// Kept for ServicePlanPanel.
-export function getPriceSummary(serviceKey, tierKey, option, hours) {
-  const p = priceFor(serviceKey, tierKey, option, hours);
+// Summary for the plan panel.
+export function getPriceSummary(serviceKey, tierKey, option, hours, tiers) {
+  const tier = (tiers || SERVICE_CATALOG[serviceKey]?.tiers || {})[tierKey];
+  const p = priceForTier(tier, option, hours);
   return p ? { total: p.total, period: p.period, hours: p.hours } : null;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SERVICE_CATALOG } from '../lib/servicePlans';
+import useServiceTiers from '../lib/useServiceTiers';
 
 const ApplicationServicesPage = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const ApplicationServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const tiers = SERVICE_CATALOG.application.tiers;
+  const { tiers } = useServiceTiers('application');
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;

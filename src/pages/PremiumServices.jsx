@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
+import useServiceTiers from '../lib/useServiceTiers';
 import '../styles/premium.css';
 import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from 30f1b5cf-premium-services.php (PHP). Markup and classes are unchanged.
 const PremiumServices = () => {
+  // Prices come from the database (service_tiers)
+  const { tiers } = useServiceTiers('premium');
+  const base = tiers.supreme.basePrice;
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+
   useSiteStyles();
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -75,22 +81,22 @@ const PremiumServices = () => {
                 <div className="premium-pricing-grid">
                   <div className="savings-card">
                     <div className="small text-white-50 text-uppercase mb-1">Monthly</div>
-                    <h4 className="fw-bold text-white mb-0">$2,394<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                    <h4 className="fw-bold text-white mb-0">{money(base)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
                   </div>
                   <div className="savings-card" style={{borderColor: 'rgba(255,122,26,0.3)'}}>
-                    <div className="savings-badge">SAVE 10%</div>
+                    <div className="savings-badge">SAVE 5%</div>
                     <div className="small text-white-50 text-uppercase mb-1">Quarterly</div>
-                    <h4 className="fw-bold text-white mb-0">$2,154<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                    <h4 className="fw-bold text-white mb-0">{money(base * 0.95)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
                   </div>
                   <div className="savings-card" style={{borderColor: 'rgba(255,122,26,0.5)'}}>
-                    <div className="savings-badge">SAVE 15%</div>
-                    <div className="small text-white-50 text-uppercase mb-1">Bi-Annually</div>
-                    <h4 className="fw-bold text-white mb-0">$2,034<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                    <div className="savings-badge">50% DOWN</div>
+                    <div className="small text-white-50 text-uppercase mb-1">Then 6 Months</div>
+                    <h4 className="fw-bold text-white mb-0">{money(base * 3)}<span className="fs-6 text-white-50 fw-normal"> down</span></h4>
                   </div>
                   <div className="savings-card" style={{borderColor: 'var(--color-orange)'}}>
-                    <div className="savings-badge">SAVE 20%</div>
+                    <div className="savings-badge">SAVE 10%</div>
                     <div className="small text-white-50 text-uppercase mb-1">Annually</div>
-                    <h4 className="fw-bold text-white mb-0">$1,915<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                    <h4 className="fw-bold text-white mb-0">{money(base * 0.9)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
                   </div>
                 </div>
               </div>
@@ -130,10 +136,10 @@ const PremiumServices = () => {
                         <div className="form-floating">
                           <select className="form-select" id="planSelect" required>
                             <option value disabled selected>Choose Billing Cycle...</option>
-                            <option value="Monthly">Monthly Billing ($2,394/mo)</option>
-                            <option value="Quarterly">Quarterly Billing (Save 10% - $6,462 total)</option>
-                            <option value="BiAnnually">Bi-Annual Billing (Save 15% - $12,204 total)</option>
-                            <option value="Annually">Annual Billing (Save 20% - $22,980 total)</option>
+                            <option value="Monthly">{`Monthly Billing (${money(base)}/mo)`}</option>
+                            <option value="Quarterly">{`Quarterly Billing (Save 5% - ${money(base * 3 * 0.95)} total)`}</option>
+                            <option value="HalfDown">{`50% Down + 6 Months (${money(base * 3)} now, then ${money(base / 2)}/mo)`}</option>
+                            <option value="Annually">{`Annual Billing (Save 10% - ${money(base * 12 * 0.9)} total)`}</option>
                           </select>
                           <label htmlFor="planSelect">Subscription Plan</label>
                         </div>
@@ -157,9 +163,7 @@ const PremiumServices = () => {
                             <div className="text-muted small mt-1 mb-2">
                               Processing your initial subscription cycle immediately alerts your dedicated project manager to begin onboarding.
                             </div>
-                            <div className="badge bg-navy text-white px-3 py-2 rounded-pill" style={{fontSize: 13}}>
-                              <i className="fa-solid fa-credit-card me-2" /> Initial Payment: <span id="dynamicPriceDisplay">$0.00</span>
-                            </div>
+                            
                           </div>
                         </label>
                       </div>

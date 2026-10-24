@@ -1,8 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import useServiceTiers from '../lib/useServiceTiers';
 
 const ServicesOverviewPage = () => {
   const navigate = useNavigate();
+  // All prices come from the database (service_tiers)
+  const { tiers: website } = useServiceTiers('website');
+  const { tiers: apps } = useServiceTiers('application');
+  const { tiers: consult } = useServiceTiers('consultation');
+  const { tiers: premium } = useServiceTiers('premium');
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  const values = (tiers, field) => Object.values(tiers).map((t) => t[field]);
+  const low = (tiers, field = 'basePrice') => money(Math.min(...values(tiers, field)));
+  const high = (tiers, field = 'basePrice') => money(Math.max(...values(tiers, field)));
+
 
   const services = [
     {
@@ -12,7 +23,7 @@ const ServicesOverviewPage = () => {
       icon: '🌐',
       color: '#3b82f6',
       features: ['Mobile responsive, SEO-ready design', 'Up to 5 pages, scaling to unlimited', 'E-commerce and AI chatbot options', 'Monthly updates included'],
-      price: 'From $297/month',
+      price: `From ${low(website)}/month`,
       cta: 'View Website Services',
       path: '/services/website'
     },
@@ -23,7 +34,7 @@ const ServicesOverviewPage = () => {
       icon: '📱',
       color: '#06b6d4',
       features: ['Native iOS & Android', 'Firebase backend & user authentication', 'Real-time data, chat and in-app payments', 'Cross-platform and AI/ML integration'],
-      price: 'From $897/month',
+      price: `From ${low(apps)}/month`,
       cta: 'View App Services',
       path: '/services/applications'
     },
@@ -34,7 +45,7 @@ const ServicesOverviewPage = () => {
       icon: '💡',
       color: '#f59e0b',
       features: ['Business audit', 'Technology strategy', 'Digital transformation', 'Growth strategy'],
-      price: 'From $50/hour',
+      price: `From ${low(consult, 'hourlyRate')}/hour`,
       cta: 'Book Consultation',
       path: '/services/consultation'
     },
@@ -45,7 +56,7 @@ const ServicesOverviewPage = () => {
       icon: '👑',
       color: '#10b981',
       features: ['Website + app in one package', '24/7 enterprise support', 'Advanced AI and chatbot', 'Dedicated account manager'],
-      price: '$2,394/month',
+      price: `${money(premium.supreme.basePrice)}/month`,
       cta: 'View Premium Package',
       path: '/services/premium'
     }
@@ -249,7 +260,7 @@ const ServicesOverviewPage = () => {
               borderLeft: '4px solid #3b82f6'
             }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#3b82f6', fontWeight: 'bold' }}>Website Services</h4>
-              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>$297 - $897</p>
+              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>{low(website)} - {high(website)}</p>
               <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '12px' }}>per month</p>
             </div>
             <div style={{
@@ -259,7 +270,7 @@ const ServicesOverviewPage = () => {
               borderLeft: '4px solid #8b5cf6'
             }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#8b5cf6', fontWeight: 'bold' }}>Application Services</h4>
-              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>$897 - $1,497</p>
+              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>{low(apps)} - {high(apps)}</p>
               <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '12px' }}>per month</p>
             </div>
             <div style={{
@@ -269,7 +280,7 @@ const ServicesOverviewPage = () => {
               borderLeft: '4px solid #f59e0b'
             }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#f59e0b', fontWeight: 'bold' }}>Consultation Services</h4>
-              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>$50 - $300</p>
+              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>{low(consult, 'hourlyRate')} - {high(consult, 'hourlyRate')}</p>
               <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '12px' }}>per hour</p>
             </div>
             <div style={{
@@ -279,8 +290,8 @@ const ServicesOverviewPage = () => {
               borderLeft: '4px solid #10b981'
             }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#10b981', fontWeight: 'bold' }}>Premium Enterprise</h4>
-              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>$2,394</p>
-              <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '12px' }}>per month or $50k flat</p>
+              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>{money(premium.supreme.basePrice)}</p>
+              <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '12px' }}>per month</p>
             </div>
           </div>
         </div>

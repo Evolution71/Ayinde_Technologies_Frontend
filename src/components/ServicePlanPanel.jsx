@@ -1,26 +1,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SERVICE_PLANS, getPriceSummary, buildPaymentData, startServiceCheckout } from '../lib/servicePlans';
+import { SERVICE_PLANS, PAYMENT_OPTIONS, getPriceSummary, buildPaymentData, startServiceCheckout } from '../lib/servicePlans';
+import useServiceTiers from '../lib/useServiceTiers';
 
 // Plan picker shown above the inquiry form on the design service pages.
 // The inquiry form stays as it is; this panel adds a direct "pay now" path
 // into the existing checkout.
 const ServicePlanPanel = ({ serviceKey }) => {
   const navigate = useNavigate();
-  const service = SERVICE_PLANS[serviceKey];
-  const planKeys = Object.keys(service.plans);
+  const service = SERVICE_PLANS[serviceKey] || SERVICE_PLANS.website;
+  // Billing options are the same for every package; fall back to them if missing
+  const options = service.options || PAYMENT_OPTIONS;
+  // Prices come from the database (service_tiers) through this hook
+  const { tiers } = useServiceTiers(serviceKey);
+  const planKeys = Object.keys(tiers);
   const isConsultation = serviceKey === 'consultation';
 
   const [planKey, setPlanKey] = useState(planKeys[0]);
-  const [option, setOption] = useState(service.options ? service.options[0].value : 'one-time');
+  const [option, setOption] = useState(options[0].value);
   const [hours, setHours] = useState(3);
   const [error, setError] = useState(null);
 
-  const summary = getPriceSummary(serviceKey, planKey, option, hours);
+  const summary = getPriceSummary(serviceKey, planKey, option, hours, tiers);
 
   const handleCheckout = () => {
     setError(null);
-    const paymentData = buildPaymentData(serviceKey, planKey, option, hours);
+    const paymentData = buildPaymentData(serviceKey, planKey, option, hours, tiers);
     if (!paymentData) {
       setError('Please choose a plan first.');
       return;
@@ -57,7 +62,7 @@ const ServicePlanPanel = ({ serviceKey }) => {
       <div className="d-flex flex-wrap gap-2 mb-3">
         {planKeys.map((key) => (
           <button key={key} type="button" style={planBtn(planKey === key)} onClick={() => setPlanKey(key)}>
-            {service.plans[key].name}
+            {tiers[key].name}
           </button>
         ))}
       </div>
@@ -83,7 +88,7 @@ const ServicePlanPanel = ({ serviceKey }) => {
             value={option}
             onChange={(e) => setOption(e.target.value)}
           >
-            {service.options.map((o) => (
+            {options.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>

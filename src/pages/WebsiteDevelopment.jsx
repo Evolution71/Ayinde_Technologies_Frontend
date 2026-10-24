@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
+import useServiceTiers from '../lib/useServiceTiers';
 import '../styles/website.css';
 import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from 84d7bf77-website-development.php (PHP). Markup and classes are unchanged.
 const WebsiteDevelopment = () => {
   useSiteStyles();
+  // Prices come from the database (service_tiers)
+  const { tiers: web } = useServiceTiers('website');
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -59,7 +63,7 @@ const WebsiteDevelopment = () => {
                   {/* Basic */}
                   <div className="price-card-mini">
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>Basic</h4>
-                    <div className="plan-price-mini">$1,200</div>
+                    <div className="plan-price-mini">{money(web.starter.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />1-5 Pages Responsive</li>
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Standard CMS</li>
@@ -69,7 +73,7 @@ const WebsiteDevelopment = () => {
                   {/* Intermediate */}
                   <div className="price-card-mini">
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>Intermediate</h4>
-                    <div className="plan-price-mini">$3,500</div>
+                    <div className="plan-price-mini">{money(web.professional.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Up to 15 Pages</li>
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Basic E-Commerce</li>
@@ -80,7 +84,7 @@ const WebsiteDevelopment = () => {
                   <div className="price-card-mini highlight">
                     <div className="popular-badge">POPULAR</div>
                     <h4 className="plan-title-mini text-white">Advanced</h4>
-                    <div className="plan-price-mini">$7,800</div>
+                    <div className="plan-price-mini">{money(web.advanced.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
                       <li className="mb-1"><i className="fa-solid fa-check text-warning me-2" />Unlimited Scaling</li>
                       <li className="mb-1"><i className="fa-solid fa-check text-warning me-2" />Full E-Commerce</li>
@@ -136,10 +140,10 @@ const WebsiteDevelopment = () => {
                           <div className="form-floating">
                             <select className="form-select" id="planSelect" required>
                               <option value disabled selected>Select your preferred tier...</option>
-                              <option value="Basic">Basic Web Development ($1,200)</option>
-                              <option value="Intermediate">Intermediate Web Development ($3,500)</option>
-                              <option value="Advanced">Advanced Web Development ($7,800)</option>
-                              <option value="Custom">Custom Enterprise Build (Requires $500 Deposit)</option>
+                              <option value="Basic">{`Basic Web Development (${money(web.starter.basePrice)}/mo)`}</option>
+                              <option value="Intermediate">{`Intermediate Web Development (${money(web.professional.basePrice)}/mo)`}</option>
+                              <option value="Advanced">{`Advanced Web Development (${money(web.advanced.basePrice)}/mo)`}</option>
+                              <option value="Custom">Custom Enterprise Build (custom quote)</option>
                             </select>
                             <label htmlFor="planSelect">Select Service Tier</label>
                           </div>
@@ -164,9 +168,7 @@ const WebsiteDevelopment = () => {
                                 Skip the queue. Processing your upfront payment guarantees immediate engineer assignment and priority support.
                               </div>
                               {/* This span dynamically changes based on select dropdown */}
-                              <div className="badge bg-navy text-white px-3 py-2 rounded-pill" style={{fontSize: 13}}>
-                                <i className="fa-solid fa-credit-card me-2" /> Amount Due: <span id="dynamicPriceDisplay">$0.00</span>
-                              </div>
+                              
                             </div>
                           </label>
                         </div>

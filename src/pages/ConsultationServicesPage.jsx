@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SERVICE_CATALOG } from '../lib/servicePlans';
+import useServiceTiers from '../lib/useServiceTiers';
 
 const ConsultationServicesPage = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ const ConsultationServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const consultationPackages = SERVICE_CATALOG.consultation.tiers;
+  const { tiers: consultationPackages } = useServiceTiers('consultation');
 
   const diagnosticServices = [
     {

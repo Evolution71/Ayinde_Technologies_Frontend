@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
+import useServiceTiers from '../lib/useServiceTiers';
 import '../styles/app.css';
 import { submitInquiry, fieldValue, fieldChecked, successText } from '../lib/inquiry';
 
 // Converted from e8954424-app-development.php (PHP). Markup and classes are unchanged.
 const AppDevelopment = () => {
   useSiteStyles();
+  // Prices come from the database (service_tiers)
+  const { tiers: app } = useServiceTiers('application');
+  const money = (n) => '$' + Math.round(n).toLocaleString('en-US');
   const [status, setStatus] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -59,7 +63,7 @@ const AppDevelopment = () => {
                   {/* MVP / Prototype */}
                   <div className="price-card-mini">
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>MVP / Prototype</h4>
-                    <div className="plan-price-mini">$4,500</div>
+                    <div className="plan-price-mini">{money(app.starter.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Core Feature Build</li>
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Single Platform / Web-App</li>
@@ -69,7 +73,7 @@ const AppDevelopment = () => {
                   {/* Cross-Platform */}
                   <div className="price-card-mini">
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>Cross-Platform</h4>
-                    <div className="plan-price-mini">$12,000</div>
+                    <div className="plan-price-mini">{money(app.professional.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />iOS &amp; Android Ready</li>
                       <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />API Integrations</li>
@@ -80,7 +84,7 @@ const AppDevelopment = () => {
                   <div className="price-card-mini highlight">
                     <div className="popular-badge">PREMIUM</div>
                     <h4 className="plan-title-mini text-white">Advanced Native</h4>
-                    <div className="plan-price-mini">$25,000</div>
+                    <div className="plan-price-mini">{money(app.advanced.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
                       <li className="mb-1"><i className="fa-solid fa-check text-warning me-2" />Swift (iOS) / Kotlin (Android)</li>
                       <li className="mb-1"><i className="fa-solid fa-check text-warning me-2" />Complex UI/UX Animations</li>
@@ -136,10 +140,10 @@ const AppDevelopment = () => {
                           <div className="form-floating">
                             <select className="form-select" id="planSelect" required>
                               <option value disabled selected>Select your preferred development tier...</option>
-                              <option value="MVP">MVP / Prototype ($4,500)</option>
-                              <option value="CrossPlatform">Cross-Platform App ($12,000)</option>
-                              <option value="Native">Advanced Native App ($25,000)</option>
-                              <option value="Enterprise">Custom Enterprise Ecosystem (Requires $1,000 Deposit)</option>
+                              <option value="MVP">{`MVP / Prototype (${money(app.starter.basePrice)}/mo)`}</option>
+                              <option value="CrossPlatform">{`Cross-Platform App (${money(app.professional.basePrice)}/mo)`}</option>
+                              <option value="Native">{`Advanced Native App (${money(app.advanced.basePrice)}/mo)`}</option>
+                              <option value="Enterprise">Custom Enterprise Ecosystem (custom quote)</option>
                             </select>
                             <label htmlFor="planSelect">Select Service Tier</label>
                           </div>
@@ -164,9 +168,7 @@ const AppDevelopment = () => {
                                 Skip the queue. Processing your upfront commitment fee guarantees immediate UI/UX wireframing and priority architectural review. Fully refundable if scope isn't agreed upon.
                               </div>
                               {/* This span dynamically changes based on select dropdown */}
-                              <div className="badge bg-navy text-white px-3 py-2 rounded-pill" style={{fontSize: 13}}>
-                                <i className="fa-solid fa-credit-card me-2" /> Amount Due: <span id="dynamicPriceDisplay">$0.00</span>
-                              </div>
+                              
                             </div>
                           </label>
                         </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SERVICE_CATALOG, PAYMENT_OPTIONS, optionLabel, priceFor } from '../lib/servicePlans';
+import useServiceTiers from '../lib/useServiceTiers';
+import { PAYMENT_OPTIONS, optionLabel, priceFor } from '../lib/servicePlans';
 
 const PremiumServicesPage = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const PremiumServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const tiers = SERVICE_CATALOG.premium.tiers;
+  const { tiers } = useServiceTiers('premium');
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -52,7 +53,7 @@ const PremiumServicesPage = () => {
 
   const calculatePrice = (tier) => {
     if (!tier) return 0;
-    const p = priceFor('premium', 'supreme', paymentOption);
+    const p = priceFor('premium', 'supreme', paymentOption, undefined, tiers);
     const discount = (p.total * discountPercent) / 100;
     return { price: p.total - discount, discount, period: p.period, basePrice: p.total };
   };
@@ -193,7 +194,7 @@ const PremiumServicesPage = () => {
                 }}
               >
                 {PAYMENT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{optionLabel('premium', 'supreme', o.value)}</option>
+                  <option key={o.value} value={o.value}>{optionLabel('premium', 'supreme', o.value, tiers)}</option>
                 ))}
               </select>
             </div>
@@ -345,7 +346,7 @@ const PremiumServicesPage = () => {
                 }}
               >
                 {PAYMENT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{optionLabel('premium', 'supreme', o.value)}</option>
+                  <option key={o.value} value={o.value}>{optionLabel('premium', 'supreme', o.value, tiers)}</option>
                 ))}
               </select>
             </div>
