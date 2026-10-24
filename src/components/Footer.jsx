@@ -33,16 +33,8 @@ const Footer = () => {
       <div className="ayn-footer__inner">
         <div className="ayn-footer__grid">
           <div className="ayn-footer__col ayn-footer__brand">
-            <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies Corporation, home">
-              <span className="ayn-mark" aria-hidden="true">
-                <span className="ayn-mark__left" />
-                <span className="ayn-mark__right" />
-                <span className="ayn-mark__dot" />
-              </span>
-              <span className="ayn-brand__text">
-                <span className="ayn-brand__name">AYINDE</span>
-                <span className="ayn-brand__sub">Technologies Corporation</span>
-              </span>
+            <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies, home">
+              <img src="/ayinde-logo-light.png" alt="Ayinde Technologies" className="ayn-brand__logo" width="220" height="58" />
             </Link>
             <p className="ayn-footer__tagline">Guide, Build &amp; Implement AI Technologies</p>
             <ul className="ayn-footer__offices">
@@ -168,8 +160,8 @@ const Footer = () => {
         .ayn-footer a:hover { color: #2F9BFF; }
         .ayn-footer a:focus-visible { outline: 3px solid #2F9BFF; outline-offset: 3px; border-radius: 4px; }
 
-        .ayn-footer .ayn-brand { display: flex; align-items: center; gap: 12px; color: #ffffff; }
-        .ayn-footer .ayn-brand:hover { color: #ffffff; }
+        .ayn-footer .ayn-brand { display: inline-block; }
+        .ayn-footer .ayn-brand__logo { display: block; height: 58px; width: auto; max-width: 100%; }
         .ayn-mark { position: relative; width: 40px; height: 40px; border-radius: 11px; background: #ffffff; flex: 0 0 auto; overflow: hidden; }
         .ayn-mark__left, .ayn-mark__right { position: absolute; bottom: 9px; width: 4px; height: 20px; border-radius: 2px; background: #2F9BFF; }
         .ayn-mark__left { left: 11px; transform: rotate(-22deg); transform-origin: bottom center; }

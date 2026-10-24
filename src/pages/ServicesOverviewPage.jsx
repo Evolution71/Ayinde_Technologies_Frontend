@@ -11,7 +11,7 @@ const ServicesOverviewPage = () => {
       description: 'Professional website solutions tailored to your business needs',
       icon: '🌐',
       color: '#3b82f6',
-      features: ['Custom Design', 'SEO Optimization', 'Mobile Responsive', 'E-Commerce Ready'],
+      features: ['Mobile responsive, SEO-ready design', 'Up to 5 pages, scaling to unlimited', 'E-commerce and AI chatbot options', 'Monthly updates included'],
       price: 'From $297/month',
       cta: 'View Website Services',
       path: '/services/website'
@@ -22,7 +22,7 @@ const ServicesOverviewPage = () => {
       description: 'Native iOS & Android apps plus web applications',
       icon: '📱',
       color: '#06b6d4',
-      features: ['iOS Development', 'Android Development', 'Web Apps', 'API Integration'],
+      features: ['Native iOS & Android', 'Firebase backend & user authentication', 'Real-time data, chat and in-app payments', 'Cross-platform and AI/ML integration'],
       price: 'From $897/month',
       cta: 'View App Services',
       path: '/services/applications'
@@ -33,8 +33,8 @@ const ServicesOverviewPage = () => {
       description: 'Expert consulting for strategic business decisions',
       icon: '💡',
       color: '#f59e0b',
-      features: ['Business Audit', 'Tech Strategy', 'Digital Transformation', 'Growth Planning'],
-      price: 'From $100/hour',
+      features: ['Business audit', 'Technology strategy', 'Digital transformation', 'Growth strategy'],
+      price: 'From $50/hour',
       cta: 'Book Consultation',
       path: '/services/consultation'
     },
@@ -44,7 +44,7 @@ const ServicesOverviewPage = () => {
       description: 'Complete all-in-one enterprise solutions',
       icon: '👑',
       color: '#10b981',
-      features: ['Website + App', 'Enterprise Support', 'Advanced AI', 'Custom Integrations'],
+      features: ['Website + app in one package', '24/7 enterprise support', 'Advanced AI and chatbot', 'Dedicated account manager'],
       price: '$2,394/month',
       cta: 'View Premium Package',
       path: '/services/premium'
@@ -269,7 +269,7 @@ const ServicesOverviewPage = () => {
               borderLeft: '4px solid #f59e0b'
             }}>
               <h4 style={{ margin: '0 0 10px 0', color: '#f59e0b', fontWeight: 'bold' }}>Consultation Services</h4>
-              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>$100 - $300</p>
+              <p style={{ margin: 0, color: '#1f2937', fontSize: '18px', fontWeight: 'bold' }}>$50 - $300</p>
               <p style={{ margin: '5px 0 0 0', color: '#666', fontSize: '12px' }}>per hour</p>
             </div>
             <div style={{

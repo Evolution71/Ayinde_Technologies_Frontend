@@ -24,6 +24,7 @@ import CRMPage from './pages/Admin/Crmpage';
 
 // Service Pages
 import ServicesOverviewPage from './pages/ServicesOverviewPage';
+import WhyAyinde from './components/WhyAyinde';
 import WebsiteServicesPage from './pages/WebsiteServicesPage';
 import ApplicationServicesPage from './pages/ApplicationServicesPage';
 import ConsultationServicesPage from './pages/ConsultationServicesPage';
@@ -49,6 +50,14 @@ import SiteExactus from './pages/Exactus';
 import SiteInventro from './pages/Inventro';
 import SiteStartProject from './pages/StartProject';
 import AllPages from './pages/AllPages';
+
+// Service pages end with the "why Ayinde" section before the global footer.
+const withWhy = (page) => (
+  <>
+    {page}
+    <WhyAyinde />
+  </>
+);
 
 const App = () => {
   useEffect(() => {
@@ -80,12 +89,12 @@ const App = () => {
             <Route path="/checkout/:courseId" element={<CheckoutPage />} />
 
             {/* Services Routes - 12-Page Structure */}
-            <Route path="/services" element={<ServicesOverviewPage />} />
+            <Route path="/services" element={withWhy(<ServicesOverviewPage />)} />
             <Route path="/services/flyers" element={<ServiceFlyers />} />
-            <Route path="/services/website" element={<WebsiteServicesPage />} />
-            <Route path="/services/applications" element={<ApplicationServicesPage />} />
-            <Route path="/services/consultation" element={<ConsultationServicesPage />} />
-            <Route path="/services/premium" element={<PremiumServicesPage />} />
+            <Route path="/services/website" element={withWhy(<WebsiteServicesPage />)} />
+            <Route path="/services/applications" element={withWhy(<ApplicationServicesPage />)} />
+            <Route path="/services/consultation" element={withWhy(<ConsultationServicesPage />)} />
+            <Route path="/services/premium" element={withWhy(<PremiumServicesPage />)} />
             <Route path="/services/checkout" element={<ServiceCheckoutPage />} />
 
             {/* Achievements/Quotes Page */}

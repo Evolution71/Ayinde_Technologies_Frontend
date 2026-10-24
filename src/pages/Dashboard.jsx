@@ -5,7 +5,7 @@ import { api } from '../api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [expiredCourses, setExpiredCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,13 +13,15 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'expired'
 
   useEffect(() => {
+    // Wait for the stored session to load before treating the visitor as logged out.
+    if (authLoading) return;
     if (!user) {
       navigate('/login');
       return;
     }
 
     fetchDashboardData();
-  }, [user, navigate]);
+  }, [authLoading, user, navigate]);
 
   const fetchDashboardData = async () => {
     try {
@@ -69,7 +71,6 @@ const Dashboard = () => {
       setEnrolledCourses(active);
       setExpiredCourses(expired);
 
-      console.log('[Dashboard] Active:', active.length, 'Expired:', expired.length, 'Total Tracked:', active.length + expired.length);
     } catch (err) {
       console.error('[Dashboard] Error:', err);
       setError(err.message || 'Failed to load dashboard data');

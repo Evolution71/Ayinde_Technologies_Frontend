@@ -111,7 +111,7 @@ const SaveCardForm = ({ courseId, onSaved, onCancel }) => {
 const CourseDetailPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -126,6 +126,8 @@ const CourseDetailPage = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        // Wait for the stored session to load before treating the visitor as logged out.
+        if (authLoading) return;
         if (!user) {
           navigate('/login');
           return;
@@ -157,7 +159,7 @@ const CourseDetailPage = () => {
     };
 
     init();
-  }, [courseId, user, navigate]);
+  }, [courseId, authLoading, user, navigate]);
 
 
   // Called by SaveCardForm after the card is saved

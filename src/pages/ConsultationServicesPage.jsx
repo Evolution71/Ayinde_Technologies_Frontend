@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SERVICE_CATALOG } from '../lib/servicePlans';
 
 const ConsultationServicesPage = () => {
   const navigate = useNavigate();
@@ -17,58 +18,7 @@ const ConsultationServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const consultationPackages = {
-    starter: {
-      name: 'Starter Consultation',
-      hourlyRate: 50,
-      minHours: 1,
-      description: 'Perfect for initial discovery & quick advice',
-      color: '#10b981',
-      icon: '🚀',
-      includes: [
-        '1-hour focused consultation',
-        'Initial discovery & assessment',
-        'Quick expert advice',
-        'Basic recommendations',
-        'Q&A session',
-        'Email follow-up'
-      ]
-    },
-    standard: {
-      name: 'Standard Consultation',
-      hourlyRate: 100,
-      minHours: 3,
-      description: 'Ideal for small projects & quick advice',
-      color: '#3b82f6',
-      icon: '💡',
-      includes: [
-        'One-on-one consultation',
-        'Strategy & advice',
-        'Up to 3 hours per session',
-        'Email support',
-        'Solutions & recommendations',
-        'Project roadmap (basic)'
-      ]
-    },
-    enterprise: {
-      name: 'Enterprise Consultation',
-      hourlyRate: 300,
-      minHours: 10,
-      description: 'For comprehensive projects & in-depth analysis',
-      color: '#f59e0b',
-      icon: '👔',
-      includes: [
-        'Dedicated consultant',
-        'Deep-dive strategy sessions',
-        'Minimum 10 hours',
-        'Priority email & phone support',
-        'Detailed recommendations report',
-        'Implementation roadmap',
-        'Weekly check-ins',
-        'Custom solutions design'
-      ]
-    }
-  };
+  const consultationPackages = SERVICE_CATALOG.consultation.tiers;
 
   const diagnosticServices = [
     {
@@ -105,7 +55,6 @@ const ConsultationServicesPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('Consultation Inquiry:', formData);
       setFormSubmitted(true);
       setFormData({
         name: '',
@@ -141,6 +90,7 @@ const ConsultationServicesPage = () => {
         serviceType: 'consultation',
         tier: selectedPackage,
         tierName: pkg.name,
+        hours,
         originalPrice: Math.round(totalAmount * 100), // in cents
         finalPrice: Math.round(totalAmount * 100), // in cents
         discountAmount: 0, // no discount for consultations
@@ -148,7 +98,7 @@ const ConsultationServicesPage = () => {
         currency: 'USD',
         period: `${hours} hour${hours > 1 ? 's' : ''}`,
         paymentOption: 'one-time',
-        features: pkg.includes
+        features: pkg.features
       };
 
       localStorage.setItem('pendingPayment', JSON.stringify(paymentData));
@@ -198,7 +148,7 @@ const ConsultationServicesPage = () => {
       <div style={{ marginBottom: '20px' }}>
         <h4 style={{ marginBottom: '12px', fontSize: '14px', fontWeight: 'bold' }}>What's Included:</h4>
         <ul style={{ margin: 0, paddingLeft: '20px', color: '#666', fontSize: '13px', lineHeight: '1.8' }}>
-          {pkg.includes.map((item, i) => (
+          {pkg.features.map((item, i) => (
             <li key={i}>{item}</li>
           ))}
         </ul>
@@ -351,7 +301,7 @@ const ConsultationServicesPage = () => {
 
           <h3 style={{ marginBottom: '15px', fontSize: '16px', fontWeight: 'bold' }}>What's Included:</h3>
           <div style={{ marginBottom: '30px' }}>
-            {pkg.includes.map((item, i) => (
+            {pkg.features.map((item, i) => (
               <div key={i} style={{
                 display: 'flex',
                 alignItems: 'flex-start',

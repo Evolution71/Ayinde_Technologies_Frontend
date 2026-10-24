@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SERVICE_CATALOG, PAYMENT_OPTIONS, optionLabel, priceFor } from '../lib/servicePlans';
 
 const PremiumServicesPage = () => {
   const navigate = useNavigate();
@@ -18,41 +19,7 @@ const PremiumServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const tiers = {
-    supreme: {
-      name: 'Supreme VIP Platinum',
-      basePrice: 2394,
-      period: '/month',
-      annualPrice: 50000,
-      annualPeriod: '/2 years',
-      threeyearPrice: 50000,
-      threeyearPeriod: '/3 years (one-time)',
-      description: 'Ultimate All-In-One Enterprise Solution',
-      color: '#f59e0b',
-      icon: '👑',
-      features: [
-        'Minimum 10 Hours Expert Consultation',
-        'Open Web/App Concept Research & Design from Beginning to End',
-        'Latest Website Creation & Development',
-        'Latest Application Creation & Development',
-        'Web/App Analytics, Growth and Monitoring',
-        'Latest Advanced AI Functions',
-        'Latest Advanced Chatbot AI Functions',
-        'Search Engine Optimization (SEO)',
-        'AI Engine Optimization',
-        'Google Reviews Management',
-        'Apple Store & Google Play Store Compatibility',
-        'Application Deployment & Monetization',
-        'Website & Application Management & Regular Updates',
-        '24/7 Rapid Bug Repairs',
-        '24/7 Constant Support, Diagnostics & Updates',
-        'Priority Feature Development',
-        'Quarterly Strategy Reviews',
-        'Custom Integration Services',
-        'Dedicated Account Manager'
-      ]
-    }
-  };
+  const tiers = SERVICE_CATALOG.premium.tiers;
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -66,7 +33,6 @@ const PremiumServicesPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('Premium Service Inquiry:', formData);
       setFormSubmitted(true);
       setFormData({
         name: '',
@@ -86,28 +52,9 @@ const PremiumServicesPage = () => {
 
   const calculatePrice = (tier) => {
     if (!tier) return 0;
-
-    let basePrice = 0;
-    let period = 'monthly';
-
-    if (paymentOption === 'monthly') {
-      basePrice = tier.basePrice;
-      period = 'monthly';
-    } else if (paymentOption === 'annual' && tier.annualPrice) {
-      basePrice = tier.annualPrice;
-      period = '2 years';
-    } else if (paymentOption === 'threeyear' && tier.threeyearPrice) {
-      basePrice = tier.threeyearPrice;
-      period = '3 years';
-    } else if (paymentOption === 'halfdown' && tier.basePrice) {
-      basePrice = (tier.basePrice * 6) / 2;
-      period = '50% down + 6 months';
-    }
-
-    const discount = (basePrice * discountPercent) / 100;
-    const finalPrice = basePrice - discount;
-
-    return { price: finalPrice, discount, period, basePrice };
+    const p = priceFor('premium', 'supreme', paymentOption);
+    const discount = (p.total * discountPercent) / 100;
+    return { price: p.total - discount, discount, period: p.period, basePrice: p.total };
   };
 
   const handleCheckout = async (tierKey) => {
@@ -245,10 +192,9 @@ const PremiumServicesPage = () => {
                   fontSize: '14px'
                 }}
               >
-                <option value="monthly">Monthly - ${tiers.supreme.basePrice}/month</option>
-                <option value="annual">Annual - ${tiers.supreme.annualPrice}/2 years</option>
-                <option value="threeyear">One-Time 3 Years - ${tiers.supreme.threeyearPrice}</option>
-                <option value="halfdown">50% Down + 6 Months (${Math.round(tiers.supreme.basePrice * 6 / 2)}/month)</option>
+                {PAYMENT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{optionLabel('premium', 'supreme', o.value)}</option>
+                ))}
               </select>
             </div>
 
@@ -398,10 +344,9 @@ const PremiumServicesPage = () => {
                   fontWeight: '500'
                 }}
               >
-                <option value="monthly">Monthly - $2,394/month</option>
-                <option value="annual">Annual Plan - $50,000 for 2 years (saves $7,528)</option>
-                <option value="threeyear">One-Time Payment - $50,000 for 3 years (saves $22,232)</option>
-                <option value="halfdown">50% Down - $7,182 down + $1,197/month for 6 months</option>
+                {PAYMENT_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{optionLabel('premium', 'supreme', o.value)}</option>
+                ))}
               </select>
             </div>
 

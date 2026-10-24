@@ -117,6 +117,7 @@ function ServiceCheckoutForm({ paymentData, user }) {
         amount: finalPrice,
         currency: paymentData.currency,
         paymentOption: paymentData.paymentOption,
+        hours: paymentData.hours,
         discountPercent: paymentData.discountPercent,
         period: paymentData.period,
         fullName: billingInfo.fullName,
@@ -305,7 +306,7 @@ function ServiceCheckoutForm({ paymentData, user }) {
 export default function ServiceCheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   // Read once on mount so the object stays stable across renders
   const [paymentData] = useState(
@@ -313,12 +314,15 @@ export default function ServiceCheckoutPage() {
   );
 
   useEffect(() => {
+    // Wait for AuthContext to restore the stored session before deciding
+    // the visitor is logged out; otherwise a refresh bounces them to /login.
+    if (authLoading) return;
     if (!paymentData) {
       navigate('/services');
     } else if (!user) {
       navigate('/login');
     }
-  }, [paymentData, user, navigate]);
+  }, [authLoading, paymentData, user, navigate]);
 
   if (!paymentData) {
     return (

@@ -68,16 +68,8 @@ const Navigation = () => {
   return (
     <header className={`ayn-nav${scrolled ? ' is-scrolled' : ''}`}>
       <div className="ayn-nav__inner">
-        <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies Corporation, home">
-          <span className="ayn-mark" aria-hidden="true">
-            <span className="ayn-mark__left" />
-            <span className="ayn-mark__right" />
-            <span className="ayn-mark__dot" />
-          </span>
-          <span className="ayn-brand__text">
-            <span className="ayn-brand__name">AYINDE</span>
-            <span className="ayn-brand__sub">Technologies Corporation</span>
-          </span>
+        <Link to="/" className="ayn-brand" aria-label="Ayinde Technologies, home">
+          <img src="/ayinde-logo.png" alt="Ayinde Technologies" className="ayn-brand__logo" width="200" height="52" />
         </Link>
 
         <button
@@ -177,62 +169,18 @@ const Navigation = () => {
           gap: 16px;
         }
 
-        /* Brand */
+        /* Brand: the official logo from the Ayinde flier */
         .ayn-brand {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          gap: 12px;
           text-decoration: none;
-          color: #0A2248;
           min-width: 0;
         }
-        .ayn-mark {
-          position: relative;
-          width: 40px;
-          height: 40px;
-          border-radius: 11px;
-          background: #0A2248;
-          flex: 0 0 auto;
-          overflow: hidden;
-        }
-        .ayn-mark__left,
-        .ayn-mark__right {
-          position: absolute;
-          bottom: 9px;
-          width: 4px;
-          height: 20px;
-          border-radius: 2px;
-          background: #2F9BFF;
-        }
-        .ayn-mark__left { left: 11px; transform: rotate(-22deg); transform-origin: bottom center; }
-        .ayn-mark__right { right: 11px; transform: rotate(22deg); transform-origin: bottom center; background: #FF7A1A; }
-        .ayn-mark__dot {
-          position: absolute;
-          top: 8px;
-          left: 50%;
-          width: 5px;
-          height: 5px;
-          margin-left: -2.5px;
-          border-radius: 50%;
-          background: #FF7A1A;
-        }
-        .ayn-brand__text { display: block; min-width: 0; }
-        .ayn-brand__name {
+        .ayn-brand__logo {
           display: block;
-          font-weight: 800;
-          font-size: 18px;
-          letter-spacing: 0.1em;
-          line-height: 1;
-        }
-        .ayn-brand__sub {
-          display: block;
-          margin-top: 5px;
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: #2F9BFF;
-          white-space: nowrap;
+          height: 52px;
+          width: auto;
+          max-width: 100%;
         }
 
         /* Desktop menu */
@@ -451,8 +399,7 @@ const Navigation = () => {
         }
 
         @media (max-width: 380px) {
-          .ayn-brand__name { font-size: 16px; }
-          .ayn-brand__sub { font-size: 10px; letter-spacing: 0.1em; }
+          .ayn-brand__logo { height: 44px; }
         }
       `}</style>
     </header>

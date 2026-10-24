@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SERVICE_CATALOG } from '../lib/servicePlans';
 
 const WebsiteServicesPage = () => {
   const navigate = useNavigate();
@@ -18,88 +19,7 @@ const WebsiteServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const tiers = {
-    starter: {
-      name: 'Website Starter',
-      basePrice: 297,
-      period: '/month',
-      description: 'Perfect for Small Businesses',
-      color: '#3b82f6',
-      icon: '🚀',
-      features: [
-        'Professional Website Design & Development',
-        'Up to 5 Pages',
-        'Mobile Responsive Design',
-        'Basic SEO Setup',
-        'Contact Form Integration',
-        'Social Media Links',
-        'Monthly Updates (8 hours)',
-        'Email Support',
-        'SSL Certificate'
-      ]
-    },
-    professional: {
-      name: 'Website Professional',
-      basePrice: 497,
-      period: '/month',
-      description: 'For Growing Businesses',
-      color: '#8b5cf6',
-      icon: '⭐',
-      features: [
-        'All Starter Features',
-        'Up to 10 Pages',
-        'Advanced SEO Optimization',
-        'Google Analytics Integration',
-        'E-Commerce Ready (Up to 50 products)',
-        'Email Marketing Integration',
-        'Blog Setup',
-        'Weekly Updates (16 hours)',
-        'Phone & Email Support',
-        'Performance Monitoring'
-      ]
-    },
-    advanced: {
-      name: 'Website Advanced',
-      basePrice: 697,
-      period: '/month',
-      description: 'For Established Businesses',
-      color: '#f59e0b',
-      icon: '💎',
-      features: [
-        'All Professional Features',
-        'Unlimited Pages',
-        'AI-Powered Chatbot',
-        'Advanced E-Commerce (Unlimited products)',
-        'Custom Integrations',
-        'CRM Integration',
-        'API Development',
-        'Bi-weekly Updates (24 hours)',
-        '24/7 Priority Support',
-        'Advanced Analytics & Reporting'
-      ]
-    },
-    premium: {
-      name: 'Website Premium',
-      basePrice: 897,
-      period: '/month',
-      description: 'Enterprise-Grade Solutions',
-      color: '#10b981',
-      icon: '👑',
-      features: [
-        'All Advanced Features',
-        'Dedicated Account Manager',
-        'Custom AI Solutions',
-        'Enterprise E-Commerce Setup',
-        'Advanced Security Features',
-        'White Label Options',
-        'Weekly Updates (32 hours)',
-        'Custom Development',
-        '24/7 Dedicated Support',
-        'Quarterly Strategy Reviews',
-        'Priority Feature Development'
-      ]
-    }
-  };
+  const tiers = SERVICE_CATALOG.website.tiers;
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -113,7 +33,6 @@ const WebsiteServicesPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('Website Service Inquiry:', formData);
       setFormSubmitted(true);
       setFormData({
         name: '',
@@ -166,6 +85,7 @@ const WebsiteServicesPage = () => {
 
       const paymentData = {
         service: 'website',
+        serviceType: 'website',
         tier: tierKey,
         tierName: tier.name,
         amount: Math.round(priceInfo.price * 100),

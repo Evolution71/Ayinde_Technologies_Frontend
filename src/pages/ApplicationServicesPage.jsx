@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SERVICE_CATALOG } from '../lib/servicePlans';
 
 const ApplicationServicesPage = () => {
   const navigate = useNavigate();
@@ -18,95 +19,7 @@ const ApplicationServicesPage = () => {
   });
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const tiers = {
-    starter: {
-      name: 'App Development Starter',
-      basePrice: 897,
-      period: '/month',
-      description: 'Launch Your First App',
-      color: '#06b6d4',
-      icon: '📱',
-      features: [
-        'Native iOS App Development',
-        'Native Android App Development',
-        'Firebase Backend Setup',
-        'Basic Push Notifications',
-        'User Authentication',
-        'Basic Database Design',
-        'App Store Submission Support',
-        'Monthly Updates (16 hours)',
-        'Email Support',
-        'Performance Monitoring'
-      ]
-    },
-    professional: {
-      name: 'App Development Professional',
-      basePrice: 1097,
-      period: '/month',
-      description: 'For Growing Apps',
-      color: '#8b5cf6',
-      icon: '⭐',
-      features: [
-        'All Starter Features',
-        'Advanced Database Architecture',
-        'Real-time Data Synchronization',
-        'In-app Payments Integration',
-        'Push Notifications (Advanced)',
-        'Social Media Integration',
-        'Analytics Dashboard',
-        'API Development',
-        'Weekly Updates (24 hours)',
-        '24/7 Priority Support',
-        'Version Control & Deployment'
-      ]
-    },
-    advanced: {
-      name: 'App Development Advanced',
-      basePrice: 1297,
-      period: '/month',
-      description: 'Enterprise-Level Features',
-      color: '#f59e0b',
-      icon: '💎',
-      features: [
-        'All Professional Features',
-        'Cross-Platform Development (iOS & Android)',
-        'Advanced Security Features',
-        'AI/ML Integration',
-        'Real-time Chat Integration',
-        'Video Streaming Integration',
-        'Advanced Payment Processing',
-        'Custom API Development',
-        'Bi-weekly Updates (32 hours)',
-        'Dedicated Development Team',
-        '24/7 Dedicated Support',
-        'Performance Optimization'
-      ]
-    },
-    premium: {
-      name: 'App Development Premium',
-      basePrice: 1497,
-      period: '/month',
-      description: 'Complete Enterprise Solution',
-      color: '#10b981',
-      icon: '👑',
-      features: [
-        'All Advanced Features',
-        'Dedicated Account Manager',
-        'Custom App Architecture',
-        'Cloud Infrastructure Setup',
-        'Advanced AI/ML Features',
-        'Enterprise Security',
-        'Multi-platform Support (Web + Mobile)',
-        'Custom Integrations',
-        'Weekly Updates (40+ hours)',
-        'Dedicated Development Team',
-        '24/7 Priority Support',
-        'Quarterly Strategy Reviews',
-        'White Label Options',
-        'Priority Feature Development'
-      ]
-    }
-  };
+  const tiers = SERVICE_CATALOG.application.tiers;
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -120,7 +33,6 @@ const ApplicationServicesPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('App Development Inquiry:', formData);
       setFormSubmitted(true);
       setFormData({
         name: '',
@@ -172,7 +84,8 @@ const ApplicationServicesPage = () => {
       const priceInfo = calculatePrice(tier);
 
       const paymentData = {
-        service: 'application',
+        service: 'applications',
+        serviceType: 'applications',
         tier: tierKey,
         tierName: tier.name,
         amount: Math.round(priceInfo.price * 100),
