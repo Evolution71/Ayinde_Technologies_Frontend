@@ -6,10 +6,12 @@ import React from 'react';
  * - Overlay with gradient for text readability
  * - Works across all pages
  */
-const VideoBackground = ({ 
-  children, 
+const VideoBackground = ({
+  children,
   overlayOpacity = 0.35,
-  minHeight = '500px'
+  minHeight = '500px',
+  gradientColor1 = 'rgba(30, 64, 175, ',
+  gradientColor2 = 'rgba(59, 130, 246, '
 }) => {
   return (
     <div
@@ -52,8 +54,9 @@ const VideoBackground = ({
           left: 0,
           width: '100%',
           height: '100%',
-          background: `linear-gradient(135deg, rgba(30, 64, 175, ${overlayOpacity}) 0%, rgba(59, 130, 246, ${overlayOpacity}) 100%)`,
+          background: `linear-gradient(135deg, ${gradientColor1}${overlayOpacity}) 0%, ${gradientColor2}${overlayOpacity}) 100%)`,
           zIndex: 1,
+          backdropFilter: 'blur(0px)',
         }}
       />
 
@@ -79,6 +82,11 @@ const VideoBackground = ({
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-30px) rotate(5deg); }
+        }
+
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
         }
 
         @keyframes slideInDown {

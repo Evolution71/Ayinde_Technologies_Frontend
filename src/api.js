@@ -1,5 +1,5 @@
 /**
- * API Client for Ayinde Technologies Corporation
+ * API Client for Ayinde Technologies
  * Updated with new Service endpoints for 12-page website structure
  *
  * Usage:
@@ -13,26 +13,15 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 // ========== TOKEN MANAGEMENT ==========
 
-// Must match the key AuthContext uses ('ayinde_token').
-const TOKEN_KEY = 'ayinde_token';
-
 const setToken = (token) => {
-  try {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token);
-    } else {
-      localStorage.removeItem(TOKEN_KEY);
-    }
-  } catch (e) { /* storage blocked */ }
-};
-
-const getToken = () => {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch (e) {
-    return null;
+  if (token) {
+    localStorage.setItem('token', token);
+  } else {
+    localStorage.removeItem('token');
   }
 };
+
+const getToken = () => localStorage.getItem('token');
 
 // ========== HELPER FUNCTIONS ==========
 
@@ -42,25 +31,10 @@ const authHeaders = () => {
   return { 'Authorization': `Bearer ${token}` };
 };
 
-// Fired when the backend rejects our token (expired or invalid).
-// AuthContext listens for this and logs the user out of the UI too.
-export const AUTH_EXPIRED_EVENT = 'ayinde:auth-expired';
-
 const parseOrThrow = async (res) => {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    if (res.status === 401 && getToken()) {
-      setToken(null);
-      try { localStorage.removeItem('user'); } catch (e) { /* storage blocked */ }
-      try { window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT)); } catch (e) { /* no window */ }
-    }
-    const err = new Error(
-      res.status === 401
-        ? 'Your session has expired. Please log in again.'
-        : (errorData.detail || `HTTP ${res.status}`)
-    );
-    err.status = res.status;
-    throw err;
+    throw new Error(errorData.detail || `HTTP ${res.status}`);
   }
   return res.json();
 };
@@ -71,52 +45,26 @@ export const api = {
 
   // ========== AUTH ENDPOINTS ==========
 
-  async login(email, password, captchaToken, captchaAnswer) {
+  async login(email, password) {
     const res = await fetch(`${API_URL}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, captcha_token: captchaToken, captcha_answer: captchaAnswer })
+      body: JSON.stringify({ email, password })
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
     return data;
   },
 
-  async register(first_name, last_name, email, password, captchaToken, captchaAnswer, termsAccepted) {
+  async register(first_name, last_name, email, password) {
     const res = await fetch(`${API_URL}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        first_name,
-        last_name,
-        email,
-        password,
-        terms_accepted: !!termsAccepted,
-        captcha_token: captchaToken,
-        captcha_answer: captchaAnswer,
-      })
+      body: JSON.stringify({ first_name, last_name, email, password })
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
     return data;
-  },
-
-  async forgotPassword(email, captchaToken, captchaAnswer) {
-    const res = await fetch(`${API_URL}/api/auth/forgot-password/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, captcha_token: captchaToken, captcha_answer: captchaAnswer })
-    });
-    return parseOrThrow(res);
-  },
-
-  async resetPassword(token, password) {
-    const res = await fetch(`${API_URL}/api/auth/reset-password/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, password })
-    });
-    return parseOrThrow(res);
   },
 
   async logout() {
@@ -189,13 +137,6 @@ export const api = {
 
   // ========== COURSE ENDPOINTS ==========
 
-  async getYoutubeCourses() {
-    const res = await fetch(`${API_URL}/api/courses/youtube/`, {
-      headers: { 'Content-Type': 'application/json' }
-    });
-    return parseOrThrow(res);
-  },
-
   async getCourses() {
     const res = await fetch(`${API_URL}/api/courses/`, {
       headers: { 'Content-Type': 'application/json' }
@@ -232,27 +173,14 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // Step 1 of saving a card: get a Stripe SetupIntent client_secret for this course.
-  async createSetupIntent(courseId) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/setup-intent/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeaders()
-      }
-    });
-    return parseOrThrow(res);
-  },
-
-  // Step 2: after Stripe confirms the SetupIntent, save its card for the course.
-  async savePaymentMethod(courseId, setupIntentId) {
+  async savePaymentMethod(courseId, nonce) {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/save-payment-method/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
-      body: JSON.stringify({ setup_intent_id: setupIntentId })
+      body: JSON.stringify({ nonce })
     });
     return parseOrThrow(res);
   },
@@ -355,7 +283,7 @@ export const api = {
    *   hours: number (for consultation only),
    *   promo_code: string (optional),
    *   amount: number,
-   *   payment_method_nonce: string (Stripe PaymentMethod id, pm_...)
+   *   payment_method_nonce: string (from Square)
    * }
    * @returns {object} Checkout response with session ID and confirmation details
    */
@@ -423,35 +351,20 @@ export const api = {
    * @param {object} orderData - {
    *   tier, tierName, amount, currency, paymentOption, discountPercent, period,
    *   fullName, email, phone, company, postalCode, country,
-   *   sourceId (Stripe PaymentMethod id, pm_...)
+   *   sourceId (Square payment token)
    * }
    * @returns {object} { success, order_id, message, order }
    */
   async createServicePurchase(orderData) {
-    // Stop waiting after 60 seconds so the customer is never left on a spinner forever
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 60000);
-    try {
-      const res = await fetch(`${API_URL}/api/services/purchase/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...authHeaders()
-        },
-        body: JSON.stringify(orderData),
-        signal: controller.signal,
-      });
-      return await parseOrThrow(res);
-    } catch (err) {
-      if (err.name === 'AbortError') {
-        throw new Error(
-          'The payment is taking longer than expected. Please check your dashboard before trying again, so you are not charged twice.'
-        );
-      }
-      throw err;
-    } finally {
-      clearTimeout(timer);
-    }
+    const res = await fetch(`${API_URL}/api/services/purchase/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      },
+      body: JSON.stringify(orderData)
+    });
+    return parseOrThrow(res);
   },
 
   // ========== ACHIEVEMENT & TEAM ENDPOINTS ==========
@@ -663,7 +576,7 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // Wrapper method for payment initialization (Stripe)
+  // ✅ NEW: Wrapper method for Square payment initialization
   async initiatePayment(courseId, amount, currency = 'USD') {
     try {
       const response = await this.createPaymentIntent(courseId, amount);
@@ -685,6 +598,9 @@ export const api = {
       } else if (response.id) {
         paymentData.payment_id = response.id;
       }
+      if (response.square_token) {
+        paymentData.client_token = response.square_token;
+      }
 
       return paymentData;
     } catch (err) {
@@ -693,14 +609,14 @@ export const api = {
     }
   },
 
-  async verifyPayment(paymentId, paymentMethodId) {
+  async verifyPayment(paymentId, nonce) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
-      body: JSON.stringify({ payment_id: paymentId, payment_method_id: paymentMethodId })
+      body: JSON.stringify({ payment_id: paymentId, nonce })
     });
     return parseOrThrow(res);
   },
@@ -723,7 +639,7 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ========== BOOKINGS (publicS) ==========
+  // ========== BOOKINGS (public) ==========
 
   async getAvailability(isoDate) {
     const res = await fetch(`${API_URL}/api/bookings/availability?date=${encodeURIComponent(isoDate)}`);

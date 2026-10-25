@@ -51,7 +51,7 @@ export default function FormPage() {
   if (done) {
     return (
       <section className="crm-page crm-narrow">
-        <h1>Thank you very much</h1>
+        <h1>Thank you</h1>
         <p>{done.message}</p>
       </section>
     );

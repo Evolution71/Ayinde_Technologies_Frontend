@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import aboutIllustration from '../assets/about-illustration.svg';
+import VideoBackground from '../components/VideoBackground';
 
 export default function About() {
   return (
@@ -394,16 +395,40 @@ export default function About() {
         }
       `}</style>
 
-      <section className="page-header">
-        <div className="container">
-          <p className="page-eyebrow">About Ayinde Technologies Corporation</p>
-          <h1>We guide, build, and stay hands-on until it's actually running.</h1>
-          <p className="page-header-sub">
+      <VideoBackground minHeight="550px">
+        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 5 }}>
+          <p className="video-bg-subtitle" style={{
+            color: '#fbbf24',
+            fontWeight: '600',
+            fontSize: '14px',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            marginBottom: '20px',
+            animation: 'slideInDown 0.8s ease-out'
+          }}>
+            About Ayinde Technologies
+          </p>
+          <h1 className="video-bg-title" style={{
+            fontSize: 'clamp(32px, 5vw, 48px)',
+            lineHeight: '1.2',
+            margin: '20px 0',
+            animation: 'slideInDown 0.8s ease-out 0.1s both'
+          }}>
+            We guide, build, and stay hands-on until it's actually running.
+          </h1>
+          <p className="video-bg-subtitle" style={{
+            fontSize: 'clamp(16px, 2vw, 18px)',
+            opacity: 0.95,
+            maxWidth: '600px',
+            margin: '20px auto',
+            lineHeight: '1.6',
+            animation: 'slideInUp 0.8s ease-out 0.2s both'
+          }}>
             A technology partner for businesses that want more than a delivered product —
             a plan that made sense before anything was built, and support after launch.
           </p>
         </div>
-      </section>
+      </VideoBackground>
 
       <section className="about-story">
         <div className="container about-story-grid">
@@ -411,7 +436,7 @@ export default function About() {
             <p className="section-eyebrow">Our story</p>
             <h2>Built around one idea: technology should follow a plan, not replace one.</h2>
             <p>
-              Ayinde Technologies Corporation started from a simple observation: most businesses don't fail
+              Ayinde Technologies started from a simple observation: most businesses don't fail
               at technology because the code is bad they fail because the app, website, or AI
               feature they paid for was never the right thing to build in the first place.
             </p>
@@ -471,15 +496,16 @@ export default function About() {
               We're a US-based team working with clients locally and internationally, with hours
               that overlap US Eastern and Pacific time zones.
             </p>
-            <p><strong>Ayinde Technologies Corporation</strong></p>
             <address>
               📍 <strong>East Coast Headquarters</strong><br/>
-              254 Chapman Rd, Ste. 208<br/>Newark, Delaware 19702<br/>United States
+              Delaware, USA
             </address>
             <address>
-              📍 <strong>Westcoast Office</strong><br/>
-              112 S Market St, Ste. 1008<br/>Inglewood, California 90301<br/>United States
+              📍 <strong>Westcoast Division</strong><br/>
+              California, USA
             </address>
+            <p><a href="tel:+13022084855">📞 1-302-208-4855</a></p>
+            <p><a href="mailto:support@ayindetechnologies.com">📧 support@ayindetechnologies.com</a></p>
           </div>
           <div className="about-cta-card">
             <h3>Have a project in mind?</h3>
