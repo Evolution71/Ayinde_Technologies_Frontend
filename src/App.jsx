@@ -5,6 +5,7 @@ import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import BackToTopButton from './components/BackToTopButton';
+import './styles/responsive.css';
 
 // Pages
 import Home from './pages/Home';
@@ -18,8 +19,8 @@ import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ServiceFlyers from './components/ServiceFlyers';
 import BookPage from './pages/BookPage';
-import FormPage from './pages/FormPage';
-import CRMPage from './pages/admin/CRMPage';
+import FormPage from './pages/Formpage';
+import CRMPage from './pages/Admin/Crmpage';
 
 // Admin console (client management) - same design as the PHP admin dashboard
 import ConsoleLayout from './console/ConsoleLayout';
@@ -42,6 +43,24 @@ import PremiumServicesPage from './pages/PremiumServicesPage';
 import ServiceCheckoutPage from './pages/ServiceCheckoutPage';
 import AchievementsPage from './pages/AchievementsPage';
 import FamousQuotesPage from './pages/FamousQuotesPage';
+
+// Design pages (PHP design). New paths only; existing routes are unchanged.
+import SiteAbout from './pages/AboutUs';
+import SiteServices from './pages/Services';
+import SiteCourses from './pages/Courses';
+import SiteProducts from './pages/Products';
+import SiteContact from './pages/Contact';
+import SiteTermsAndConditions from './pages/TermsAndConditions';
+import SitePremiumServices from './pages/PremiumServices';
+import SiteWebsiteDevelopment from './pages/WebsiteDevelopment';
+import SiteAppDevelopment from './pages/AppDevelopment';
+import SiteTechConsulting from './pages/TechConsulting';
+import SiteHrWise from './pages/HrWise';
+import SiteVerusPos from './pages/VerusPos';
+import SiteExactus from './pages/Exactus';
+import SiteInventro from './pages/Inventro';
+import SiteStartProject from './pages/StartProject';
+import AllPages from './pages/AllPages';
 
 const ConsoleRoutes = () => (
   <Routes>
@@ -98,6 +117,24 @@ const SiteRoutes = () => (
         <Route path="/forms/:slug" element={<FormPage />} />
         <Route path="/admin/crm" element={<CRMPage />} />
         <Route path="/quotes" element={<FamousQuotesPage />} />
+
+        {/* Design pages (new paths; existing pages above are unchanged) */}
+        <Route path="/about-us" element={<SiteAbout />} />
+        <Route path="/our-services" element={<SiteServices />} />
+        <Route path="/our-courses" element={<SiteCourses />} />
+        <Route path="/products" element={<SiteProducts />} />
+        <Route path="/contact" element={<SiteContact />} />
+        <Route path="/terms-and-conditions" element={<SiteTermsAndConditions />} />
+        <Route path="/premium-services" element={<SitePremiumServices />} />
+        <Route path="/website-development" element={<SiteWebsiteDevelopment />} />
+        <Route path="/app-development" element={<SiteAppDevelopment />} />
+        <Route path="/tech-consulting" element={<SiteTechConsulting />} />
+        <Route path="/hr-wise" element={<SiteHrWise />} />
+        <Route path="/verus-pos" element={<SiteVerusPos />} />
+        <Route path="/exactus" element={<SiteExactus />} />
+        <Route path="/inventro" element={<SiteInventro />} />
+        <Route path="/start-project" element={<SiteStartProject />} />
+        <Route path="/all-pages" element={<AllPages />} />
 
         {/* Catch-all - redirect to home */}
         <Route path="*" element={<Home />} />
