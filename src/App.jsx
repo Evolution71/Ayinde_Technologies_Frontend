@@ -19,7 +19,7 @@ import CourseDetailPage from './pages/CourseDetailPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ServiceFlyers from './components/ServiceFlyers';
 import BookPage from './pages/BookPage';
-import FormPage from './pages/Formpage';
+import FormPage from './pages/FormPage';
 import CRMPage from './pages/Admin/Crmpage';
 
 // Admin console (client management) - same design as the PHP admin dashboard
