@@ -402,15 +402,30 @@ export const api = {
    * @returns {object} { success, order_id, message, order }
    */
   async createServicePurchase(orderData) {
-    const res = await fetch(`${API_URL}/api/services/purchase/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeaders()
-      },
-      body: JSON.stringify(orderData)
-    });
-    return parseOrThrow(res);
+    // Stop waiting after 60 seconds so the customer is never left on a spinner forever
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60000);
+    try {
+      const res = await fetch(`${API_URL}/api/services/purchase/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders()
+        },
+        body: JSON.stringify(orderData),
+        signal: controller.signal,
+      });
+      return await parseOrThrow(res);
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        throw new Error(
+          'The payment is taking longer than expected. Please check your dashboard before trying again, so you are not charged twice.'
+        );
+      }
+      throw err;
+    } finally {
+      clearTimeout(timer);
+    }
   },
 
   // ========== ACHIEVEMENT & TEAM ENDPOINTS ==========

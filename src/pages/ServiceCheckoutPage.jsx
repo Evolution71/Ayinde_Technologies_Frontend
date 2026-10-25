@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { stripePromise } from '../lib/stripe';
@@ -50,6 +50,8 @@ function ServiceCheckoutForm({ paymentData, user }) {
   const elements = useElements();
 
   const [processing, setProcessing] = useState(false);
+  // One key per checkout attempt; a retry reuses it so the card is never charged twice
+  const attemptKey = useRef(null);
   const [error, setError] = useState(null);
   const [cardComplete, setCardComplete] = useState(false);
   const [billingInfo, setBillingInfo] = useState({
@@ -87,6 +89,7 @@ function ServiceCheckoutForm({ paymentData, user }) {
     }
 
     setProcessing(true);
+    if (!attemptKey.current) attemptKey.current = crypto.randomUUID();
 
     try {
       // 1. Turn the card into a Stripe PaymentMethod. Card data goes straight to Stripe, not to our server.
@@ -127,6 +130,7 @@ function ServiceCheckoutForm({ paymentData, user }) {
         postalCode: billingInfo.postalCode,
         country: billingInfo.country,
         sourceId: paymentMethod.id,
+        idempotencyKey: attemptKey.current,
       });
 
       if (response.success) {
@@ -148,6 +152,11 @@ function ServiceCheckoutForm({ paymentData, user }) {
       setError(response.message || 'Payment processing failed.');
     } catch (err) {
       console.error('[ServiceCheckout] Error:', err);
+      // Keep the key after a timeout so a retry cannot charge twice. Any other
+      // failure (e.g. a declined card) gets a fresh key for the next attempt.
+      if (!String(err.message).includes('taking longer than expected')) {
+        attemptKey.current = null;
+      }
       setError(err.message || 'Payment failed. Please try again.');
     } finally {
       setProcessing(false);
@@ -275,7 +284,11 @@ function ServiceCheckoutForm({ paymentData, user }) {
           marginBottom: '10px',
         }}
       >
-        {processing ? '🔄 Processing Payment...' : `💳 Pay $${finalPrice.toFixed(2)}`}
+        {processing ? (
+          <span><i className="fa-solid fa-spinner fa-spin me-2" aria-hidden="true" />Processing payment...</span>
+        ) : (
+          `💳 Pay $${finalPrice.toFixed(2)}`
+        )}
       </button>
 
       <button
