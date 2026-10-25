@@ -2,13 +2,46 @@ import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import '../styles/hr-wise.css';
+import { submitInquiry } from '../lib/inquiry';
 
 // Converted from cfcd9be2-hr-wise.php (PHP). Markup and classes are unchanged.
 const HrWise = () => {
   useSiteStyles();
-  const handleFormSubmit = (e) => {
-    // Simulated submit, as in the PHP source. Wire to the backend when ready.
+  // Online subscription is not open yet, so the default tab is the demo request.
+  const [intent, setIntent] = useState('demo');
+  const [demo, setDemo] = useState({
+    first_name: '', last_name: '', email: '', phone: '', company: '', employee_count: '', message: '',
+  });
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [demoStatus, setDemoStatus] = useState({ type: '', text: '' });
+  const [sending, setSending] = useState(false);
+
+  const updateDemo = (e) => setDemo((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const handleDemoSubmit = async (e) => {
     e.preventDefault();
+    setDemoStatus({ type: '', text: '' });
+    if (!termsAccepted) {
+      setDemoStatus({ type: 'error', text: 'Please accept the Privacy Policy and Terms of Service to continue.' });
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await submitInquiry('hr-wise-demo', {
+        ...demo,
+        employee_count: Number(demo.employee_count),
+        message: demo.message || null,
+        phone: demo.phone || null,
+        terms_accepted: true,
+      });
+      setDemoStatus({ type: 'success', text: `Thanks! Your request ${res.tracking_reference} has been received. Our team will contact you shortly.` });
+      setDemo({ first_name: '', last_name: '', email: '', phone: '', company: '', employee_count: '', message: '' });
+      setTermsAccepted(false);
+    } catch (err) {
+      setDemoStatus({ type: 'error', text: err.message || 'Something went wrong. Please try again.' });
+    } finally {
+      setSending(false);
+    }
   };
 
   const GALLERY = [
@@ -117,79 +150,116 @@ const HrWise = () => {
                     <div id="formContentBox">
                       <div className="text-center mb-4">
                         <h2 className="display-font text-navy">Get HR-Wise</h2>
-                        <p className="text-muted small">Choose your subscription plan or request our team to contact you for a customized demo.</p>
+                        <p className="text-muted small">Request a demo and our team will set up the right plan for your business.</p>
                       </div>
-                      <form onSubmit={handleFormSubmit} id="hrForm">
-                        {/* Intent Toggle */}
-                        <div className="intent-toggle-wrapper">
-                          <div className="intent-btn active" id="btnPayNow">
-                            <i className="fa-solid fa-credit-card me-2" /> Subscribe &amp; Pay Now
-                          </div>
-                          <div className="intent-btn" id="btnIndicate">
-                            <i className="fa-solid fa-headset me-2" /> Indicate Interest / Demo
-                          </div>
+
+                      <div className="intent-toggle-wrapper" role="tablist">
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={intent === 'demo'}
+                          className={`intent-btn${intent === 'demo' ? ' active' : ''}`}
+                          onClick={() => setIntent('demo')}
+                        >
+                          <i className="fa-solid fa-headset me-2" /> Indicate Interest / Demo
+                        </button>
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={intent === 'pay'}
+                          className={`intent-btn${intent === 'pay' ? ' active' : ''}`}
+                          onClick={() => setIntent('pay')}
+                        >
+                          <i className="fa-solid fa-credit-card me-2" /> Subscribe &amp; Pay Now
+                        </button>
+                      </div>
+
+                      {intent === 'pay' ? (
+                        <div className="text-center py-4">
+                          <h4 className="display-font text-navy">Online subscriptions are coming soon</h4>
+                          <p className="text-muted">
+                            You will be able to subscribe to HR-Wise online once it is available.
+                            Until then, request a demo and we will set up your plan with you.
+                          </p>
+                          <button type="button" className="btn-primary-custom px-4 py-2" onClick={() => setIntent('demo')}>
+                            Request a demo
+                          </button>
                         </div>
-                        <input type="hidden" id="userIntent" defaultValue="pay" />
-                        <div className="row g-3">
-                          <div className="col-md-6">
-                            <div className="form-floating">
-                              <input type="text" className="form-control" id="fName" required />
-                              <label htmlFor="fName">First Name</label>
+                      ) : (
+                        <form onSubmit={handleDemoSubmit} id="hrForm" className="mt-4">
+                          {demoStatus.text && (
+                            <div className={`alert ${demoStatus.type === 'success' ? 'alert-success' : 'alert-danger'}`} role="status">
+                              {demoStatus.text}
+                            </div>
+                          )}
+                          <div className="row g-3">
+                            <div className="col-md-6">
+                              <div className="form-floating">
+                                <input type="text" className="form-control" id="fName" name="first_name" value={demo.first_name} onChange={updateDemo} required />
+                                <label htmlFor="fName">First Name</label>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="form-floating">
+                                <input type="text" className="form-control" id="lName" name="last_name" value={demo.last_name} onChange={updateDemo} required />
+                                <label htmlFor="lName">Last Name</label>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="form-floating">
+                                <input type="email" className="form-control" id="emailAdd" name="email" value={demo.email} onChange={updateDemo} required />
+                                <label htmlFor="emailAdd">Work Email</label>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="form-floating">
+                                <input type="tel" className="form-control" id="phoneNum" name="phone" value={demo.phone} onChange={updateDemo} />
+                                <label htmlFor="phoneNum">Phone Number (optional)</label>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="form-floating">
+                                <input type="text" className="form-control" id="company" name="company" value={demo.company} onChange={updateDemo} required />
+                                <label htmlFor="company">Company Name</label>
+                              </div>
+                            </div>
+                            <div className="col-md-6">
+                              <div className="form-floating">
+                                <input type="number" min="1" className="form-control" id="employeeCount" name="employee_count" value={demo.employee_count} onChange={updateDemo} required />
+                                <label htmlFor="employeeCount">Number of Current Employees</label>
+                              </div>
+                            </div>
+                            <div className="col-12">
+                              <div className="form-floating">
+                                <textarea className="form-control" id="demoMessage" name="message" value={demo.message} onChange={updateDemo} style={{ height: 110 }} />
+                                <label htmlFor="demoMessage">Anything we should know? (optional)</label>
+                              </div>
+                            </div>
+                            <div className="col-12">
+                              <label className="form-check form-switch d-flex align-items-start gap-2">
+                                <input
+                                  className="form-check-input mt-1"
+                                  type="checkbox"
+                                  role="switch"
+                                  checked={termsAccepted}
+                                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                                />
+                                <span className="small">
+                                  I agree to the <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and{' '}
+                                  <a href="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.
+                                </span>
+                              </label>
+                            </div>
+                            <div className="col-12 mt-3 text-center">
+                              <button type="submit" className="btn-primary-custom w-100 py-3" id="submitActionBtn" disabled={sending} style={{ fontSize: 16 }}>
+                                {sending ? (
+                                  <span><i className="fa-solid fa-spinner fa-spin me-2" aria-hidden="true" />Sending request...</span>
+                                ) : 'Request a Demo'}
+                              </button>
                             </div>
                           </div>
-                          <div className="col-md-6">
-                            <div className="form-floating">
-                              <input type="text" className="form-control" id="lName" required />
-                              <label htmlFor="lName">Last Name</label>
-                            </div>
-                          </div>
-                          <div className="col-md-6">
-                            <div className="form-floating">
-                              <input type="email" className="form-control" id="emailAdd" required />
-                              <label htmlFor="emailAdd">Corporate Email</label>
-                            </div>
-                          </div>
-                          <div className="col-md-6">
-                            <div className="form-floating">
-                              <input type="text" className="form-control" id="company" required />
-                              <label htmlFor="company">Company Name</label>
-                            </div>
-                          </div>
-                          <div className="col-12">
-                            <div className="form-floating">
-                              <select className="form-select" id="planSelect" required>
-                                <option value disabled selected>Select Billing Cycle...</option>
-                                <option value="Monthly">Monthly Billing ($49/mo)</option>
-                                <option value="Quarterly">Quarterly Billing ($139/qtr)</option>
-                                <option value="BiAnnually">Bi-Annual Billing ($269/half-year)</option>
-                                <option value="Annually">Annual Billing ($499/yr - Save 15%)</option>
-                              </select>
-                              <label htmlFor="planSelect">Subscription Plan</label>
-                            </div>
-                          </div>
-                          <div className="col-12">
-                            <div className="form-floating">
-                              <input type="number" className="form-control" id="employeeCount" placeholder={0} required />
-                              <label htmlFor="employeeCount">Number of Current Employees</label>
-                            </div>
-                          </div>
-                          {/* Dynamic Checkout Button Area */}
-                          <div className="col-12 mt-4 text-center">
-                            <div id="priceDisplayBox" className="mb-3 badge bg-navy text-white px-4 py-2 rounded-pill fs-6">
-                              Total Due: <span id="displayAmount">$0.00</span>
-                            </div>
-                            <button type="submit" className="btn-primary-custom w-100 py-3" id="submitActionBtn" style={{fontSize: 16}}>
-                              Proceed to Secure Checkout
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                    {/* Payment Loader */}
-                    <div className="payment-loader" id="paymentLoaderBox">
-                      <div className="spinner-border mb-3" style={{color: 'var(--color-blue)'}} role="status" />
-                      <h4 className="display-font text-navy">Connecting to Secure Gateway...</h4>
-                      <p className="text-muted small">Redirecting to Stripe to process <strong id="loaderAmount" className="text-navy" />.</p>
+                        </form>
+                      )}
                     </div>
                   </div>
                 </div>

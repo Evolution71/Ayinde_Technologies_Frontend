@@ -12,6 +12,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import ContactForm from './pages/ContactForm';
 import Login from './pages/login';
+import ResetPassword from './pages/ResetPassword';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import Courses from './components/Courses';
@@ -82,6 +83,7 @@ const App = () => {
 
             {/* Authentication */}
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Courses */}
             <Route path="/courses" element={<Courses />} />

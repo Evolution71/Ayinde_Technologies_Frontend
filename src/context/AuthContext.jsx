@@ -88,9 +88,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (first_name, last_name, email, password, captchaToken, captchaAnswer) => {
+  const register = async (first_name, last_name, email, password, captchaToken, captchaAnswer, termsAccepted) => {
     try {
-      const response = await api.register(first_name, last_name, email, password, captchaToken, captchaAnswer);
+      const response = await api.register(
+        first_name, last_name, email, password, captchaToken, captchaAnswer, termsAccepted
+      );
       // ✅ FIXED: Store token using 'ayinde_token' key to match api.js
       localStorage.setItem('ayinde_token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));

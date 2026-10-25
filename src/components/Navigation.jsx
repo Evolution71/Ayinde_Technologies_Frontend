@@ -247,6 +247,15 @@ const Navigation = () => {
           box-shadow: 0 18px 40px rgba(10, 34, 72, 0.14);
         }
         .ayn-dropdown.is-open .ayn-dd { display: block; }
+        /* Invisible bridge over the gap so the menu stays open while the mouse moves into it */
+        .ayn-dd::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: -16px;
+          height: 16px;
+        }
         .ayn-dd__item {
           display: block;
           padding: 11px 14px;

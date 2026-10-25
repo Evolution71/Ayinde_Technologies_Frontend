@@ -71,26 +71,52 @@ export const api = {
 
   // ========== AUTH ENDPOINTS ==========
 
-  async login(email, password) {
+  async login(email, password, captchaToken, captchaAnswer) {
     const res = await fetch(`${API_URL}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, captcha_token: captchaToken, captcha_answer: captchaAnswer })
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
     return data;
   },
 
-  async register(first_name, last_name, email, password) {
+  async register(first_name, last_name, email, password, captchaToken, captchaAnswer, termsAccepted) {
     const res = await fetch(`${API_URL}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ first_name, last_name, email, password })
+      body: JSON.stringify({
+        first_name,
+        last_name,
+        email,
+        password,
+        terms_accepted: !!termsAccepted,
+        captcha_token: captchaToken,
+        captcha_answer: captchaAnswer,
+      })
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
     return data;
+  },
+
+  async forgotPassword(email, captchaToken, captchaAnswer) {
+    const res = await fetch(`${API_URL}/api/auth/forgot-password/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, captcha_token: captchaToken, captcha_answer: captchaAnswer })
+    });
+    return parseOrThrow(res);
+  },
+
+  async resetPassword(token, password) {
+    const res = await fetch(`${API_URL}/api/auth/reset-password/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password })
+    });
+    return parseOrThrow(res);
   },
 
   async logout() {
