@@ -37,18 +37,21 @@ const asArray = (data, key) => (Array.isArray(data) ? data : data?.[key] || []);
 
 // Make sure the user is enrolled (trial) before a payment intent can be created
 async function ensureEnrolled(courseId) {
+  let notEnrolled = false;
   try {
-    await api.getEnrollmentStatus(courseId);
+    const status = await api.getEnrollmentStatus(courseId);
+    notEnrolled = status?.status === 'not_enrolled';
   } catch (err) {
     const msg = err.message || '';
-    if (msg.includes('403') || msg.includes('Not enrolled')) {
-      try {
-        await api.enrollInCourse(courseId);
-      } catch (innerErr) {
-        throw new Error(`Trial enrollment failed: ${innerErr.message}`);
-      }
-    }
+    notEnrolled = msg.includes('403') || msg.includes('Not enrolled');
     // Other errors are ignored here, as before; the payment intent call will surface real problems
+  }
+  if (notEnrolled) {
+    try {
+      await api.enrollInCourse(courseId);
+    } catch (innerErr) {
+      throw new Error(`Trial enrollment failed: ${innerErr.message}`);
+    }
   }
 }
 

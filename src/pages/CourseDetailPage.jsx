@@ -277,6 +277,35 @@ const CourseDetailPage = () => {
           </div>
         )}
 
+        {enrollment?.status === 'not_enrolled' && (
+          <div style={{
+            padding: '15px',
+            backgroundColor: '#eff6ff',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            color: '#1e3a8a',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '10px',
+          }}>
+            <strong>You are not enrolled in this course yet.</strong>
+            <button
+              onClick={() => navigate(`/checkout/${courseId}`)}
+              style={{
+                padding: '8px 20px',
+                backgroundColor: '#1e40af',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Start free trial
+            </button>
+          </div>
+        )}
+
         {isExpired && (
           <div style={{
             padding: '15px',

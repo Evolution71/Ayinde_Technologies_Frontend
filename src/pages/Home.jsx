@@ -622,7 +622,7 @@ const Home = () => {
                       {/* Slide 1 */}
                       <div className="custom-quote-slide" style={{ display: "block" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/emad-mostaque.webp" alt="Emad Mustad" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/emad-mostaque.webp" alt="Emad Mustad" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"In a few years, everyone will have their own personal AI — just like we all have smartphones today."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Emad Mustad</div>
@@ -634,7 +634,7 @@ const Home = () => {
                       {/* Slide 2 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/google-ceo.webp" alt="Sundar Pichai" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/google-ceo.webp" alt="Sundar Pichai" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"Artificial intelligence will have a more profound impact on humanity than fire, electricity and the internet."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Sundar Pichai</div>
@@ -646,7 +646,7 @@ const Home = () => {
                       {/* Slide 3 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/john-chambers.webp" alt="John Chambers" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/john-chambers.webp" alt="John Chambers" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"If you don't innovate fast, disrupt your industry, disrupt yourself, you'll be left behind."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>John Chambers</div>
@@ -658,7 +658,7 @@ const Home = () => {
                       {/* Slide 4 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/jensen-huang.webp" alt="Jensen Huang" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/jensen-huang.webp" alt="Jensen Huang" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"You're not going to lose your job to an AI, but you're going to lose your job to someone who uses AI."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Jensen Huang</div>
@@ -670,7 +670,7 @@ const Home = () => {
                       {/* Slide 5 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/bill-gates.jpg" alt="Bill Gates" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/bill-gates.jpg" alt="Bill Gates" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"If Your Business Is Not On The Internet Then Your Business Will Be Out Of Business."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Bill Gates</div>
@@ -682,7 +682,7 @@ const Home = () => {
                       {/* Slide 6 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/jeff-bezos.jpg" alt="Jeff Bezos" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/jeff-bezos.jpg" alt="Jeff Bezos" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"If you don't understand the details of your business, you are going to fail."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Jeff Bezos</div>
@@ -694,7 +694,7 @@ const Home = () => {
                       {/* Slide 7 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/elon-musk.webp" alt="Elon Musk" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/elon-musk.webp" alt="Elon Musk" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"When something is important enough, you do it even if the odds are not in your favor."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Elon Musk</div>
@@ -706,7 +706,7 @@ const Home = () => {
                       {/* Slide 8 */}
                       <div className="custom-quote-slide" style={{ display: "none" }}>
                           <div className="d-flex flex-column flex-md-row align-items-center justify-content-center gap-4 px-4">
-                              <img src="img/tori-burch.webp" alt="Tori Burch" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
+                              <img src="/img/tori-burch.webp" alt="Tori Burch" className="rounded-circle shadow" style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: "0" }} />
                               <div className="text-center text-md-start">
                                   <h3 className="display-font fs-3 mb-3" style={{ color: "var(--color-navy)" }}>"If it doesn't scare you, you're probably not dreaming big enough."</h3>
                                   <div className="fw-bold" style={{ color: "var(--color-navy)" }}>Tori Burch</div>
