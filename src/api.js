@@ -85,6 +85,24 @@ export const api = {
     return data;
   },
 
+  async forgotPassword(email, captchaToken, captchaAnswer) {
+    const res = await fetch(`${API_URL}/api/auth/forgot-password/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, captcha_token: captchaToken, captcha_answer: captchaAnswer })
+    });
+    return parseOrThrow(res);
+  },
+
+  async resetPassword(token, password) {
+    const res = await fetch(`${API_URL}/api/auth/reset-password/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, password })
+    });
+    return parseOrThrow(res);
+  },
+
   async logout() {
     setToken(null);
   },
@@ -154,6 +172,24 @@ export const api = {
   },
 
   // ========== COURSE ENDPOINTS ==========
+
+  async createSetupIntent(courseId) {
+    const res = await fetch(`${API_URL}/api/courses/${courseId}/setup-intent/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeaders()
+      }
+    });
+    return parseOrThrow(res);
+  },
+
+  async getYoutubeCourses() {
+    const res = await fetch(`${API_URL}/api/courses/youtube/`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    return parseOrThrow(res);
+  },
 
   async getCourses() {
     const res = await fetch(`${API_URL}/api/courses/`, {
