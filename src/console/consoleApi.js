@@ -2,7 +2,7 @@
  * API client for the admin console (/console).
  * Talks to the FastAPI routes in routers/console.py.
  *
- * Uses the same JWT the rest of the site uses (localStorage 'token').
+ * Uses the same JWT the rest of the site uses (localStorage 'ayinde_token').
  */
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -18,7 +18,7 @@ export class ConsoleApiError extends Error {
 
 const getToken = () => {
   try {
-    return localStorage.getItem('token');
+    return localStorage.getItem('ayinde_token');
   } catch {
     return null;
   }

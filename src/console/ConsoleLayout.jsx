@@ -50,7 +50,7 @@ const NAV = [
 
 const getToken = () => {
   try {
-    return localStorage.getItem('token');
+    return localStorage.getItem('ayinde_token');
   } catch {
     return null;
   }
@@ -126,7 +126,7 @@ export default function ConsoleLayout() {
 
   const logout = () => {
     try {
-      localStorage.removeItem('token');
+      localStorage.removeItem('ayinde_token');
     } catch {
       /* ignore */
     }

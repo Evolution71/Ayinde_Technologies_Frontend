@@ -13,15 +13,18 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 // ========== TOKEN MANAGEMENT ==========
 
+// Must match the key AuthContext uses ('ayinde_token').
+const TOKEN_KEY = 'ayinde_token';
+
 const setToken = (token) => {
   if (token) {
-    localStorage.setItem('token', token);
+    localStorage.setItem(TOKEN_KEY, token);
   } else {
-    localStorage.removeItem('token');
+    localStorage.removeItem(TOKEN_KEY);
   }
 };
 
-const getToken = () => localStorage.getItem('token');
+const getToken = () => localStorage.getItem(TOKEN_KEY);
 
 // ========== HELPER FUNCTIONS ==========
 
@@ -31,10 +34,25 @@ const authHeaders = () => {
   return { 'Authorization': `Bearer ${token}` };
 };
 
+// Fired when the backend rejects our token (expired or invalid).
+// AuthContext listens for this and logs the user out of the UI too.
+export const AUTH_EXPIRED_EVENT = 'ayinde:auth-expired';
+
 const parseOrThrow = async (res) => {
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
-    throw new Error(errorData.detail || `HTTP ${res.status}`);
+    if (res.status === 401 && getToken()) {
+      setToken(null);
+      try { localStorage.removeItem('user'); } catch (e) { /* storage blocked */ }
+      try { window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT)); } catch (e) { /* no window */ }
+    }
+    const err = new Error(
+      res.status === 401
+        ? 'Your session has expired. Please log in again.'
+        : (errorData.detail || `HTTP ${res.status}`)
+    );
+    err.status = res.status;
+    throw err;
   }
   return res.json();
 };
