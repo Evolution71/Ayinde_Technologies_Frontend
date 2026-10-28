@@ -74,11 +74,19 @@ export const api = {
     return data;
   },
 
-  async register(first_name, last_name, email, password) {
+  async register(first_name, last_name, email, password, captchaToken, captchaAnswer, termsAccepted) {
     const res = await fetch(`${API_URL}/api/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ first_name, last_name, email, password })
+      body: JSON.stringify({
+        first_name,
+        last_name,
+        email,
+        password,
+        terms_accepted: !!termsAccepted,
+        captcha_token: captchaToken,
+        captcha_answer: captchaAnswer,
+      })
     });
     const data = await parseOrThrow(res);
     setToken(data.access_token);
