@@ -110,7 +110,11 @@ const About = () => {
                 {/* CEO / Founder (Featured Large Column) */}
                 <div className="col-lg-5">
                   <div className="team-card-featured text-center mx-auto">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&h=300&q=80" alt="Albert A.D. Cabrera" className="rounded-circle shadow-sm mx-auto mb-4" style={{width: 180, height: 180, objectFit: 'cover', border: '5px solid var(--color-light)'}} />
+                    <svg role="img" aria-label="Albert A.D. Cabrera avatar" viewBox="0 0 180 180" width="180" height="180" className="rounded-circle shadow-sm mx-auto mb-4 d-block" style={{maxWidth: '100%', height: 'auto', border: '5px solid var(--color-light)', borderRadius: '50%', overflow: 'hidden', background: '#0A2248'}}>
+                      <rect width="180" height="180" fill="#0A2248" />
+                      <circle cx="90" cy="70" r="34" fill="#2F9BFF" />
+                      <path d="M30 170c6-36 30-56 60-56s54 20 60 56" fill="#2F9BFF" />
+                    </svg>
                     <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>Albert A.D. Cabrera</h3>
                     <p className="text-secondary fw-bold small mb-4" style={{letterSpacing: 1, color: 'var(--color-orange) !important'}}>CEO &amp; FOUNDER</p>
                     <p className="text-muted mb-4" style={{fontStyle: 'italic', lineHeight: '1.7', fontSize: 15}}>"Technology should follow a business plan, not replace one. Our mission is to elevate enterprises through smart, scalable, and secure automation."</p>
