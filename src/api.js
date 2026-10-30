@@ -5,7 +5,7 @@
  * Usage:
  *   import { api } from '../api'
  *   await api.getServiceTiers(serviceType)
- *   await api.createServiceCheckout(serviceData)
+ *   await api.createServicePurchase(orderData)
  *   await api.applyPromoCode(code)
  */
 
@@ -235,18 +235,6 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  async savePaymentMethod(courseId, nonce) {
-    const res = await fetch(`${API_URL}/api/courses/${courseId}/save-payment-method/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeaders()
-      },
-      body: JSON.stringify({ nonce })
-    });
-    return parseOrThrow(res);
-  },
-
   async cancelSubscription(courseId) {
     const res = await fetch(`${API_URL}/api/courses/${courseId}/cancel/`, {
       method: 'POST',
@@ -337,43 +325,6 @@ export const api = {
   },
 
   /**
-   * Create service checkout (initiate purchase)
-   * @param {object} checkoutData - {
-   *   service_type: 'website' | 'applications' | 'consultation' | 'premium',
-   *   tier: 'starter' | 'professional' | 'advanced' | 'premium',
-   *   payment_option: 'monthly' | 'quarterly' | 'annual' | 'fifty_percent_down',
-   *   hours: number (for consultation only),
-   *   promo_code: string (optional),
-   *   amount: number,
-   *   payment_method_nonce: string (from Square)
-   * }
-   * @returns {object} Checkout response with session ID and confirmation details
-   */
-  async createServiceCheckout(checkoutData) {
-    const res = await fetch(`${API_URL}/api/services/checkout/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeaders()
-      },
-      body: JSON.stringify(checkoutData)
-    });
-    return parseOrThrow(res);
-  },
-
-  /**
-   * Get checkout status
-   * @param {string} checkoutId - ID from createServiceCheckout response
-   * @returns {object} Checkout status and details
-   */
-  async getCheckoutStatus(checkoutId) {
-    const res = await fetch(`${API_URL}/api/services/checkout/${checkoutId}/`, {
-      headers: authHeaders()
-    });
-    return parseOrThrow(res);
-  },
-
-  /**
    * Cancel a service subscription
    * @param {string} subscriptionId - Service subscription ID
    * @returns {object} Cancellation confirmation
@@ -409,11 +360,12 @@ export const api = {
   },
 
   /**
-   * Create service purchase order (direct service order endpoint)
+   * Buy a service package. The backend re-prices the order and charges the card through Stripe.
    * @param {object} orderData - {
-   *   tier, tierName, amount, currency, paymentOption, discountPercent, period,
+   *   serviceType, tier, tierName, amount, currency, paymentOption, hours, discountPercent, period,
    *   fullName, email, phone, company, postalCode, country,
-   *   sourceId (Square payment token)
+   *   sourceId (Stripe PaymentMethod id, starts with pm_),
+   *   idempotencyKey (one per checkout attempt)
    * }
    * @returns {object} { success, order_id, message, order }
    */
@@ -638,47 +590,19 @@ export const api = {
     return parseOrThrow(res);
   },
 
-  // ✅ NEW: Wrapper method for Square payment initialization
-  async initiatePayment(courseId, amount, currency = 'USD') {
-    try {
-      const response = await this.createPaymentIntent(courseId, amount);
-
-      // Handle different response formats from backend
-      let paymentData = {
-        client_token: null,
-        payment_id: null,
-        amount: amount,
-        currency: currency,
-        course_id: courseId
-      };
-
-      if (response.client_token) {
-        paymentData.client_token = response.client_token;
-      }
-      if (response.payment_id) {
-        paymentData.payment_id = response.payment_id;
-      } else if (response.id) {
-        paymentData.payment_id = response.id;
-      }
-      if (response.square_token) {
-        paymentData.client_token = response.square_token;
-      }
-
-      return paymentData;
-    } catch (err) {
-      console.error('[API] Payment initiation error:', err);
-      throw err;
-    }
-  },
-
-  async verifyPayment(paymentId, nonce) {
+  /**
+   * Charge a course payment with a Stripe PaymentMethod created by Stripe.js
+   * @param {string} paymentId - Payment ID from createPaymentIntent
+   * @param {string} paymentMethodId - Stripe PaymentMethod id (pm_...)
+   */
+  async verifyPayment(paymentId, paymentMethodId) {
     const res = await fetch(`${API_URL}/api/payments/verify/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...authHeaders()
       },
-      body: JSON.stringify({ payment_id: paymentId, nonce })
+      body: JSON.stringify({ payment_id: paymentId, payment_method_id: paymentMethodId })
     });
     return parseOrThrow(res);
   },

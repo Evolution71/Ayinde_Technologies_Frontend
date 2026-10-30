@@ -333,7 +333,8 @@ export default function ServiceCheckoutPage() {
     if (!paymentData) {
       navigate('/services');
     } else if (!user) {
-      navigate('/login');
+      // Come back to checkout after logging in; the package is kept in localStorage
+      navigate('/login', { state: { from: '/services/checkout' } });
     }
   }, [authLoading, paymentData, user, navigate]);
 

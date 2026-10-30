@@ -3,12 +3,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import AuthForms from '../components/AuthForms';
 
 /**
- * Login Page - Renders the AuthForms modals with login/register tabs
+ * Login / Create account page - renders AuthForms with the login and register tabs.
+ * Opens on the "Create account" tab when reached from /register (or when location.state.mode is 'register').
  */
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from;
+  const initialMode = location.state?.mode === 'register' ? 'register' : 'login';
 
   const handleSuccess = () => {
     // Go back to the page that sent them here (e.g. checkout), otherwise home.
@@ -18,6 +20,8 @@ const Login = () => {
   const handleBackClick = () => {
     navigate('/');
   };
+
+  const isRegister = initialMode === 'register';
 
   return (
     <div style={{
@@ -43,15 +47,19 @@ const Login = () => {
           padding: '30px 20px',
           textAlign: 'center'
         }}>
-          <h1 style={{ margin: '0 0 10px 0', fontSize: '28px' }}>Welcome Back</h1>
+          <h1 style={{ margin: '0 0 10px 0', fontSize: '28px' }}>
+            {isRegister ? 'Create your account' : 'Welcome Back'}
+          </h1>
           <p style={{ margin: 0, fontSize: '14px', opacity: 0.9 }}>
-            Log in to your Ayinde Technologies Corporation account
+            {isRegister
+              ? 'Join Ayinde Technologies Corporation to track your projects, courses and service requests'
+              : 'Log in to your Ayinde Technologies Corporation account'}
           </p>
         </div>
 
         {/* Auth Forms */}
         <div style={{ padding: '30px 20px' }}>
-          <AuthForms onSuccess={handleSuccess} />
+          <AuthForms onSuccess={handleSuccess} initialMode={initialMode} />
         </div>
 
         {/* Footer */}

@@ -1,7 +1,7 @@
 {
   "name": "ayinde-technologies",
   "version": "1.0.0",
-  "description": "Professional website for Ayinde Technologies",
+  "description": "Website and client portal for Ayinde Technologies Corporation: digital products (Build), business tools (Automate) and consulting plans (Plan).",
   "private": true,
   "dependencies": {
     "@stripe/react-stripe-js": "^7.0.0",

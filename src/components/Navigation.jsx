@@ -3,6 +3,9 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const SERVICE_LINKS = [
+  { to: '/build', label: 'Build: Digital Products' },
+  { to: '/automate', label: 'Automate: Business Tools' },
+  { to: '/plan', label: 'Plan: Consulting' },
   { to: '/website-development', label: 'Website Development' },
   { to: '/app-development', label: 'App Development' },
   { to: '/tech-consulting', label: 'Tech Consulting' },

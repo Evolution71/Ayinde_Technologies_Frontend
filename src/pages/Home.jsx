@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/site-base.css';
 import '../styles/home-page.css';
+import '../styles/offerings.css';
 import { api } from '../api';
 import Captcha from '../components/Captcha';
 import NewsletterSection from '../components/NewsletterSection';
@@ -195,7 +196,7 @@ const Home = () => {
                                       <span className="badge-custom badge-orange text-white bg-white bg-opacity-10 border border-light mb-4">
                                           <span className="rounded-circle bg-warning d-inline-block me-2" style={{ width: "8px", height: "8px" }}></span> Business Automation • EST 2026
                                       </span>
-                                      <h1 className="hero-title display-font">Technology Partner,<br />Not Just a Vendor</h1>
+                                      <h1 className="hero-title display-font">Build and scale your business<br />more efficiently</h1>
                                       <p className="hero-desc">Ayinde Technologies Corporation helps businesses automate operations with a clear plan before code, and support after launch. East + West Coast coverage.</p>
                                       <div className="d-flex align-items-center gap-3 flex-wrap mt-4">
                                           <Link to="/contact" className="btn-accent">Book Strategy Call ↗</Link>
@@ -269,6 +270,48 @@ const Home = () => {
                   </div>
               </div>
           </section>
+          {/* Where do you want to start? */}
+          <section id="start" className="py-5">
+              <div className="container">
+                  <div className="text-center mb-5">
+                      <span className="badge-custom badge-navy mb-3">Start here</span>
+                      <h2 className="display-font fs-1 mb-3">Where do you want to start?</h2>
+                      <p className="text-secondary mx-auto" style={{ maxWidth: 640 }}>
+                          Choose the goal closest to what you need now. Each page shows the packages, the prices and what is included.
+                      </p>
+                  </div>
+                  <div className="row g-4">
+                      <div className="col-md-4">
+                          <Link to="/build" className="start-card h-100">
+                              <i className="fa-solid fa-laptop-code start-card__icon" aria-hidden="true"></i>
+                              <h3 className="h4 display-font">Build</h3>
+                              <p className="start-card__label">Digital products</p>
+                              <p className="text-secondary mb-0">Business websites that explain what you do, win enquiries and can be updated every month.</p>
+                              <span className="start-card__more">See Build packages <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                          </Link>
+                      </div>
+                      <div className="col-md-4">
+                          <Link to="/automate" className="start-card h-100">
+                              <i className="fa-solid fa-gears start-card__icon" aria-hidden="true"></i>
+                              <h3 className="h4 display-font">Automate</h3>
+                              <p className="start-card__label">Business tools</p>
+                              <p className="text-secondary mb-0">Mobile and web apps that handle bookings, payments and internal approvals so your team stops repeating work.</p>
+                              <span className="start-card__more">See Automate packages <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                          </Link>
+                      </div>
+                      <div className="col-md-4">
+                          <Link to="/plan" className="start-card h-100">
+                              <i className="fa-solid fa-compass-drafting start-card__icon" aria-hidden="true"></i>
+                              <h3 className="h4 display-font">Plan</h3>
+                              <p className="start-card__label">Consulting</p>
+                              <p className="text-secondary mb-0">Expert hours and a written recommendation, so you know what to build, in what order and at what cost.</p>
+                              <span className="start-card__more">See Plan packages <i className="fa-solid fa-arrow-right ms-1"></i></span>
+                          </Link>
+                      </div>
+                  </div>
+              </div>
+          </section>
+
           {/* Marquee */}
           <div className="marquee-wrapper">
               <div className="marquee-content">

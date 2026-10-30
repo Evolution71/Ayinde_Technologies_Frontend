@@ -1,0 +1,3 @@
+DELETE these files from GitHub (they are no longer used):
+src/components/CourseEnrollmentCard.jsx
+src/components/SquarePaymentModal.jsx

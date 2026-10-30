@@ -4,10 +4,16 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import Captcha from './Captcha';
 
+// Same rule the backend enforces (routers/auth.py _check_password)
+const PASSWORD_RULE_MESSAGE = 'Password must be at least 8 characters and include a letter and a number.';
+function passwordMeetsRule(password) {
+  return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
+}
+
 // mode: 'login' | 'register' | 'forgot'
-export default function AuthForms({ onSuccess }) {
+export default function AuthForms({ onSuccess, initialMode = 'login' }) {
   const { login, register } = useAuth();
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(initialMode);
   const [form, setForm] = useState({ first_name: '', last_name: '', email: '', password: '' });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState('');
@@ -26,10 +32,29 @@ export default function AuthForms({ onSuccess }) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+  function handleTermsChange(e) {
+    setTermsAccepted(e.target.checked);
+    // Clear the old "accept the terms" message as soon as the box is ticked
+    if (e.target.checked) setError('');
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setNotice('');
+
+    // Checks that need no network call come first, so the user sees the real problem
+    if (mode === 'register') {
+      if (!termsAccepted) {
+        setError('Please tick the box to accept the Privacy Policy and Terms and Conditions.');
+        return;
+      }
+      if (!passwordMeetsRule(form.password)) {
+        setError(PASSWORD_RULE_MESSAGE);
+        return;
+      }
+    }
+
     setLoading(true);
 
     const captchaToken = captchaRef.current ? captchaRef.current.getToken() : null;
@@ -37,21 +62,26 @@ export default function AuthForms({ onSuccess }) {
 
     try {
       if (mode === 'login') {
-        await login(form.email, form.password, captchaToken, captchaAnswer);
+        await login(form.email.trim(), form.password, captchaToken, captchaAnswer);
         if (onSuccess) onSuccess();
       } else if (mode === 'register') {
-        if (!termsAccepted) {
-          throw new Error('Please accept the Privacy Policy and Terms and Conditions to continue.');
-        }
-        await register(form.first_name, form.last_name, form.email, form.password, captchaToken, captchaAnswer, termsAccepted);
+        await register(
+          form.first_name.trim(),
+          form.last_name.trim(),
+          form.email.trim(),
+          form.password,
+          captchaToken,
+          captchaAnswer,
+          termsAccepted
+        );
         if (onSuccess) onSuccess();
       } else {
-        const res = await api.forgotPassword(form.email, captchaToken, captchaAnswer);
+        const res = await api.forgotPassword(form.email.trim(), captchaToken, captchaAnswer);
         setNotice(res.message);
         if (captchaRef.current) captchaRef.current.refresh();
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong.');
+      setError(err.message || 'Something went wrong. Please try again.');
       if (captchaRef.current) captchaRef.current.refresh();
     } finally {
       setLoading(false);
@@ -144,10 +174,9 @@ export default function AuthForms({ onSuccess }) {
             <input
               className="form-check-input"
               type="checkbox"
-              role="switch"
               id="accept-terms"
               checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
+              onChange={handleTermsChange}
               style={{ marginTop: 4, flexShrink: 0 }}
             />
             <span>
