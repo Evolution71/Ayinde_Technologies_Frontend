@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
+import ServiceDescription from '../components/ServiceDescription';
+import { SERVICE_DOCS } from '../data/serviceDocs';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
 import useServiceTiers from '../lib/useServiceTiers';
@@ -56,9 +58,7 @@ const PremiumServices = () => {
                 <span className="badge-custom bg-white text-navy border border-light shadow-sm mb-3">
                   <i className="fa-solid fa-crown text-warning me-2" /> <span className="text-dark">PREMIUM ENTERPRISE SUITE</span>
                 </span>
-                <h1 className="display-font mb-3" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>
-                  The Ultimate Digital Ecosystem.
-                </h1>
+                <h1 className="display-font mb-3" style={{fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>{SERVICE_DOCS.premium.headline}</h1>
                 <p className="text-white-50 mb-4" style={{fontSize: '1.1rem', maxWidth: 500}}>
                   Get a fully synchronized Mobile App, Web Platform, and Desktop Application built exclusively for your business. Subscribe and save with our long-term partnership plans.
                 </p>
@@ -186,6 +186,7 @@ const PremiumServices = () => {
             </div>
           </div>
         </section>
+        <ServiceDescription doc={SERVICE_DOCS.premium} />
         {/* === Footer === */}
       </div>
       

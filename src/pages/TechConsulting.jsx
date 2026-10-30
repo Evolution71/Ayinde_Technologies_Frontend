@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
+import ServiceDescription from '../components/ServiceDescription';
+import { SERVICE_DOCS } from '../data/serviceDocs';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
 import useServiceTiers from '../lib/useServiceTiers';
@@ -52,9 +54,7 @@ const TechConsulting = () => {
                 <span className="badge-custom badge-navy bg-white border border-light shadow-sm mb-3">
                   <i className="fa-solid fa-network-wired me-2" /> STRATEGY &amp; ADVICE
                 </span>
-                <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2rem, 3.5vw, 3rem)', lineHeight: '1.1'}}>
-                  Plan before you build.
-                </h1>
+                <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2rem, 3.5vw, 3rem)', lineHeight: '1.1'}}>{SERVICE_DOCS.consulting.headline}</h1>
                 <p className="text-muted mb-4" style={{fontSize: '1.05rem', maxWidth: 500}}>
                   Whether you need quick expert advice or an in-depth enterprise implementation roadmap, our consultants are ready to guide your technology decisions.
                 </p>
@@ -208,6 +208,7 @@ const TechConsulting = () => {
             </div>
           </div>
         </section>
+        <ServiceDescription doc={SERVICE_DOCS.consulting} />
         {/* === Footer === */}
       </div>
       

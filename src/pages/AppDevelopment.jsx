@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
+import ServiceDescription from '../components/ServiceDescription';
+import { SERVICE_DOCS } from '../data/serviceDocs';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
 import useServiceTiers from '../lib/useServiceTiers';
@@ -52,9 +54,7 @@ const AppDevelopment = () => {
                 <span className="badge-custom badge-orange bg-white border border-light shadow-sm mb-3">
                   <i className="fa-solid fa-mobile-screen-button me-2" /> APP ENGINEERING
                 </span>
-                <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>
-                  Deploy powerful mobile and desktop applications.
-                </h1>
+                <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>{SERVICE_DOCS.app.headline}</h1>
                 <p className="text-muted mb-4" style={{fontSize: '1.1rem', maxWidth: 500}}>
                   From rapid prototypes to native enterprise ecosystems. Choose your tier, submit your brief, and our engineers will begin mapping your application architecture immediately.
                 </p>
@@ -196,6 +196,7 @@ const AppDevelopment = () => {
             </div>
           </div>
         </section>
+        <ServiceDescription doc={SERVICE_DOCS.app} />
         {/* === Footer === */}
       </div>
       

@@ -62,6 +62,9 @@ import SiteInventro from './pages/Inventro';
 import SiteStartProject from './pages/StartProject';
 import AllPages from './pages/AllPages';
 
+// Offering pages: Build, Automate, Plan
+import { BuildPage, AutomatePage, PlanPage } from './pages/OfferingPage';
+
 const ConsoleRoutes = () => (
   <Routes>
     <Route path="/console" element={<ConsoleLayout />}>
@@ -92,8 +95,15 @@ const SiteRoutes = () => (
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
 
+        {/* Offerings */}
+        <Route path="/build" element={<BuildPage />} />
+        <Route path="/automate" element={<AutomatePage />} />
+        <Route path="/plan" element={<PlanPage />} />
+
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Navigate to="/login" replace state={{ mode: 'register' }} />} />
+        <Route path="/signup" element={<Navigate to="/login" replace state={{ mode: 'register' }} />} />
 
         {/* Courses */}
         <Route path="/courses" element={<Courses />} />
@@ -154,7 +164,7 @@ const Shell = () => {
 const App = () => {
   useEffect(() => {
     // Set page title
-    document.title = 'Ayinde Technologies - Premium Tech Solutions';
+    document.title = 'Ayinde Technologies Corporation - Websites, Apps, Consulting and Enterprise Solutions';
   }, []);
 
   return (

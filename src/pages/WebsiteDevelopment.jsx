@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
+import ServiceDescription from '../components/ServiceDescription';
+import { SERVICE_DOCS } from '../data/serviceDocs';
 import '../styles/site-base.css';
 import ServicePlanPanel from '../components/ServicePlanPanel';
 import useServiceTiers from '../lib/useServiceTiers';
@@ -52,9 +54,7 @@ const WebsiteDevelopment = () => {
                 <span className="badge-custom badge-blue bg-white border border-light shadow-sm mb-3">
                   <i className="fa-solid fa-code me-2" /> WEB ENGINEERING
                 </span>
-                <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>
-                  Build highly scalable web ecosystems.
-                </h1>
+                <h1 className="display-font mb-3" style={{color: 'var(--color-navy)', fontSize: 'clamp(2.5rem, 4vw, 3.5rem)', lineHeight: '1.1'}}>{SERVICE_DOCS.website.headline}</h1>
                 <p className="text-muted mb-4" style={{fontSize: '1.1rem', maxWidth: 500}}>
                   Select a tier that fits your roadmap. Once submitted, our engineers will review your request and initialize project onboarding immediately.
                 </p>
@@ -196,6 +196,7 @@ const WebsiteDevelopment = () => {
             </div>
           </div>
         </section>
+        <ServiceDescription doc={SERVICE_DOCS.website} />
         {/* === Footer === */}
       </div>
       
