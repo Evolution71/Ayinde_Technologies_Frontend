@@ -1,5 +1,7 @@
 /* Build / Automate / Plan offering pages */
 
+/* Defined globally so the service description cards and CTA can use them too */
+:root,
 .offering-page {
   --offer-navy: #0A2248;
   --offer-blue: #2F9BFF;
@@ -166,7 +168,11 @@
   text-align: center;
 }
 .offer-cta h2 { color: #fff; }
+.offer-cta p { color: #e2e8f0; }
 .offer-cta .offer-hero__actions { justify-content: center; }
+.offer-cta .btn { color: #fff; }
+.offer-cta .btn-outline-light { border-color: #fff; }
+.offer-cta .btn-outline-light:hover { color: var(--offer-navy); background: #fff; }
 
 @media (max-width: 575.98px) {
   .offer-hero { padding: 3rem 0 2.5rem; }
@@ -251,7 +257,8 @@
 }
 .svc-dropdown__label {
   display: block;
-  color: var(--offer-orange, #FF7A1A);
+  /* Darker orange than the brand orange so the small label passes contrast on white */
+  color: #B45309;
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.06em;
