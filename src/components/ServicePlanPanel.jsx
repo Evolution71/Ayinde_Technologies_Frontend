@@ -1,7 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SERVICE_PLANS, PAYMENT_OPTIONS, getPriceSummary, buildPaymentData, startServiceCheckout } from '../lib/servicePlans';
+import { SERVICE_PLANS, PAYMENT_OPTIONS, getPriceSummary, buildPaymentData, startServiceCheckout, priceForTier } from '../lib/servicePlans';
 import useServiceTiers from '../lib/useServiceTiers';
+
+// Website and app packages are sold as subscriptions: visitors choose Monthly or Annual.
+// The backend (service_pricing.py) uses the same two options for these services.
+const SUBSCRIPTION_OPTIONS = [
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'annual', label: 'Annual' },
+];
+const SUBSCRIPTION_SERVICES = ['website', 'application'];
+
+// Whole dollars show without cents; anything with cents shows two decimals.
+const money = (n) => {
+  const value = Number(n);
+  const cents = Math.abs(value % 1) > 0.001;
+  return '$' + value.toLocaleString('en-US', {
+    minimumFractionDigits: cents ? 2 : 0,
+    maximumFractionDigits: 2,
+  });
+};
 
 // Plan picker shown above the inquiry form on the design service pages.
 // The inquiry form stays as it is; this panel adds a direct "pay now" path
@@ -9,12 +27,13 @@ import useServiceTiers from '../lib/useServiceTiers';
 const ServicePlanPanel = ({ serviceKey }) => {
   const navigate = useNavigate();
   const service = SERVICE_PLANS[serviceKey] || SERVICE_PLANS.website;
-  // Billing options are the same for every package; fall back to them if missing
-  const options = service.options || PAYMENT_OPTIONS;
+  const isConsultation = serviceKey === 'consultation';
+  const isSubscription = SUBSCRIPTION_SERVICES.includes(serviceKey);
+  // Billing options: Monthly/Annual for website and app packages, the full list otherwise
+  const options = isSubscription ? SUBSCRIPTION_OPTIONS : service.options || PAYMENT_OPTIONS;
   // Prices come from the database (service_tiers) through this hook
   const { tiers } = useServiceTiers(serviceKey);
   const planKeys = Object.keys(tiers);
-  const isConsultation = serviceKey === 'consultation';
 
   const [planKey, setPlanKey] = useState(planKeys[0]);
   const [option, setOption] = useState(options[0].value);
@@ -22,6 +41,14 @@ const ServicePlanPanel = ({ serviceKey }) => {
   const [error, setError] = useState(null);
 
   const summary = getPriceSummary(serviceKey, planKey, option, hours, tiers);
+
+  // Price shown on each plan button for the billing option currently selected
+  const planPrice = (tier) => {
+    if (!tier) return '';
+    if (isConsultation) return `${money(tier.hourlyRate)}/hour`;
+    if (option === 'annual') return `${money(priceForTier(tier, 'annual').total)}/year`;
+    return `${money(tier.basePrice)}/month`;
+  };
 
   const handleCheckout = () => {
     setError(null);
@@ -42,6 +69,7 @@ const ServicePlanPanel = ({ serviceKey }) => {
   };
   const planBtn = (active) => ({
     flex: '1 1 140px',
+    minWidth: 0,
     padding: '10px 12px',
     borderRadius: 8,
     border: active ? '2px solid var(--color-blue)' : '1px solid #d1d5db',
@@ -52,6 +80,17 @@ const ServicePlanPanel = ({ serviceKey }) => {
     cursor: 'pointer',
     textAlign: 'left',
   });
+  const toggleBtn = (active) => ({
+    flex: '1 1 0',
+    padding: '8px 12px',
+    border: 'none',
+    borderRadius: 6,
+    background: active ? 'var(--color-navy)' : 'transparent',
+    color: active ? '#fff' : 'var(--color-navy)',
+    fontWeight: 600,
+    fontSize: 14,
+    cursor: 'pointer',
+  });
 
   return (
     <div style={box}>
@@ -59,10 +98,41 @@ const ServicePlanPanel = ({ serviceKey }) => {
         {service.title}
       </h4>
 
+      {isSubscription && (
+        <div className="mb-3">
+          <span className="form-label small fw-bold d-block mb-1" id={`${serviceKey}-billing-label`}>Billing</span>
+          <div
+            role="radiogroup"
+            aria-labelledby={`${serviceKey}-billing-label`}
+            className="d-flex p-1 gap-1"
+            style={{ background: '#eef2f7', borderRadius: 8 }}
+          >
+            {options.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                role="radio"
+                aria-checked={option === o.value}
+                style={toggleBtn(option === o.value)}
+                onClick={() => setOption(o.value)}
+              >
+                {o.label}
+                {o.value === 'annual' && <span style={{ fontWeight: 400, fontSize: 12 }}> (save 10%)</span>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="d-flex flex-wrap gap-2 mb-3">
         {planKeys.map((key) => (
           <button key={key} type="button" style={planBtn(planKey === key)} onClick={() => setPlanKey(key)}>
-            {tiers[key].name}
+            <span style={{ display: 'block' }}>{tiers[key].name}</span>
+            {isSubscription && (
+              <span style={{ display: 'block', fontWeight: 400, fontSize: 13, color: 'var(--color-orange)' }}>
+                {planPrice(tiers[key])}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -80,25 +150,30 @@ const ServicePlanPanel = ({ serviceKey }) => {
           />
         </div>
       ) : (
-        <div className="mb-3">
-          <label className="form-label small fw-bold" htmlFor={`${serviceKey}-option`}>Billing</label>
-          <select
-            id={`${serviceKey}-option`}
-            className="form-select"
-            value={option}
-            onChange={(e) => setOption(e.target.value)}
-          >
-            {options.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        </div>
+        !isSubscription && (
+          <div className="mb-3">
+            <label className="form-label small fw-bold" htmlFor={`${serviceKey}-option`}>Billing</label>
+            <select
+              id={`${serviceKey}-option`}
+              className="form-select"
+              value={option}
+              onChange={(e) => setOption(e.target.value)}
+            >
+              {options.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          </div>
+        )
       )}
 
       {summary && (
         <p className="mb-3 small text-muted">
-          Total: <strong style={{ color: 'var(--color-navy)' }}>${summary.total.toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong>
+          Total: <strong style={{ color: 'var(--color-navy)' }}>{money(summary.total)}</strong>
           {' '}({summary.period})
+          {isSubscription && option === 'annual' && (
+            <> &middot; about {money(summary.total / 12)} per month</>
+          )}
         </p>
       )}
 
