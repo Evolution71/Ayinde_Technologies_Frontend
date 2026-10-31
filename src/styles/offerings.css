@@ -215,3 +215,100 @@
   font-weight: 600;
   color: var(--offer-navy, #0A2248);
 }
+
+/* Service description dropdowns (ServiceDescription.jsx) */
+.svc-dropdown {
+  border: 1px solid var(--offer-line, #dbe4f0);
+  border-radius: 14px;
+  background: #fff;
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+.svc-dropdown__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--offer-navy, #0A2248);
+  border-radius: 14px;
+}
+.svc-dropdown__summary::-webkit-details-marker { display: none; }
+.svc-dropdown__summary:focus-visible {
+  outline: 3px solid var(--offer-blue, #2F9BFF);
+  outline-offset: 2px;
+}
+.svc-dropdown__summary:hover .svc-dropdown__title { color: var(--offer-blue, #2F9BFF); }
+.svc-dropdown__title {
+  display: block;
+  font-size: clamp(1.25rem, 2.4vw, 1.6rem);
+  line-height: 1.25;
+  color: inherit;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.svc-dropdown__label {
+  display: block;
+  color: var(--offer-orange, #FF7A1A);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+.svc-dropdown__icon {
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--offer-ice, #F8FAFF);
+  border: 1px solid var(--offer-line, #dbe4f0);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--offer-navy, #0A2248);
+  transition: transform 0.2s ease;
+}
+.svc-dropdown[open] > .svc-dropdown__summary .svc-dropdown__icon,
+.svc-dropdown--plan[open] > .svc-dropdown__summary .svc-dropdown__icon {
+  transform: rotate(45deg);
+}
+.svc-dropdown__body {
+  padding: 0 1.5rem 1.5rem;
+  color: var(--offer-text, #334155);
+  line-height: 1.65;
+}
+.svc-dropdown__body > .row { margin-left: 0; margin-right: 0; }
+.svc-dropdown__body .offer-card { box-shadow: none; }
+
+/* Plan cards: each plan is a dropdown inside the Plans dropdown */
+.svc-dropdown--plan {
+  border-radius: 14px;
+}
+.svc-dropdown--plan > .svc-dropdown__summary--plan {
+  align-items: flex-start;
+  padding: 1.25rem 1.25rem 1rem;
+}
+.svc-dropdown--plan .svc-dropdown__body {
+  padding: 0 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+}
+.svc-dropdown--plan .offer-tier__list { flex: 0 0 auto; }
+.svc-dropdown--plan .btn { align-self: flex-start; }
+
+@media (max-width: 575.98px) {
+  .svc-dropdown__summary { padding: 0.8rem 1rem; }
+  .svc-dropdown__body { padding: 0 1rem 1.25rem; }
+  .svc-dropdown--plan .svc-dropdown__body { padding: 0 1rem 1.25rem; }
+  .svc-dropdown__icon { width: 2rem; height: 2rem; }
+}
+
+/* Hide the default disclosure marker in older Safari */
+details.svc-dropdown > summary { list-style: none; }
+details.svc-dropdown > summary::marker { content: ''; }
