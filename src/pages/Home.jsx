@@ -939,17 +939,64 @@ const Home = () => {
                   boxShadow: '0 16px 40px rgba(10,34,72,0.08)'
                 }}
               >
-                <div style={{ fontSize: '50px', marginBottom: '15px' }}>{member.image || '👤'}</div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 96,
+                    height: 96,
+                    margin: '0 auto 16px',
+                    borderRadius: '50%',
+                    background: '#0A2248',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 30,
+                    fontWeight: 700,
+                    letterSpacing: 1,
+                  }}
+                >
+                  {(() => {
+                    const parts = (member.name || '').trim().split(/\s+/).filter(Boolean);
+                    if (!parts.length) return '?';
+                    const first = parts[0][0];
+                    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+                    return (first + last).toUpperCase();
+                  })()}
+                </div>
                 <h3 style={{ marginBottom: '5px', fontSize: '18px', fontWeight: 'bold' }}>
                   {member.name}
                 </h3>
-                <p style={{ color: '#0A2248', marginBottom: '10px', fontWeight: '500' }}>
-                  {member.title}
-                </p>
+                {member.title && (
+                  <p style={{ color: '#0A2248', marginBottom: '10px', fontWeight: '500' }}>
+                    {member.title}
+                  </p>
+                )}
                 {member.quote && (
                   <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic', marginTop: '10px' }}>
                     "{member.quote}"
                   </p>
+                )}
+                {member.linkedin_url && (
+                  <a
+                    href={member.linkedin_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${member.name} on LinkedIn`}
+                    style={{
+                      display: 'inline-block',
+                      marginTop: '14px',
+                      padding: '8px 16px',
+                      borderRadius: 999,
+                      border: '1px solid #0A66C2',
+                      color: '#0A66C2',
+                      fontWeight: 600,
+                      fontSize: 14,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    LinkedIn
+                  </a>
                 )}
               </div>
             ))
