@@ -1,12 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import useSiteStyles from '../hooks/useSiteStyles';
 import '../styles/site-base.css';
 import '../styles/about.css';
 import NewsletterSection from '../components/NewsletterSection';
+import { api } from '../api';
+
+// Initials for the avatar circle, e.g. "Festus Ezuma" -> "FE".
+const initialsOf = (name) => {
+  const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '?';
+  const first = parts[0][0];
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+  return (first + last).toUpperCase();
+};
 
 // Converted from 3df4fc5f-about.php (PHP). Markup and classes are unchanged.
 const About = () => {
   useSiteStyles();
+
+  // Leadership and team come from the database (team_members table)
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    api
+      .getTeamMembers()
+      .then((res) => {
+        if (!live) return;
+        const list = Array.isArray(res?.all_members) ? res.all_members : [];
+        // Leadership first; the order within each group comes from the database
+        const sorted = [...list].sort(
+          (a, b) => (a.category === 'leadership' ? 0 : 1) - (b.category === 'leadership' ? 0 : 1)
+        );
+        setMembers(sorted);
+      })
+      .catch(() => {
+        if (live) setError(true);
+      })
+      .finally(() => {
+        if (live) setLoading(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+
   return (
     <>
       <div className="ayinde-site about-page">
@@ -92,9 +132,7 @@ const About = () => {
               </div>
             </div>
           </section>
-          {/* === Add this to your existing 
-        
-        <!-- === Replace your existing Leadership Section with this === */}
+          {/* === Leadership and Team (from the database, initials only, no photos) === */}
           <section className="py-5 mb-5">
             <div className="container">
               {/* Header */}
@@ -105,74 +143,49 @@ const About = () => {
                   <p className="text-muted">Meet the visionary minds steering Ayinde Technologies Corporation into the future of enterprise automation.</p>
                 </div>
               </div>
+
+              {loading && <p className="text-center text-muted">Loading team members...</p>}
+              {!loading && error && <p className="text-center" style={{color: '#d32f2f'}}>We could not load the team right now. Please refresh the page.</p>}
+              {!loading && !error && members.length === 0 && (
+                <p className="text-center text-muted">Team members will appear here once added.</p>
+              )}
+
               {/* Team Grid */}
-              <div className="row g-4 align-items-stretch">
-                {/* CEO / Founder (Featured Large Column) */}
-                <div className="col-lg-5">
-                  <div className="team-card-featured text-center mx-auto">
-                    <svg role="img" aria-label="Albert A.D. Cabrera avatar" viewBox="0 0 180 180" width="180" height="180" className="rounded-circle shadow-sm mx-auto mb-4 d-block" style={{maxWidth: '100%', height: 'auto', border: '5px solid var(--color-light)', borderRadius: '50%', overflow: 'hidden', background: '#0A2248'}}>
-                      <rect width="180" height="180" fill="#0A2248" />
-                      <circle cx="90" cy="70" r="34" fill="#2F9BFF" />
-                      <path d="M30 170c6-36 30-56 60-56s54 20 60 56" fill="#2F9BFF" />
-                    </svg>
-                    <h3 className="display-font mb-1" style={{color: 'var(--color-navy)'}}>Albert A.D. Cabrera</h3>
-                    <p className="text-secondary fw-bold small mb-4" style={{letterSpacing: 1, color: 'var(--color-orange) !important'}}>CEO &amp; FOUNDER</p>
-                    <p className="text-muted mb-4" style={{fontStyle: 'italic', lineHeight: '1.7', fontSize: 15}}>"Technology should follow a business plan, not replace one. Our mission is to elevate enterprises through smart, scalable, and secure automation."</p>
-                    <div className="d-flex justify-content-center gap-3 mt-auto">
-                      <a href="/contact" className="social-link" aria-label="LinkedIn"><i className="fa-brands fa-linkedin-in" /></a>
-                      <a href="mailto:info@ayindetechnologies.com" className="social-link" aria-label="Email"><i className="fa-solid fa-envelope" /></a>
+              <div className="row g-4">
+                {members.map((m) => (
+                  <div className="col-sm-6 col-lg-3" key={m.id}>
+                    <div
+                      className="h-100 text-center bg-white rounded-4 p-4"
+                      style={{boxShadow: '0 16px 40px rgba(10,34,72,0.08)'}}
+                    >
+                      <div
+                        aria-hidden="true"
+                        className="d-flex align-items-center justify-content-center mx-auto mb-3"
+                        style={{width: 96, height: 96, borderRadius: '50%', background: '#0A2248', color: '#fff', fontSize: 30, fontWeight: 700, letterSpacing: 1}}
+                      >
+                        {initialsOf(m.name)}
+                      </div>
+                      <h3 className="display-font h5 mb-1" style={{color: 'var(--color-navy)'}}>{m.name}</h3>
+                      {m.title && (
+                        <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>{m.title}</p>
+                      )}
+                      {m.quote && (
+                        <p className="text-muted small fst-italic mb-2" style={{lineHeight: 1.6}}>"{m.quote}"</p>
+                      )}
+                      {m.linkedin_url && (
+                        <a
+                          href={m.linkedin_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${m.name} on LinkedIn`}
+                          className="btn btn-outline-primary btn-sm mt-2"
+                        >
+                          LinkedIn
+                        </a>
+                      )}
                     </div>
                   </div>
-                </div>
-                {/* Rest of the Leadership Team (2x2 Grid) */}
-                <div className="col-lg-7">
-                  <div className="row g-4 h-100">
-                    {/* CTO */}
-                    <div className="col-md-6">
-                      <div className="team-card-compact flex-column flex-sm-row text-center text-sm-start">
-                        <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=150&h=150&q=80" alt="CTO Profile" className="rounded-circle shadow-sm" style={{width: 90, height: 90, objectFit: 'cover', flexShrink: 0}} />
-                        <div>
-                          <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>Marcus Chen</h5>
-                          <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>CHIEF TECHNOLOGY OFFICER</p>
-                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
-                        </div>
-                      </div>
-                    </div>
-                    {/* CAIO */}
-                    <div className="col-md-6">
-                      <div className="team-card-compact flex-column flex-sm-row text-center text-sm-start">
-                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&h=150&q=80" alt="CAIO Profile" className="rounded-circle shadow-sm" style={{width: 90, height: 90, objectFit: 'cover', flexShrink: 0}} />
-                        <div>
-                          <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>Dr. Sarah Al-Fayed</h5>
-                          <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>CHIEF AI OFFICER (CAIO)</p>
-                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Project Manager */}
-                    <div className="col-md-6">
-                      <div className="team-card-compact flex-column flex-sm-row text-center text-sm-start">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&h=150&q=80" alt="Project Manager Profile" className="rounded-circle shadow-sm" style={{width: 90, height: 90, objectFit: 'cover', flexShrink: 0}} />
-                        <div>
-                          <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>James Wilson</h5>
-                          <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>HEAD PROJECT MANAGER</p>
-                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Human Resources */}
-                    <div className="col-md-6">
-                      <div className="team-card-compact flex-column flex-sm-row text-center text-sm-start">
-                        <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=150&h=150&q=80" alt="HR Profile" className="rounded-circle shadow-sm" style={{width: 90, height: 90, objectFit: 'cover', flexShrink: 0}} />
-                        <div>
-                          <h5 className="display-font mb-1" style={{color: 'var(--color-navy)', fontSize: 18}}>Elena Rodriguez</h5>
-                          <p className="small fw-bold mb-2" style={{color: 'var(--color-blue)', letterSpacing: '0.5px'}}>DIRECTOR OF HR</p>
-                          <a href="/contact" className="text-muted small text-decoration-none hover-primary"><i className="fa-brands fa-linkedin" /> Connect</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </section>
@@ -180,7 +193,7 @@ const About = () => {
           <NewsletterSection />
         </div>
       </div>
-      
+
     </>
   );
 };
