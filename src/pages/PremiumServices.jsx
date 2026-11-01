@@ -79,24 +79,25 @@ const PremiumServices = () => {
                 </div>
                 {/* Pricing Summary */}
                 <div className="premium-pricing-grid">
-                  <div className="savings-card">
-                    <div className="small text-white-50 text-uppercase mb-1">Monthly</div>
-                    <h4 className="fw-bold text-white mb-0">{money(base)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                  {/* Ordered lowest to highest amount: Annually, Quarterly, Monthly, 50% Down */}
+                  <div className="savings-card" style={{borderColor: 'var(--color-orange)'}}>
+                    <div className="savings-badge">SAVE 10%</div>
+                    <div className="small text-white-50 text-uppercase mb-1">Annually</div>
+                    <h4 className="fw-bold text-white mb-0">{money(base * 0.9)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
                   </div>
                   <div className="savings-card" style={{borderColor: 'rgba(255,122,26,0.3)'}}>
                     <div className="savings-badge">SAVE 5%</div>
                     <div className="small text-white-50 text-uppercase mb-1">Quarterly</div>
                     <h4 className="fw-bold text-white mb-0">{money(base * 0.95)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
                   </div>
+                  <div className="savings-card">
+                    <div className="small text-white-50 text-uppercase mb-1">Monthly</div>
+                    <h4 className="fw-bold text-white mb-0">{money(base)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
+                  </div>
                   <div className="savings-card" style={{borderColor: 'rgba(255,122,26,0.5)'}}>
                     <div className="savings-badge">50% DOWN</div>
                     <div className="small text-white-50 text-uppercase mb-1">Then 6 Months</div>
                     <h4 className="fw-bold text-white mb-0">{money(base * 3)}<span className="fs-6 text-white-50 fw-normal"> down</span></h4>
-                  </div>
-                  <div className="savings-card" style={{borderColor: 'var(--color-orange)'}}>
-                    <div className="savings-badge">SAVE 10%</div>
-                    <div className="small text-white-50 text-uppercase mb-1">Annually</div>
-                    <h4 className="fw-bold text-white mb-0">{money(base * 0.9)}<span className="fs-6 text-white-50 fw-normal">/mo</span></h4>
                   </div>
                 </div>
               </div>
