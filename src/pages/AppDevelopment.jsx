@@ -65,9 +65,10 @@ const AppDevelopment = () => {
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>MVP / Prototype</h4>
                     <div className="plan-price-mini">{money(app.starter.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
-                      <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Core Feature Build</li>
-                      <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Single Platform / Web-App</li>
-                      <li><i className="fa-solid fa-check text-info me-2" />4-6 Weeks Delivery</li>
+                      {app.starter.features.map((f) => (
+                        <li key={f} className="mb-1"><i className="fa-solid fa-check text-info me-2" />{f}</li>
+                      ))}
+                      <li><i className="fa-solid fa-check text-info me-2" />Light-speed deployment</li>
                     </ul>
                   </div>
                   {/* Cross-Platform */}
@@ -75,9 +76,10 @@ const AppDevelopment = () => {
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>Cross-Platform</h4>
                     <div className="plan-price-mini">{money(app.professional.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
-                      <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />iOS &amp; Android Ready</li>
-                      <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />API Integrations</li>
-                      <li><i className="fa-solid fa-check text-info me-2" />8-12 Weeks Delivery</li>
+                      {app.professional.features.map((f) => (
+                        <li key={f} className="mb-1"><i className="fa-solid fa-check text-info me-2" />{f}</li>
+                      ))}
+                      <li><i className="fa-solid fa-check text-info me-2" />Light-speed deployment</li>
                     </ul>
                   </div>
                   {/* Native (Highlighted) */}
@@ -86,9 +88,10 @@ const AppDevelopment = () => {
                     <h4 className="plan-title-mini text-white">Advanced Native</h4>
                     <div className="plan-price-mini">{money(app.advanced.basePrice)}<small>/mo</small></div>
                     <ul className="list-unstyled mb-0 small text-muted">
-                      <li className="mb-1"><i className="fa-solid fa-check text-warning me-2" />Swift (iOS) / Kotlin (Android)</li>
-                      <li className="mb-1"><i className="fa-solid fa-check text-warning me-2" />Complex UI/UX Animations</li>
-                      <li><i className="fa-solid fa-check text-warning me-2" />12-16 Weeks Delivery</li>
+                      {app.advanced.features.map((f) => (
+                        <li key={f} className="mb-1"><i className="fa-solid fa-check text-warning me-2" />{f}</li>
+                      ))}
+                      <li><i className="fa-solid fa-check text-warning me-2" />Light-speed deployment</li>
                     </ul>
                   </div>
                   {/* Enterprise */}
@@ -96,9 +99,10 @@ const AppDevelopment = () => {
                     <h4 className="plan-title-mini" style={{color: 'var(--color-navy)'}}>Custom Enterprise</h4>
                     <div className="plan-price-mini" style={{fontSize: '1.4rem', color: 'var(--color-navy)'}}>Let's Talk</div>
                     <ul className="list-unstyled mb-0 small text-muted">
-                      <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />IoT &amp; AI Integration</li>
-                      <li className="mb-1"><i className="fa-solid fa-check text-info me-2" />Admin Dashboard + APIs</li>
-                      <li><i className="fa-solid fa-check text-info me-2" />Timeline TBD</li>
+                      {app.premium.features.map((f) => (
+                        <li key={f} className="mb-1"><i className="fa-solid fa-check text-info me-2" />{f}</li>
+                      ))}
+                      <li><i className="fa-solid fa-check text-info me-2" />Light-speed deployment</li>
                     </ul>
                   </div>
                 </div>
